@@ -6,26 +6,23 @@ Authors: Frankie Wang
 import QuadraticNumberFields.RingOfIntegers.Zsqrtd
 
 /-!
-# `HalfInt` Layer
+# Half-Integer Representatives
 
-This file is for half-integer representatives `(a + b√d) / 2` and their
-structural lemmas.
+This file defines half-integer representatives `(a + b√d) / 2` in quadratic fields
+and provides basic structural lemmas. These are used in the classification of
+rings of integers when `d ≡ 1 (mod 4)`.
 
-## TODO (Revised)
+## Main Definitions
 
-1. Canonical half-integer API (reuse existing `Zsqrtd` definitions)
-- [x] Expose `halfInt` here as a thin wrapper/alias of `Zsqrtd.halfInt`.
-- [x] Add `omegaHalf (d : ℤ) : Qsqrtd (d : ℚ) := halfInt d 1 1`.
-- [x] Add coordinate simp lemmas for `halfInt` and `omegaHalf`.
+* `halfInt d a' b'`: The half-integer `(a' + b'√d) / 2` in `Q(√d)`.
+* `omegaHalf d`: The distinguished generator `(1 + √d) / 2`.
 
-2. Port formulas from old draft
-- [x] Port `trace_halfInt`.
-- [x] Port `norm_halfInt`.
-- [ ] Keep theorem names and statement shape compatible with `Integrality.lean`.
+## Main Theorems
 
-3. Classification-facing lemmas
-- [ ] Add parity normal-form lemmas for half-integer coordinates.
-- [ ] Add lemmas reducing image-membership goals to divisibility-by-2 goals.
+* `halfInt_re`, `halfInt_im`: Coordinate simp lemmas.
+* `omegaHalf_re`, `omegaHalf_im`: Coordinates of `omegaHalf`.
+* `trace_halfInt`: Trace of `halfInt d a' b'` is `a'`.
+* `norm_halfInt`: Norm of `halfInt d a' b'` is `(a'² - d·b'²) / 4`.
 -/
 
 namespace QuadraticNumberFields
