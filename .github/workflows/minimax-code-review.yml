@@ -1,8 +1,8 @@
 name: AI Code Review with MiniMax
 
 on:
-  pull_request:
-    types: [opened, synchronize]
+  issue_comment:
+    types: [created]
 
 permissions:
   pull-requests: write
@@ -10,6 +10,10 @@ permissions:
 jobs:
   review:
     name: MiniMax Code Review
+    if: >-
+      github.event.issue.pull_request &&
+      github.event.comment.body == '@minimax review' &&
+      github.event.comment.user.login == github.repository_owner
     runs-on: ubuntu-latest
     steps:
       - name: Code Review
