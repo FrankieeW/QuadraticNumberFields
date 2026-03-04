@@ -31,7 +31,7 @@ instance {d : ℤ} [QuadFieldParam d] : Field (QuadraticNumberFields d) := by
   letI : Fact (∀ r : ℚ, r ^ 2 ≠ (d : ℚ) + 0 * r) := ⟨by
     intro r hr
     have hsqQ : IsSquare ((d : ℤ) : ℚ) := ⟨r, by nlinarith [hr]⟩
-    exact (not_isSquare_int d) (Rat.isSquare_intCast_iff.mp hsqQ)
+    exact (QuadFieldParam.not_isSquare d) (Rat.isSquare_intCast_iff.mp hsqQ)
   ⟩
   infer_instance
 
@@ -52,4 +52,3 @@ instance {d : ℤ} [QuadFieldParam d] : NumberField (QuadraticNumberFields d) wh
     have hfinite : Module.Finite ℚ (QuadraticNumberFields d) := by
       infer_instance
     exact hmod ▸ hfinite
-
