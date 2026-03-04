@@ -194,7 +194,7 @@ We welcome contributions! Areas where help is needed:
 4. **Documentation** - Improve explanations and tutorials
 5. **Testing** - Verify computations with known results
 
-See [CONTRIBUTING.md](https://github.com/FrankieeW/QuadraticNumberFields/blob/main/CONTRIBUTING.md) for guidelines.
+See the [GitHub Issues page](https://github.com/FrankieeW/QuadraticNumberFields/issues) to report bugs or discuss new features.
 
 ### Discussion
 

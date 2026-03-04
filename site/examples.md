@@ -41,7 +41,7 @@ The **Eisenstein integers** are closely related to hexagonal lattices and the si
 
 **Classification:**
 - Since $-3 \equiv 1 \pmod{4}$, we have Case 2
-- Let $\omega = \frac{1 + \sqrt{-3}}{2}$, a primitive cube root of unity
+- Let $\omega = \frac{-1 + \sqrt{-3}}{2}$, a primitive cube root of unity
 - $\mathcal{O}_{\mathbb{Q}(\sqrt{-3})} = \mathbb{Z}[\omega] = \{a + b\omega : a, b \in \mathbb{Z}\}$
 
 **Properties of $\omega$:**
