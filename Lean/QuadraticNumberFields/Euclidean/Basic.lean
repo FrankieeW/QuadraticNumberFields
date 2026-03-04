@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Frankie Wang
 -/
 import Mathlib.RingTheory.EuclideanDomain
-import QuadraticNumberFields.FieldInstance
+import QuadraticNumberFields.Instances
 
 /-!
 # Euclidean Classification Framework
