@@ -1,1 +1,0 @@
-# Verso documentation placeholder
