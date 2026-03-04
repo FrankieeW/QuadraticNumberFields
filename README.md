@@ -2,55 +2,76 @@
 
 A Lean 4 formalization of quadratic number fields Q(√d) and the classification of their ring of integers.
 
+**[Documentation site](https://frankieew.github.io/QuadraticNumberFields)**
+
+## Main Result
+
+For squarefree `d ≠ 1`, the ring of integers `𝓞 (Q(√d))` is classified as follows:
+
+- If `d % 4 ≠ 1`, then `𝓞 (Q(√d)) ≃+* ℤ√d`.
+- If `d % 4 = 1`, writing `d = 1 + 4k`, then `𝓞 (Q(√d)) ≃+* ℤ[(1+√d)/2]`.
+
+Classical examples:
+- **Gaussian integers** (`d = -1`): `𝓞 (Q(√(-1))) ≃+* ℤ[i]`
+- **Eisenstein integers** (`d = -3`): `𝓞 (Q(√(-3))) ≃+* ℤ[ω]` where `ω = (1+√(-3))/2`
+
+## Mathematical Content
+
+This project formalizes:
+- Definition of quadratic number fields Q(√d) as `QuadraticAlgebra ℚ d 0`
+- `QuadFieldParam`: typeclass for squarefree `d ≠ 1` parameters
+- Parametrization and uniqueness of the quadratic field structure
+- Ring of integers classification (`ringOfIntegers_classification`)
+- Integrality criteria via trace and norm
+- Euclidean domain classification framework: for squarefree `d < 0`, the ring `𝓞 (Q(√d))` is norm-Euclidean iff `d ∈ {-1, -2, -3, -7, -11}`
+
 ## Project Structure
 
 ```
 QuadraticNumberFields/
-├── README.md              # This file
-├── CLAUDE.md              # Development guidance
 ├── Lean/                  # Lean formal proofs
 │   ├── lakefile.toml
 │   ├── lean-toolchain
 │   ├── QuadraticNumberFields.lean    # Root module
-│   └── QuadraticNumberFields/        # Library modules
-│       ├── Basic.lean
-│       ├── Def.lean
-│       ├── Param.lean
-│       ├── ParamUniqueness.lean
-│       ├── FieldInstance.lean
-│       ├── Rescale.lean
-│       ├── Euclidean/                # Euclidean domain proofs
-│       └── RingOfIntegers/           # Ring of integers classification
+│   └── QuadraticNumberFields/
+│       ├── Basic.lean               # Qsqrtd type, norm and trace
+│       ├── Def.lean                 # QuadraticNumberFields definition
+│       ├── Param.lean               # QuadFieldParam typeclass and instances
+│       ├── ParamUniqueness.lean     # Uniqueness of the quadratic structure
+│       ├── FieldInstance.lean       # Field typeclass instances
+│       ├── Rescale.lean             # Rescaling between Q(√d) forms
+│       ├── Euclidean/
+│       │   └── Basic.lean           # Euclidean domain classification framework
+│       └── RingOfIntegers/
+│           ├── Classification.lean  # Main classification theorem
+│           ├── HalfInt.lean         # Half-integer normal form
+│           ├── Integrality.lean     # Integrality criteria
+│           ├── ModFour.lean         # Modulo-4 arithmetic lemmas
+│           ├── Norm.lean            # Norm computations
+│           ├── ZOnePlusSqrtOverTwo.lean  # ℤ[(1+√d)/2] ring
+│           └── Zsqrtd.lean          # ℤ√d ring
 ├── Verso/                 # Documentation generation
-└── site/                  # Jekyll website
+└── site/                  # Jekyll website (GitHub Pages)
 ```
+
+## Prerequisites
+
+- [Lean 4](https://leanprover.github.io/) `v4.29.0-rc2`
+- [mathlib](https://github.com/leanprover-community/mathlib4) `v4.29.0-rc2`
+- [elan](https://github.com/leanprover/elan) (Lean version manager)
 
 ## Build Instructions
 
 ```bash
 cd Lean
-lake exe cache get  # Download mathlib cache (required!)
+lake exe cache get  # Download mathlib cache (required, speeds up build significantly)
 lake build
 ```
-
-## Mathematical Content
-
-This project formalizes:
-- Definition of quadratic number fields Q(√d)
-- Ring of integers classification for quadratic fields
-- Euclidean domain structure
-- Norm computations
 
 ## Template
 
 This repository follows the structure of [Polychromatic](https://github.com/b-mehta/Polychromatic).
 
-## Quick Links
-
-- [Lean](https://leanprover.github.io/)
-- [mathlib](https://github.com/leanprover-community/mathlib)
-- [Verso](https://github.com/leanprover/verso)
-
-## Reference
+## References
 
 - [Z[(1+sqrt(1+4k))/2] discussion (Lean Zulip)](https://leanprover.zulipchat.com/#narrow/channel/217875-Is-there-code-for-X.3F/topic/Z.5B.281.2Bsqrt.281.2B4k.29.29.2F2.5D/near/520523635)
