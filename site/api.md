@@ -130,4 +130,10 @@ theorem isUnit_zOnePlusSqrtOverTwo_iff_norm_eq_one_or_neg_one
 | `RingOfIntegers/ZOnePlusSqrtOverTwo.lean` | $\mathbb{Z}[\omega]$ definitions |
 | `Euclidean/Basic.lean` | Euclidean domain structure |
 
+## See Also
+
+- [Mathematical Background](math.html) - Theory and mathematical context
+- [Formalization Details](formalization.html) - Design decisions and implementation
+- [Getting Started](getting-started.html) - How to use this formalization
+
 [← Back to Home](index.html)

@@ -98,4 +98,8 @@ In this project, we formalize:
 - `norm_mul`: Norm multiplicativity
 - `isUnit_zsqrtd_iff_norm_eq_one_or_neg_one`: Unit criterion
 
+For complete API documentation, see the [API reference](api.html).
+
+For detailed examples including Gaussian integers, Eisenstein integers, and Pell's equation, see [Examples and Applications](examples.html).
+
 [← Back to Home](index.html)
