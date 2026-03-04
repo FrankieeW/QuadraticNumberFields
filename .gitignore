@@ -22,3 +22,8 @@ Thumbs.db
 
 # Build artifacts
 docbuild/
+_site/
+
+# Ruby/Bundler
+site/Gemfile.lock
+site/vendor/
