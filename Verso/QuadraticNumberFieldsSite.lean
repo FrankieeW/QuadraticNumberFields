@@ -20,66 +20,99 @@ set_option verso.exampleModule "QuadraticNumberFields"
 
 #doc (Page) "Quadratic Number Fields" =>
 
-# Overview
+# Quadratic Number Fields
 
-This repository provides a formalisation in the Lean 4 theorem prover of results related to
-quadratic number fields $\mathbb{Q}(\sqrt{d})$ and the classification of their ring of integers.
+A formalization of quadratic number fields $`\mathbb{Q}(\sqrt{d})` and the classification of their ring of integers in Lean 4.
 
-Given a square-free integer $d$, the quadratic number field $\mathbb{Q}(\sqrt{d})$ is the smallest
-field containing $\mathbb{Q}$ and $\sqrt{d}$. The ring of integers $\mathcal{O}_K$ of a number field
-$K$ is the set of all algebraic integers in $K$.
+## Overview
 
-For quadratic fields, the ring of integers has a particularly nice classification:
+Given a square-free integer $`d`, the **quadratic number field** $`\mathbb{Q}(\sqrt{d})` is the smallest field containing $`\mathbb{Q}` and $`\sqrt{d}`. The **ring of integers** $`\mathcal{O}_K` of a number field $`K` is the set of all algebraic integers in $`K`.
 
-- If $d \equiv 2, 3 \pmod{4}$, then $\mathcal{O}_K = \mathbb{Z}[\sqrt{d}]$
-- If $d \equiv 1 \pmod{4}$, then $\mathcal{O}_K = \mathbb{Z}\left[\frac{1 + \sqrt{d}}{2}\right]$
+This project formalizes the complete classification theorem:
 
-# Repository Structure
+: **Case 1** ($`d \equiv 2, 3 \pmod{4}`)
 
-The repository is organised as follows:
+  $`\mathcal{O}_{\mathbb{Q}(\sqrt{d})} = \mathbb{Z}[\sqrt{d}]`
 
-: `Lean`
+: **Case 2** ($`d \equiv 1 \pmod{4}`)
 
-  The formal Lean 4 proofs, including:
-  - `QuadraticNumberFields/Def.lean`: Core definitions of quadratic number fields
-  - `QuadraticNumberFields/Basic.lean`: Basic properties
-  - `QuadraticNumberFields/Param.lean`: Parameterization
-  - `QuadraticNumberFields/RingOfIntegers/`: Classification theorems
-
-: `Verso`
-
-  Lean code for generating this documentation website using the Verso framework.
-
-: `site`
-
-  Jekyll website source files, completed by the Verso-generated content.
+  $`\mathcal{O}_{\mathbb{Q}(\sqrt{d})} = \mathbb{Z}\left[\frac{1 + \sqrt{d}}{2}\right]`
 
 # Mathematical Background
 
-## Quadratic Number Fields
+## Definition of Quadratic Fields
 
-A quadratic number field is an extension of $\mathbb{Q}$ of degree 2. Every such field can be written
-as $\mathbb{Q}(\sqrt{d})$ for some square-free integer $d$.
+A **quadratic number field** is an extension of $`\mathbb{Q}` of degree 2. Every such field can be written as $`\mathbb{Q}(\sqrt{d})` for some square-free integer $`d \neq 0, 1`.
+
+$$`\mathbb{Q}(\sqrt{d}) = \{a + b\sqrt{d} : a, b \in \mathbb{Q}\}`$$
 
 ## Ring of Integers
 
-The ring of integers $\mathcal{O}_K$ of a number field $K$ consists of all elements of $K$ that
-are roots of monic polynomials with integer coefficients.
+The **ring of integers** $`\mathcal{O}_K` of a number field $`K` consists of all elements that are roots of monic polynomials with integer coefficients.
 
-For quadratic fields, we have the following classification theorem:
-
-**Theorem**: Let $d$ be a square-free integer. Then:
-
-1. If $d \equiv 2, 3 \pmod{4}$, then $\mathcal{O}_{\mathbb{Q}(\sqrt{d})} = \mathbb{Z}[\sqrt{d}]$
-2. If $d \equiv 1 \pmod{4}$, then $\mathcal{O}_{\mathbb{Q}(\sqrt{d})} = \mathbb{Z}\left[\frac{1 + \sqrt{d}}{2}\right]$
+For quadratic fields, determining which elements are integral leads to the classification theorem above.
 
 ## Norm
 
-The norm of an element $\alpha = a + b\sqrt{d}$ in $\mathbb{Q}(\sqrt{d})$ is defined as:
+The **norm** of $`\alpha = a + b\sqrt{d}` is:
 
-$$N(\alpha) = \alpha \cdot \bar{\alpha} = (a + b\sqrt{d})(a - b\sqrt{d}) = a^2 - db^2$$
+$$`N(\alpha) = \alpha \cdot \bar{\alpha} = a^2 - db^2`$$
 
-The norm is multiplicative: $N(\alpha\beta) = N(\alpha)N(\beta)$.
+Key properties:
+- **Multiplicativity:** $`N(\alpha\beta) = N(\alpha)N(\beta)`
+- **Unit criterion:** $`\alpha \in \mathcal{O}_K^\times \iff N(\alpha) = \pm 1`
+
+# Examples
+
+## Gaussian Integers
+
+For $`d = -1`: Since $`-1 \equiv 3 \pmod{4}`, we have $`\mathcal{O}_{\mathbb{Q}(i)} = \mathbb{Z}[i]`.
+
+- Elements: $`a + bi` where $`a, b \in \mathbb{Z}`
+- Norm: $`N(a + bi) = a^2 + b^2`
+- Units: $`\pm 1, \pm i`
+
+## Eisenstein Integers
+
+For $`d = -3`: Since $`-3 \equiv 1 \pmod{4}`, we have $`\mathcal{O}_{\mathbb{Q}(\sqrt{-3})} = \mathbb{Z}[\omega]` where $`\omega = \frac{1 + \sqrt{-3}}{2}`.
+
+- Elements: $`a + b\omega` where $`a, b \in \mathbb{Z}`
+- Norm: $`N(a + b\omega) = a^2 - ab + b^2`
+- Units: $`\pm 1, \pm \omega, \pm \omega^2` (6 units)
+
+# Repository Structure
+
+: `Lean/QuadraticNumberFields/`
+
+  Core definitions and proofs:
+  - `Basic.lean`: Core definitions (`Qsqrtd`, trace, norm)
+  - `Param.lean`: `QuadFieldParam` class
+  - `Def.lean`: Main field definition
+
+: `Lean/QuadraticNumberFields/RingOfIntegers/`
+
+  Classification theorems:
+  - `Classification.lean`: Main theorem
+  - `Integrality.lean`: Integrality proofs
+  - `Norm.lean`: Norm properties
+  - `Zsqrtd.lean`: $`\mathbb{Z}[\sqrt{d}]` definitions
+  - `ZOnePlusSqrtOverTwo.lean`: $`\mathbb{Z}[\omega]` definitions
+
+: `Verso/`
+
+  Documentation generation using Verso framework
+
+: `site/`
+
+  Jekyll website source files
+
+# Build Instructions
+
+```bash
+cd Lean
+lake exe cache get
+lake build
+```
 
 # References
 
