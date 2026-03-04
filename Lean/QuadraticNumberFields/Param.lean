@@ -8,6 +8,36 @@ import Mathlib.RingTheory.Int.Basic
 import Mathlib.Tactic
 import QuadraticNumberFields.Basic
 
+/-!
+# Parameterization of Quadratic Fields
+
+This file defines `QuadFieldParam d`, the class of valid parameters for quadratic
+number fields `ℚ(√d)`. A valid parameter is a squarefree integer `d ≠ 1`.
+
+## Main Definitions
+
+* `QuadFieldParam d`: Class asserting that `d` is a squarefree integer with `d ≠ 1`.
+* `Qsqrtd_zero_not_isReduced`: `Q(√0)` is not reduced (has nilpotents).
+* `Qsqrtd_zero_not_isField`: `Q(√0)` is not a field.
+* `Qsqrtd_one_not_isField`: `Q(√1) ≅ ℚ × ℚ` is not a field.
+
+## Main Theorems
+
+* `QuadFieldParam.ne_zero`: Squarefree implies nonzero.
+* `not_isSquare_int`: For a valid parameter `d`, `d` is not a perfect square.
+* `quadFieldParam_of_squarefree_ne_one`: Any squarefree `d ≠ 1` is a valid parameter.
+* `quadFieldParam_of_prime`: Any prime gives a valid parameter.
+* `quadFieldParam_of_natAbs_prime`: If `|d|` is prime, `d` is a valid parameter.
+
+## Instances
+
+We provide instances for common parameters: `-1`, `-3`, and any prime or
+squarefree `d ≠ 1` via `Fact`.
+-/
+
+/-! ## Non-field degeneracies -/
+
+/-- `Q(√0)` is not reduced because `√0² = 0` but `√0 ≠ 0`. -/
 lemma Qsqrtd_zero_not_isReduced : ¬ IsReduced (Qsqrtd (0 : ℚ)) := by
   intro ⟨h⟩
   have hnil : IsNilpotent (⟨0, 1⟩ : Qsqrtd 0) :=
@@ -16,10 +46,13 @@ lemma Qsqrtd_zero_not_isReduced : ¬ IsReduced (Qsqrtd (0 : ℚ)) := by
     intro heq; exact one_ne_zero (congr_arg QuadraticAlgebra.im heq)
   exact hne (h _ hnil)
 
+/-- `Q(√0)` is not a field (it has nilpotents). -/
 lemma Qsqrtd_zero_not_isField : ¬ IsField (Qsqrtd (0 : ℚ)) := by
   intro hF
   haveI := hF.isDomain
   exact Qsqrtd_zero_not_isReduced (inferInstance : IsReduced (Qsqrtd (0 : ℚ)))
+
+/-! ## Quadratic Field Parameters -/
 
 /-- Parameters for `Q(√d)`.
 `d ≠ 0` is not stored as a field, since it follows from `squarefree`
@@ -32,6 +65,7 @@ class QuadFieldParam (d : ℤ) : Prop where
 lemma QuadFieldParam.ne_zero (d : ℤ) [QuadFieldParam d] : d ≠ 0 :=
   (QuadFieldParam.squarefree (d := d)).ne_zero
 
+/-- For a valid parameter `d`, the integer `d` is not a perfect square. -/
 lemma not_isSquare_int (d : ℤ) [QuadFieldParam d] : ¬ IsSquare d := by
   intro hdSq
   rcases hdSq with ⟨z, hz⟩
@@ -47,6 +81,7 @@ lemma not_isSquare_int (d : ℤ) [QuadFieldParam d] : ¬ IsSquare d := by
       Squarefree.eq_zero_or_one_of_pow_of_not_isUnit (x := z) (n := 2) hsqz2 huz
     norm_num at h01
 
+/-- `Q(√1) ≅ ℚ × ℚ` is not a field (it has zero divisors). -/
 lemma Qsqrtd_one_not_isField : ¬ IsField (Qsqrtd (1 : ℚ)) := by
   intro hF
   haveI := hF.isDomain
@@ -62,6 +97,8 @@ lemma Qsqrtd_one_not_isField : ¬ IsField (Qsqrtd (1 : ℚ)) := by
 
 Instances for frequently used squarefree integers.
 -/
+
+/-- Constructor for `QuadFieldParam` from explicit proofs. -/
 def QuadFieldParam.mk' (d : ℤ) (hs : Squarefree d) (h1 : d ≠ 1) :
     QuadFieldParam d :=
 { squarefree := hs, ne_one := h1 }
@@ -85,16 +122,20 @@ lemma quadFieldParam_of_natAbs_prime (d : ℤ) (hd : Nat.Prime d.natAbs) :
     QuadFieldParam d :=
   quadFieldParam_of_prime d (Int.prime_iff_natAbs_prime.2 hd)
 
+/-- Instance for any `d` where `|d|` is prime (via `Fact`). -/
 instance (d : ℤ) [Fact (Nat.Prime d.natAbs)] : QuadFieldParam d :=
   quadFieldParam_of_natAbs_prime d (Fact.out)
 
+/-- Instance for any squarefree `d ≠ 1` (via `Fact`). -/
 instance (d : ℤ) [Fact (Squarefree d)] [Fact (d ≠ 1)] : QuadFieldParam d :=
   quadFieldParam_of_squarefree_ne_one d (Fact.out) (Fact.out)
 
+/-- The Gaussian field `Q(√(-1)) = Q(i)` has valid parameter `-1`. -/
 instance : QuadFieldParam (-1) where
   squarefree := by simp
   ne_one := by decide
 
+/-- The Eisenstein field `Q(√(-3))` has valid parameter `-3`. -/
 instance : QuadFieldParam (-3 : ℤ) := by
   letI : Fact (Nat.Prime ((-3 : ℤ).natAbs)) := ⟨by decide⟩
   exact inferInstance

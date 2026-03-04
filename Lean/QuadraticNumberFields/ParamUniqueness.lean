@@ -7,11 +7,38 @@ import Mathlib.Algebra.Squarefree.Basic
 import Mathlib.Tactic
 import QuadraticNumberFields.Param
 
+/-!
+# Uniqueness of Quadratic Field Parameters
+
+This file proves that the squarefree integer parameter `d` of a quadratic field
+`ℚ(√d)` is unique up to equality. That is, if `ℚ(√d₁) ≃ₐ[ℚ] ℚ(√d₂)` with both
+`d₁` and `d₂` squarefree, then `d₁ = d₂`.
+
+## Main Results
+
+* `quadratic_field_param_unique`: The main uniqueness theorem.
+* `squarefree_eq_of_rat_sq_mul`: Helper lemma relating squarefree integers
+  connected by a rational square factor.
+
+## Helper Lemmas
+
+Several technical lemmas about squarefree integers and rational squares support
+the main theorem:
+* `not_isSquare_neg_one_rat`: `-1` is not a square in `ℚ`.
+* `nat_eq_one_of_squarefree_intcast_of_isSquare`: A squarefree integer that is
+  a square must be `1`.
+* `int_dvd_of_ratio_square`: Divisibility criterion from square ratios.
+-/
+
+/-! ## Helper Lemmas -/
+
+/-- `-1` is not a square in `ℚ`. -/
 lemma not_isSquare_neg_one_rat : ¬ IsSquare (- (1 : ℚ)) := by
   rintro ⟨r, hr⟩
   have hnonneg : 0 ≤ r ^ 2 := sq_nonneg r
   nlinarith [hr, hnonneg]
 
+/-- A squarefree integer that is a perfect square (as an integer) must equal `1`. -/
 lemma nat_eq_one_of_squarefree_intcast_of_isSquare (m : ℕ)
     (hsm : Squarefree (m : ℤ)) (hsq : IsSquare (m : ℤ)) : m = 1 := by
   rcases hsq with ⟨z, hz⟩
@@ -26,6 +53,7 @@ lemma nat_eq_one_of_squarefree_intcast_of_isSquare (m : ℕ)
       Squarefree.eq_zero_or_one_of_pow_of_not_isUnit (x := z) (n := 2) hsqz2 huz
     norm_num at h01
 
+/-- If `d₁/d₂` is a rational square and `d₂` is squarefree, then `d₂ ∣ d₁`. -/
 lemma int_dvd_of_ratio_square (d₁ d₂ : ℤ) (hd₂ : d₂ ≠ 0)
     (hsq_d₂ : Squarefree d₂) (hr : IsSquare ((d₁ : ℚ) / (d₂ : ℚ))) : d₂ ∣ d₁ := by
   have hsq_den_nat : IsSquare (((d₁ : ℚ) / (d₂ : ℚ)).den) := (Rat.isSquare_iff.mp hr).2
@@ -40,6 +68,8 @@ lemma int_dvd_of_ratio_square (d₁ d₂ : ℤ) (hd₂ : d₂ ≠ 0)
     nat_eq_one_of_squarefree_intcast_of_isSquare _ hsqf_den_int hsq_den_int
   exact (Rat.den_div_intCast_eq_one_iff d₁ d₂ hd₂).1 hden1_nat
 
+/-- If two squarefree integers are related by `d₁ = d₂ · r²` for rational `r`,
+then `d₁ = d₂`. -/
 lemma squarefree_eq_of_rat_sq_mul {d₁ d₂ : ℤ}
     (hd₁ : Squarefree d₁) (hd₂ : Squarefree d₂)
     {r : ℚ} (hr : (d₁ : ℚ) = d₂ * r ^ 2) : d₁ = d₂ := by
@@ -79,6 +109,8 @@ lemma squarefree_eq_of_rat_sq_mul {d₁ d₂ : ℤ}
       field_simp [hd₂Q]
     exfalso
     exact not_isSquare_neg_one_rat (by rwa [this] at hratio)
+
+/-! ## Main Theorem -/
 
 /-- The squarefree integer parameter of a quadratic field is unique:
     `ℚ(√d₁) ≃ₐ[ℚ] ℚ(√d₂)` with both squarefree implies `d₁ = d₂`. -/

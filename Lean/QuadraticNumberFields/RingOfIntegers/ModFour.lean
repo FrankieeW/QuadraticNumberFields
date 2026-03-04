@@ -6,27 +6,34 @@ Authors: Frankie Wang
 import QuadraticNumberFields.Param
 
 /-!
-# `ModFour` Layer
+# Congruence Criteria Modulo 4
 
-This file is for congruence criteria modulo `4` used by the ring-of-integers
-classification.
+This file develops congruence criteria modulo 4 used in the classification of
+rings of integers in quadratic fields. The key distinction is whether `d ≡ 1 (mod 4)`,
+which determines whether `𝓞(Q(√d))` is `ℤ[√d]` or `ℤ[(1+√d)/2]`.
 
-## TODO (Revised)
+## Main Results
 
-1. Port core lemmas from old draft (`ModFourCriteria.lean`)
-- [x] Port `squarefree_int_not_dvd_four`.
-- [x] Port `squarefree_int_emod_four`.
-- [x] Port `dvd_four_sub_sq_iff_even_even_of_ne_one_mod_four`.
-- [x] Port `dvd_four_sub_sq_iff_same_parity_of_one_mod_four`.
+### Squarefree Properties
+* `squarefree_int_not_dvd_four`: A squarefree integer is not divisible by 4.
+* `squarefree_int_emod_four`: A squarefree integer has `d % 4 ∈ {1, 2, 3}`.
 
-2. Branch-conversion API used by classification
-- [x] `exists_k_of_mod_four_eq_one : d % 4 = 1 → ∃ k : ℤ, d = 1 + 4 * k`.
-- [x] `mod_four_eq_one_of_exists_k : (∃ k : ℤ, d = 1 + 4 * k) → d % 4 = 1`.
-- [x] `mod_four_branch_split : d % 4 = 1 ∨ d % 4 ≠ 1`.
+### Parity and Squares
+* `Int.sq_emod_four_of_even`: The square of an even integer is `0 mod 4`.
+* `Int.sq_emod_four_of_odd`: The square of an odd integer is `1 mod 4`.
 
-3. Consumer-facing interfaces
-- [x] Expose branch lemmas with names used directly in `Classification.lean`.
-- [ ] Add rewriting helpers so branch goals reduce with minimal `omega` boilerplate.
+### Divisibility Criteria
+* `dvd_four_sub_sq_iff_even_even_or_odd_odd_mod_four_one`: Main criterion for
+  `4 ∣ (a'² - d·b'²)`.
+* `dvd_four_sub_sq_iff_even_even_of_ne_one_mod_four`: If `d % 4 ≠ 1`,
+  divisibility by 4 forces both coordinates even.
+* `dvd_four_sub_sq_iff_same_parity_of_one_mod_four`: If `d % 4 = 1`,
+  divisibility by 4 is equivalent to same parity.
+
+### Branch Utilities
+* `exists_k_of_mod_four_eq_one`: Extract `k` from `d % 4 = 1` as `d = 1 + 4k`.
+* `mod_four_eq_one_of_exists_k`: Converse of the above.
+* `mod_four_branch_split`: Trivial case split `d % 4 = 1 ∨ d % 4 ≠ 1`.
 -/
 
 namespace QuadraticNumberFields

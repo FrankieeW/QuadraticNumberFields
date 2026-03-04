@@ -9,31 +9,37 @@ import QuadraticNumberFields.RingOfIntegers.ZOnePlusSqrtOverTwo
 import QuadraticNumberFields.ParamUniqueness
 
 /-!
-# `Integrality` Layer
+# Integrality Criteria for Quadratic Fields
 
-This file is for integrality criteria in `QuadraticNumberFields d`, mainly via trace
-and norm identities.
+This file develops integrality criteria for elements of quadratic number fields
+and proves that integral elements have specific normal forms.
 
-## TODO (Revised)
+## Main Results
 
-1. Integrality normal form (port/adapt from old `ZQuadPath`)
-- [x] Prove: integral `x` in `Qsqrtd (d : ℚ)` has half-integer coordinates.
-- [x] Derive `4 ∣ (a'^2 - d * b'^2)` for those half-integer coordinates.
-- [x] Provide a reusable wrapper theorem under `[QuadFieldParam d]`.
+### Half-Integer Normal Form
+* `exists_halfInt_with_div_four_of_isIntegral`: Any integral element of `Q(√d)`
+  can be written as `halfInt d a' b'` with `4 ∣ (a'² - d·b'²)`.
 
-2. Non-`1 mod 4` branch integrality
-- [x] Prove integral elements lie in `Zsqrtd d` image.
-- [x] `IsIntegralClosure` assembly moved to `Classification.lean`.
+### Non-`1 mod 4` Branch
+* `exists_zsqrtd_of_isIntegral_of_ne_one_mod_four`: If `d % 4 ≠ 1`, integral
+  elements lie in the image of `Zsqrtd d`.
 
-3. `1 mod 4` branch integrality
-- [x] Prove integral elements lie in `ZOnePlusSqrtOverTwo k` image.
-- [x] `IsIntegralClosure` assembly moved to `Classification.lean`.
+### `1 mod 4` Branch
+* `exists_zOnePlusSqrtOverTwo_of_isIntegral_of_one_mod_four`: If `d = 1 + 4k`,
+  integral elements lie in the image of `ZOnePlusSqrtOverTwo k`.
+
+## Supporting Lemmas
+
+The file provides equivalence theorems connecting divisibility by 4 with
+membership in various carrier sets, used by `Classification.lean`.
 -/
 
 namespace QuadraticNumberFields
 namespace RingOfIntegers
 
 open scoped NumberField
+
+/-! ## Divisibility-Carrier Equivalences -/
 
 /-- In the non-`1 mod 4` branch, divisibility by `4` is equivalent to representability
 in the image of `Zsqrtd d` under the canonical embedding into `Q(√d)`. -/
@@ -101,6 +107,8 @@ lemma isIntegral_toQsqrtd (d : ℤ) (z : Zsqrtd d) :
     IsIntegral ℤ (Zsqrtd.toQsqrtdHom d z) := by
   have hz : IsIntegral ℤ z := Algebra.IsIntegral.isIntegral z
   exact map_isIntegral_int (Zsqrtd.toQsqrtdHom d) hz
+
+/-! ## Half-Integer Normal Form -/
 
 /-- Trace in `Q(√d)` is `2 * re`. -/
 private theorem trace_eq_two_re {d : ℤ} (x : Qsqrtd (d : ℚ)) :
@@ -236,6 +244,8 @@ lemma exists_halfInt_with_div_four_of_isIntegral
   have hdiv : (4 : ℤ) ∣ (a' ^ 2 - d * b' ^ 2) :=
     (Rat.den_div_intCast_eq_one_iff (a' ^ 2 - d * b' ^ 2) 4 (by norm_num)).1 hden
   exact ⟨a', b', hxHalf, hdiv⟩
+
+/-! ## Classification Lemmas -/
 
 /-- Integrality classification in the `d % 4 ≠ 1` branch: integral elements of `Q(√d)`
 lie in the image of `Zsqrtd d`. -/
