@@ -55,6 +55,9 @@ lake build
 
 ## Navigation
 
+### Getting Started
+- [Getting Started Guide](getting-started.html) - Installation and first steps
+
 ### Theory and Examples
 - [Mathematical Background](math.html) - Detailed mathematical theory and proofs
 - [Examples and Applications](examples.html) - Gaussian integers, Eisenstein integers, and more
