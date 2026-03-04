@@ -1,0 +1,10 @@
+{
+  "name": "QuadraticNumberFields Development",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "customizations": {
+    "vscode": {
+      "extensions": ["leanprover.lean4"]
+    }
+  },
+  "postCreateCommand": "sh .devcontainer/post-create.sh"
+}

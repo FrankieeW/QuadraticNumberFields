@@ -1,0 +1,19 @@
+name = "quadraticnumberfields"
+version = "0.1.0"
+keywords = ["math", "number-theory", "algebra"]
+defaultTargets = ["QuadraticNumberFields"]
+
+[leanOptions]
+pp.unicode.fun = true
+autoImplicit = false
+relaxedAutoImplicit = false
+linter.style.longLine = true
+linter.style.multiGoal = true
+linter.flexible = true
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+
+[[lean_lib]]
+name = "QuadraticNumberFields"

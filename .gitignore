@@ -1,0 +1,24 @@
+# Lean build artifacts
+*.olean
+*.ilean
+*.hash
+
+# Lake build directory
+lake/
+.lake/
+
+# Mathlib cache
+~/.lean/cache/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+docbuild/
