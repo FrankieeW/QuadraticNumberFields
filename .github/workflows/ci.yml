@@ -12,10 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Lean
+      - name: Install Elan
         run: |
-          curl https://elan.lean-lang.org/elan-init.sh -sSf | sh
-          source ~/.elan/env
+          curl https://elan.lean-lang.org/elan-init.sh -sSf | sh -s -- -y
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
 
       - name: Build Lean
         working-directory: ./Lean
@@ -32,9 +32,10 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.1'
+          bundler-cache: true
+          working-directory: ./site
 
       - name: Build site
         working-directory: ./site
         run: |
-          bundle install
           bundle exec jekyll build
