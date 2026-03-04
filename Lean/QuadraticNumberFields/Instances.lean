@@ -16,6 +16,12 @@ typeclass instances, establishing that quadratic fields are indeed number fields
 
 * `QuadraticNumberFields d`: Type alias for `Qsqrtd (d : ℚ)` with `[QuadFieldParam d]`.
 
+## Implementation Note
+
+This file is separated from `Basic.lean` for organizational clarity in this
+standalone library. If this code is merged into mathlib, these instances
+should be moved into `Basic.lean` following mathlib conventions.
+
 ## Main Instances
 
 * `Field (QuadraticNumberFields d)`: `Q(√d)` is a field for valid parameters.
