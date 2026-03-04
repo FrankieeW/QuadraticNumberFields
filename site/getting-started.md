@@ -80,7 +80,8 @@ QuadraticNumberFields/
 │   ├── QuadraticNumberFields.lean # Entry point
 │   └── QuadraticNumberFields/
 │       ├── Basic.lean             # Core definitions
-│       ├── Def.lean               # Main type definition
+│       ├── Def.lean               # Module imports / namespace setup
+│       ├── FieldInstance.lean     # Main type definition
 │       ├── RingOfIntegers/        # Classification theorem
 │       │   ├── Classification.lean
 │       │   ├── Zsqrtd.lean
@@ -102,7 +103,7 @@ code .
 ### Navigate to Key Files
 
 1. **Start with the main definition:**
-   - Open `Lean/QuadraticNumberFields/Def.lean`
+   - Open `Lean/QuadraticNumberFields/FieldInstance.lean`
    - This defines `QuadraticNumberFields d`
 
 2. **Explore the classification theorem:**
@@ -123,11 +124,11 @@ Lean provides **interactive feedback** as you navigate:
 
 ### Example: Exploring a Definition
 
-Open `Lean/QuadraticNumberFields/Def.lean`:
+Open `Lean/QuadraticNumberFields/FieldInstance.lean`:
 
 ```lean
 /-- The quadratic number field Q(√d) -/
-def QuadraticNumberFields (d : ℤ) := Qsqrtd d
+abbrev QuadraticNumberFields (d : ℤ) [QuadFieldParam d] : Type := Qsqrtd (d : ℚ)
 ```
 
 **Try:**
@@ -255,7 +256,7 @@ lake build
 **VS Code extension not working:**
 1. Ensure Lean 4 extension is installed
 2. Restart VS Code
-3. Check that `lean-toolchain` file exists in project root
+3. Check that a `lean-toolchain` file exists (for this project it is at `Lean/lean-toolchain`)
 
 **Slow performance:**
 - Make sure you ran `lake exe cache get` to download precompiled mathlib

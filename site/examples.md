@@ -50,7 +50,7 @@ The **Eisenstein integers** are closely related to hexagonal lattices and the si
 - $\overline{\omega} = \omega^2 = -1 - \omega$
 
 **Norm:** For $z = a + b\omega$:
-$$N(z) = a^2 - ab + b^2 = a^2 + ab(-1) + b^2(1 - (-1) + 1) = a^2 - ab + b^2$$
+$$N(z) = z\overline{z} = (a + b\omega)(a + b\omega^2) = a^2 + ab(\omega + \omega^2) + b^2\omega^3 = a^2 - ab + b^2$$
 
 **Units:** The units in $\mathbb{Z}[\omega]$ are $\{\pm 1, \pm \omega, \pm \omega^2\}$
 - These are the sixth roots of unity
