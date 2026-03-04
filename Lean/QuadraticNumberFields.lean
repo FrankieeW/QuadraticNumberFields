@@ -1,1 +1,4 @@
-import QuadraticNumberFields.Def
+import QuadraticNumberFields.Basic
+import QuadraticNumberFields.Rescale
+import QuadraticNumberFields.Param
+import QuadraticNumberFields.ParamUniqueness
