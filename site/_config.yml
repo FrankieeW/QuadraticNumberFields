@@ -1,0 +1,17 @@
+title: QuadraticNumberFields
+description: A formalization of quadratic number fields in Lean 4
+baseurl: "/QuadraticNumberFields"
+url: "https://frankieew.github.io"
+
+markdown: kramdown
+theme: minima
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
