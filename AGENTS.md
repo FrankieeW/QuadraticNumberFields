@@ -71,3 +71,14 @@ Lean formalization complete - includes ring of integers classification for quadr
 - Add module docstrings (`/-! ... -/`) to all source files
 - Add definition docstrings (`/-- ... -/`) to public definitions
 - Document main definitions and main theorems in module docstrings
+
+### Lean Code Quality
+
+1. **Always verify with lean-lsp-mcp first**: Run `lean_diagnostic_messages` on modified files until there are no errors or warnings
+2. **Build only when needed**: Only run `lake build` if Lean files were actually modified
+3. **Commit after verification**: Commit only after both lean-lsp-mcp passes AND (if applicable) `lake build` succeeds
+
+### Website Documentation Anchors
+
+- **Preserve** `-- ANCHOR: name --` and `-- ANCHOR_END:` comments - they mark sections extracted for website documentation
+- Do not remove or modify these anchor comments
