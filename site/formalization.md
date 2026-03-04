@@ -37,9 +37,10 @@ This ensures:
 We represent $\mathbb{Q}(\sqrt{d})$ using mathlib's `QuadraticAlgebra`:
 
 ```lean
-def QuadraticNumberFields (d : ℤ) := Qsqrtd d
-
 abbrev Qsqrtd (d : ℚ) : Type := QuadraticAlgebra ℚ d 0
+
+abbrev QuadraticNumberFields (d : ℤ) [QuadFieldParam d] : Type :=
+  Qsqrtd (d : ℚ)
 ```
 
 **Rationale:** This leverages existing infrastructure for:
@@ -53,14 +54,14 @@ The classification theorem distinguishes two cases based on $d \bmod 4$:
 
 **Case 1:** $d \not\equiv 1 \pmod{4}$
 ```lean
-def Zsqrtd (d : ℤ) := { z : ℤ√d // true }
+abbrev Zsqrtd (d : ℤ) : Type := QuadraticAlgebra ℤ d 0
 ```
 Ring of integers: $\mathbb{Z}[\sqrt{d}]$
 
 **Case 2:** $d \equiv 1 \pmod{4}$
 ```lean
-def ZOnePlusSqrtOverTwo (k : ℤ) :=
-  QuadraticAlgebra ℤ (1 + 4*k) 0
+abbrev ZOnePlusSqrtOverTwo (k : ℤ) : Type :=
+  QuadraticAlgebra ℤ k 1
 ```
 Ring of integers: $\mathbb{Z}\left[\frac{1+\sqrt{d}}{2}\right]$ where $d = 1 + 4k$
 
@@ -125,8 +126,8 @@ def norm (z : ℤ√d) : ℤ := z.re ^ 2 - d * z.im ^ 2
 For $d \equiv 1 \pmod{4}$, the basis $\{1, \omega\}$ where $\omega = \frac{1+\sqrt{d}}{2}$:
 
 ```lean
-def omega (k : ℤ) : ZOnePlusSqrtOverTwo k :=
-  ⟨1/2, 1/2⟩  -- represents (1 + √(1+4k))/2
+def omega (k : ℤ) : Qsqrtd (1 + 4 * k) :=
+  ⟨(1 : ℚ) / 2, (1 : ℚ) / 2⟩  -- represents (1 + √(1 + 4 * k)) / 2
 ```
 
 ## Connections to mathlib
