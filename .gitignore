@@ -27,3 +27,6 @@ _site/
 # Ruby/Bundler
 site/Gemfile.lock
 site/vendor/
+
+# Git worktrees
+.worktrees/
