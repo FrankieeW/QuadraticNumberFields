@@ -16,7 +16,7 @@ This file proves that the squarefree integer parameter `d` of a quadratic field
 
 ## Main Results
 
-* `quadratic_field_param_unique`: The main uniqueness theorem.
+* `QuadFieldParam.unique`: The main uniqueness theorem.
 * `squarefree_eq_of_rat_sq_mul`: Helper lemma relating squarefree integers
   connected by a rational square factor.
 
@@ -114,7 +114,7 @@ lemma squarefree_eq_of_rat_sq_mul {d₁ d₂ : ℤ}
 
 /-- The squarefree integer parameter of a quadratic field is unique:
     `ℚ(√d₁) ≃ₐ[ℚ] ℚ(√d₂)` with both squarefree implies `d₁ = d₂`. -/
-theorem quadratic_field_param_unique {d₁ d₂ : ℤ}
+theorem QuadFieldParam.unique {d₁ d₂ : ℤ}
     [h₁ : QuadFieldParam d₁] [h₂ : QuadFieldParam d₂]
     (φ : Qsqrtd (d₁ : ℚ) ≃ₐ[ℚ] Qsqrtd (d₂ : ℚ)) : d₁ = d₂ := by
   set a := (φ ⟨0, 1⟩).re
@@ -142,7 +142,7 @@ theorem quadratic_field_param_unique {d₁ d₂ : ℤ}
   have hb : b ≠ 0 := by
     intro hb0; simp [hb0] at hre
     have : IsSquare ((d₁ : ℤ) : ℚ) := ⟨a, by nlinarith⟩
-    exact (not_isSquare_int d₁) (Rat.isSquare_intCast_iff.mp this)
+    exact (QuadFieldParam.not_isSquare d₁) (Rat.isSquare_intCast_iff.mp this)
   have ha : a = 0 := by
     rcases mul_eq_zero.mp him with h | h
     · exact (mul_eq_zero.mp h).resolve_left (by norm_num)
