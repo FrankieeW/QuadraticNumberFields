@@ -7,27 +7,26 @@ import QuadraticNumberFields.FieldInstance
 import Mathlib.NumberTheory.Zsqrtd.Basic
 
 /-!
-# QA Framework for `Zsqrtd`
+# Model of `ℤ[√d]`
 
-This module is a QA-owned scaffold around `ℤ[√d]`.
-Current phase: API shape only; no property proofs.
+This module provides a QA-owned model of `ℤ[√d]` based on `QuadraticAlgebra ℤ d 0`,
+along with its embedding into `Q(√d)` and isomorphism with mathlib's `ℤ√d`.
 
-## TODO (Revised Phase Plan)
+## Main Definitions
 
-1. API cleanup and stability
-- [x] Base model and `toMathlib/ofMathlib/equivMathlib` are in place.
-- [ ] Add focused `[simp]` lemmas for coordinates under these maps.
-- [ ] Add transport lemmas for `trace`, `norm`, `conj`, and `sqrtd` across `equivMathlib`.
+* `Zsqrtd d`: The ring `ℤ[√d]` as `QuadraticAlgebra ℤ d 0`.
+* `Zsqrtd.sqrtd`: The distinguished element `√d`.
+* `Zsqrtd.conj`: Conjugation `(a + b√d) ↦ (a - b√d)`.
+* `Zsqrtd.trace`, `Zsqrtd.norm`: Trace and norm on `ℤ[√d]`.
+* `Zsqrtd.toQsqrtdHom`: Ring hom embedding into `Q(√d)`.
+* `Zsqrtd.halfInt`: Half-integer representative `(a' + b'√d)/2`.
 
-2. Embedding into `Q(√d)`
-- [x] Upgrade `toQsqrtd` from a function to a ring hom
-  `toQsqrtdHom : Zsqrtd d →+* Qsqrtd (d : ℚ)`.
-- [x] Prove injectivity for the embedding and add cast-coordinate simp lemmas.
-- [ ] Replace `Set.range` placeholders by carrier APIs built from the ring hom.
+## Main Theorems
 
-3. Classification support
-- [ ] Add bridge theorem: QA carrier in `Q(√d)` corresponds to mathlib `ℤ√d` image.
-- [ ] Expose lemmas consumed by `Integrality.lean` for the non-`1 mod 4` branch.
+* `Zsqrtd.toQsqrtdHom_injective`: The embedding is injective.
+* `Zsqrtd.equivMathlib`: Ring isomorphism with mathlib's `ℤ√d`.
+* `Zsqrtd.halfInt_mem_range_toQsqrtdHom_iff_even_even`: Characterization of
+  half-integers in the image of `Zsqrtd d`.
 -/
 
 namespace QuadraticNumberFields

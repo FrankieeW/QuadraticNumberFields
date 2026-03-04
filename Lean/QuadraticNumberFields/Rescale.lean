@@ -7,7 +7,34 @@ import Mathlib.Algebra.Squarefree.Basic
 import Mathlib.Tactic
 import QuadraticNumberFields.Basic
 
-/-- `ℚ(√d) ≃ₐ[ℚ] ℚ(√(a²d))` via `⟨r, s⟩ ↦ ⟨r, s·a⁻¹⟩`. -/
+/-!
+# Rescaling Isomorphisms for Quadratic Fields
+
+This file establishes isomorphisms between quadratic fields with related parameters.
+The key insight is that `ℚ(√d) ≅ ℚ(√(a²d))` for any nonzero `a ∈ ℚ`, allowing us
+to normalize parameters.
+
+## Main Definitions
+
+* `rescale d a ha`: An algebra isomorphism `ℚ(√d) ≃ₐ[ℚ] ℚ(√(a²d))` given by
+  `⟨r, s⟩ ↦ ⟨r, s·a⁻¹⟩`.
+
+## Main Theorems
+
+* `Qsqrtd_iso_int_param`: Every `Q(√d)` is isomorphic to some `Q(√z)` with `z ∈ ℤ`.
+* `Qsqrtd_iso_squarefree_int_param`: Every `Q(√d)` is isomorphic to some `Q(√z)`
+  with `z` a squarefree integer.
+
+These results allow us to work exclusively with squarefree integer parameters
+when classifying quadratic fields.
+-/
+
+/-! ## Rescaling Isomorphism -/
+
+/-- `ℚ(√d) ≃ₐ[ℚ] ℚ(√(a²d))` via `⟨r, s⟩ ↦ ⟨r, s·a⁻¹⟩`.
+
+This shows that scaling the parameter by a rational square yields an
+isomorphic quadratic field. -/
 def rescale (d : ℚ) (a : ℚ) (ha : a ≠ 0) :
     QuadraticAlgebra ℚ d 0 ≃ₐ[ℚ] QuadraticAlgebra ℚ (a ^ 2 * d) 0 := by
   have h1d : (1 : QuadraticAlgebra ℚ d 0) = ⟨1, 0⟩ := by ext <;> rfl
@@ -25,6 +52,10 @@ def rescale (d : ℚ) (a : ℚ) (ha : a ≠ 0) :
     (by simp [h1d, h1a])
     (by intro x y; ext <;> simp <;> field_simp)
 
+/-! ## Integer Parameter Normalization -/
+
+/-- Every quadratic field `Q(√d)` is isomorphic to one with an integer parameter:
+`∃ z ∈ ℤ, Q(√d) ≃ₐ[ℚ] Q(√z)`. -/
 theorem Qsqrtd_iso_int_param (d : ℚ) :
     ∃ z : ℤ, Nonempty (Qsqrtd d ≃ₐ[ℚ] Qsqrtd (z : ℚ)) := by
   obtain ⟨m, n, hn0, hd⟩ : ∃ m n : ℤ, n ≠ 0 ∧ d = m / n := by
@@ -39,6 +70,8 @@ theorem Qsqrtd_iso_int_param (d : ℚ) :
   have hcast : (m * n : ℚ) = (m * n : ℤ) := (Int.cast_mul m n).symm
   exact ⟨hrescale.trans (AlgEquiv.cast (by rw [heq, hcast]))⟩
 
+/-- Every quadratic field `Q(√d)` is isomorphic to one with a *squarefree* integer
+parameter: `∃ z ∈ ℤ, Squarefree z ∧ Q(√d) ≃ₐ[ℚ] Q(√z)`. -/
 theorem Qsqrtd_iso_squarefree_int_param {d : ℤ} (hd : d ≠ 0) :
     ∃ z : ℤ, Squarefree z ∧ Nonempty (Qsqrtd (d : ℚ) ≃ₐ[ℚ] Qsqrtd (z : ℚ)) := by
   obtain ⟨a, b, heq, ha⟩ := Nat.sq_mul_squarefree d.natAbs

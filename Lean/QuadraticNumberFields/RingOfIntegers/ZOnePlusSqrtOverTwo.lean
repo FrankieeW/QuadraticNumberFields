@@ -6,28 +6,26 @@ Authors: Frankie Wang
 import QuadraticNumberFields.RingOfIntegers.HalfInt
 
 /-!
-# `ℤ[(1 + √(1 + 4k)) / 2]`
-# `ℤ[(1 + √d) / 2]`
+# The Ring `ℤ[(1 + √(1 + 4k)) / 2]`
 
-This file packages the standard order candidate in the `d ≡ 1 [ZMOD 4]` branch.
+This file defines and studies the ring `ZOnePlusSqrtOverTwo k`, which is the
+candidate ring of integers for quadratic fields with `d ≡ 1 (mod 4)`.
+When `d = 1 + 4k`, we have `𝓞(Q(√d)) ≅ ℤ[(1+√d)/2]`.
 
-## TODO (Revised)
+## Main Definitions
 
-1. Parameter semantics and core embedding
-- [x] Keep the model
-  `ZOnePlusSqrtOverTwo k := QuadraticAlgebra ℤ k 1` (`ω^2 = ω + k`).
-- [x] Treat argument as `k`; ambient field parameter is `d = 1 + 4 * k`.
-- [x] Upgrade `toQsqrtdFun` to a ring hom into `Q(√(1 + 4*k))`.
+* `ZOnePlusSqrtOverTwo k`: The ring `ℤ[(1 + √(1+4k))/2]` modeled as
+  `QuadraticAlgebra ℤ k 1` (satisfying `ω² = ω + k`).
+* `Qsqrtd.omega k`: The generator `ω = (1 + √(1+4k))/2` in `Q(√(1+4k))`.
+* `Qsqrtd.Zomega k`: The subalgebra `ℤ[ω]` as a `Subalgebra`.
+* `ZOnePlusSqrtOverTwo.toQsqrtdHom`: Ring hom embedding into `Q(√(1+4k))`.
+* `ZOnePlusSqrtOverTwo.carrierSet`: The image as a set.
 
-2. Generator and defining equation
-- [ ] Define canonical generator `ω : ZOnePlusSqrtOverTwo k`.
-- [ ] Prove `ω^2 = ω + k`.
-- [ ] Add compatibility lemma with `(1 + √(1 + 4*k)) / 2` in `Q(√(1 + 4*k))`.
+## Main Theorems
 
-3. Classification interfaces
-- [ ] Package a branch target carrier (`Subring`/`Subalgebra`) for `d % 4 = 1`.
-- [x] Add bridge lemmas to half-integer normal form with same-parity criterion.
-- [x] Expose theorem names consumed by `Integrality.lean` and `Classification.lean`.
+* `ZOnePlusSqrtOverTwo.toQsqrtdHom_injective`: The embedding is injective.
+* `ZOnePlusSqrtOverTwo.halfInt_mem_carrierSet_iff_same_parity`:
+  A half-integer is in the carrier iff its coordinates have the same parity.
 -/
 
 namespace Qsqrtd
