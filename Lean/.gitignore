@@ -1,0 +1,11 @@
+# Lake build artifacts
+.lake/
+build/
+
+# IDE
+*.olean
+*.ilean
+*.trace
+
+# OS
+.DS_Store
