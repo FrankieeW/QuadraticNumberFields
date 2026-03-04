@@ -11,7 +11,13 @@ A Lean 4 formalization of quadratic number fields $\mathbb{Q}(\sqrt{d})$ and the
 
 Given a square-free integer $d$, the **quadratic number field** $\mathbb{Q}(\sqrt{d})$ is the smallest field containing $\mathbb{Q}$ and $\sqrt{d}$. The **ring of integers** $\mathcal{O}_K$ of a number field $K$ is the set of all algebraic integers in $K$.
 
-This project formalizes the complete classification of rings of integers for quadratic fields in Lean 4.
+This project provides a complete formalization in Lean 4 of:
+- The structure of quadratic number fields
+- The classification of their rings of integers
+- Norm and trace properties
+- Integrality criteria and unit structures
+
+The formalization is fully verified and integrates with mathlib's algebraic hierarchy.
 
 ## Main Theorem
 
@@ -47,13 +53,23 @@ lake exe cache get
 lake build
 ```
 
+## Navigation
+
+### Theory and Examples
+- [Mathematical Background](math.html) - Detailed mathematical theory and proofs
+- [Examples and Applications](examples.html) - Gaussian integers, Eisenstein integers, and more
+
+### Technical Documentation
+- [API Documentation](api.html) - Lean formalization reference
+- [Formalization Details](formalization.html) - Design decisions and proof techniques
+- [Resources](resources.html) - Learning materials, tools, and references
+
 ## Quick Links
 
 - [GitHub Repository](https://github.com/FrankieeW/QuadraticNumberFields)
-- [Mathematical Background](math.html)
-- [API Documentation](api.html)
-- [Lean](https://leanprover.github.io/)
-- [mathlib](https://github.com/leanprover-community/mathlib)
+- [Lean 4](https://leanprover.github.io/)
+- [mathlib4](https://github.com/leanprover-community/mathlib4)
+- [Lean Zulip Chat](https://leanprover.zulipchat.com/)
 
 ## Reference
 
