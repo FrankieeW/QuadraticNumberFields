@@ -80,6 +80,31 @@ For $`d = -3`: Since $`-3 \equiv 1 \pmod{4}`, we have $`\mathcal{O}_{\mathbb{Q}(
 - Norm: $`N(a + b\omega) = a^2 - ab + b^2`
 - Units: $`\pm 1, \pm \omega, \pm \omega^2` (6 units)
 
+## Ideal Theory in $`\mathbb{Z}[\sqrt{-5}]` (Formally Verified)
+
+For $`d = -5`: Since $`-5 \equiv 3 \pmod{4}`, the ring of integers is $`\mathbb{Z}[\sqrt{-5}]`. This ring is *not* a UFD — the classic example being $`6 = 2 \cdot 3 = (1 + \sqrt{-5})(1 - \sqrt{-5})`.
+
+The project includes complete formal verification of ideal factorization and ramification theory for this ring:
+
+**Ideal Factorizations:**
+- $`(2) = \mathfrak{p}_2^2` where $`\mathfrak{p}_2 = (2, 1 + \sqrt{-5})`
+- $`(3) = \mathfrak{p}_{3,1} \cdot \mathfrak{p}_{3,2}` where $`\mathfrak{p}_{3,1} = (3, 1 + \sqrt{-5})`, $`\mathfrak{p}_{3,2} = (3, 1 - \sqrt{-5})`
+- $`(1 + \sqrt{-5}) = \mathfrak{p}_2 \cdot \mathfrak{p}_{3,1}`
+- $`(1 - \sqrt{-5}) = \mathfrak{p}_2 \cdot \mathfrak{p}_{3,2}`
+
+**Primality:** All three ideals $`\mathfrak{p}_2`, $`\mathfrak{p}_{3,1}`, $`\mathfrak{p}_{3,2}` are proved to be prime.
+
+**Ramification and Inertia:**
+
+| Prime | Factorization | $`e` | $`f` | $`g` |
+|-------|--------------|------|------|------|
+| 2 | $`(2) = \mathfrak{p}_2^2` | 2 | 1 | 1 |
+| 3 | $`(3) = \mathfrak{p}_{3,1} \cdot \mathfrak{p}_{3,2}` | 1 | 1 | 2 |
+
+Verification: $`\sum e_i f_i = 2 = [\mathbb{Q}(\sqrt{-5}) : \mathbb{Q}]` ✓
+
+See `Examples/ZsqrtdNeg5/` for the Lean source.
+
 # Repository Structure
 
 : `Lean/QuadraticNumberFields/`
@@ -97,6 +122,13 @@ For $`d = -3`: Since $`-3 \equiv 1 \pmod{4}`, we have $`\mathcal{O}_{\mathbb{Q}(
   - `Norm.lean`: Norm properties
   - `Zsqrtd.lean`: $`\mathbb{Z}[\sqrt{d}]` definitions
   - `ZOnePlusSqrtOverTwo.lean`: $`\mathbb{Z}[\omega]` definitions
+
+: `Lean/QuadraticNumberFields/Examples/ZsqrtdNeg5/`
+
+  Concrete verified examples for $`\mathbb{Z}[\sqrt{-5}]`:
+  - `Basic.lean`: `NoZeroDivisors`/`IsDomain` instances for negative $`d`
+  - `Ideals.lean`: Ideal factorization and primality proofs
+  - `RamificationInertia.lean`: Ramification indices and inertia degrees
 
 : `Verso/`
 

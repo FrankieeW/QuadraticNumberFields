@@ -35,6 +35,10 @@ The Lean source lives under `Lean/QuadraticNumberFields/`. The core type is `Qsq
   - `Norm.lean` — Norm computations
   - `Classification.lean` — Final `ringOfIntegers_classification` theorem
 - **`Euclidean/Basic.lean`** — Norm-Euclidean classification: `d ∈ {-1, -2, -3, -7, -11}` iff norm-Euclidean
+- **`Examples/`** — Concrete verified examples:
+  - `ZsqrtdNeg5/Basic.lean` — General `NoZeroDivisors`/`IsDomain` for negative `d`
+  - `ZsqrtdNeg5/Ideals.lean` — Ideal factorization and primality in ℤ[√-5]
+  - `ZsqrtdNeg5/RamificationInertia.lean` — Ramification indices and inertia degrees
 
 ### Other Components
 
