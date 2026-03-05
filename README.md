@@ -60,6 +60,18 @@ QuadraticNumberFields/
 └── site/                  # Jekyll website (GitHub Pages)
 ```
 
+
+## Code Statistics
+
+| Module | Code Lines | Comment Lines | Total Lines |
+|--------|------------|---------------|-------------|
+| `QuadraticNumberFields/RingOfIntegers` | 758 | 299 | 1241 |
+| `QuadraticNumberFields/Examples` | 519 | 124 | 718 |
+| `QuadraticNumberFields` | 337 | 195 | 631 |
+| `QuadraticNumberFields/Euclidean` | 48 | 25 | 89 |
+| `Root` | 16 | 0 | 16 |
+| **Total** | **1678** | **643** | **2321** |
+
 ## Prerequisites
 
 - [Lean 4](https://leanprover.github.io/) `v4.29.0-rc2`
