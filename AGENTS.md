@@ -51,6 +51,7 @@ The Lean source lives under `Lean/QuadraticNumberFields/`. The core type is `Qsq
 - Name: Frankie Wang
 - Email: git@frankie.wang
 - GitHub: FrankieeW
+- Should check gh and git config and status after every session to ensure commits are properly attributed
 
 ## Workflow Guidelines
 
