@@ -4,7 +4,18 @@ Main rules and guidelines for AI agents working on this repository.
 
 ## Project Overview
 
-A Lean 4 formalization of quadratic number fields Q(√d) and the classification of their ring of integers. The main result: for squarefree `d ≠ 1`, `𝓞(Q(√d)) ≃+* ℤ√d` when `d % 4 ≠ 1`, and `𝓞(Q(√d)) ≃+* ℤ[(1+√d)/2]` when `d % 4 = 1`.
+A Lean 4 formalization of quadratic number fields `Q(√d)` and the
+classification of their ring of integers.
+
+Core objects:
+- `Qsqrtd (d : ℚ) := QuadraticAlgebra ℚ d 0`
+- `QuadFieldParam d`: stores `Squarefree d` and `d ≠ 1`
+- `QuadraticNumberFields (d : ℤ) [QuadFieldParam d] := Qsqrtd (d : ℚ)`
+
+Main ring-of-integers theorems (`RingOfIntegers/Classification.lean`):
+- `ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one`
+- `ringOfIntegers_equiv_zOnePlusSqrtOverTwo_of_mod_four_eq_one`
+- `ringOfIntegers_classification`
 
 ## Build Commands
 
@@ -18,14 +29,16 @@ Only run `lake build` if Lean files were actually modified. Use `lean_diagnostic
 
 ## Key Architecture
 
-The Lean source lives under `Lean/QuadraticNumberFields/`. The core type is `Qsqrtd d := QuadraticAlgebra ℚ d 0` (from mathlib). Everything flows through the `QuadFieldParam d` typeclass which gates the squarefree/non-one requirements.
+The Lean source lives under `Lean/QuadraticNumberFields/`. The base type is
+`Qsqrtd`; `QuadraticNumberFields d` is the integer-parameter alias used by the
+main theorems, with parameter validity gated by `QuadFieldParam d`.
 
 - **`Basic.lean`** — Defines `Qsqrtd d` with trace, norm, and ℚ-embedding
+- **`Instances.lean`** — Defines `QuadraticNumberFields d` and `Field`/`NumberField` instances
 - **`Param.lean`** — `QuadFieldParam d` typeclass (squarefree `d ≠ 1`), instances for `-1`, `-3`, primes
-- **`Def.lean`** — Root import aggregating Basic, Rescale, Param, FieldInstance, ParamUniqueness
-- **`FieldInstance.lean`** — Field typeclass instances for `Qsqrtd d`
 - **`Rescale.lean`** — Isomorphisms between `Q(√d)` and `Q(√(c²d))`
 - **`ParamUniqueness.lean`** — Uniqueness of the quadratic field parameter
+- **`TotallyRealComplex.lean`** — Totally real / complex place behavior for `Q(√d)`
 - **`RingOfIntegers/`** — Classification theorem:
   - `Integrality.lean` — `IsIntegralClosure` constructions, half-integer normal form
   - `ModFour.lean` — Modulo-4 arithmetic lemmas
