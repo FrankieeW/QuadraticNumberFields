@@ -6,7 +6,7 @@ Authors: Frankie Wang
 Ideal factorization and primality results for ℤ[√-5].
 Ported from the ANT project.
 -/
-import Mathlib.NumberTheory.Zsqrtd.Basic
+import QuadraticNumberFields.Examples.ZsqrtdNeg5.Basic
 import Mathlib.RingTheory.Ideal.Operations
 import Mathlib.RingTheory.Ideal.Norm.AbsNorm
 import Mathlib.Tactic.NormNum
@@ -37,18 +37,7 @@ namespace QuadraticNumberFields.Examples.ZsqrtdNeg5
 /-- The working quadratic integer ring `ℤ[√-5]` used in this file. -/
 abbrev R := Zsqrtd (-5)
 
-instance instNoZeroDivisorsR : NoZeroDivisors R where
-  eq_zero_or_eq_zero_of_mul_eq_zero := by
-    intro a b hab
-    have hnorm : Zsqrtd.norm (a * b) = 0 := by
-      simp [hab, Zsqrtd.norm_zero (d := (-5))]
-    have hmulnorm : Zsqrtd.norm a * Zsqrtd.norm b = 0 := by
-      simpa [Zsqrtd.norm_mul] using hnorm
-    rcases mul_eq_zero.mp hmulnorm with ha | hb
-    · exact Or.inl ((Zsqrtd.norm_eq_zero_iff (d := (-5)) (by decide) a).1 ha)
-    · exact Or.inr ((Zsqrtd.norm_eq_zero_iff (d := (-5)) (by decide) b).1 hb)
-
-instance instIsDomainR : IsDomain R := NoZeroDivisors.to_isDomain R
+instance : Fact ((-5 : ℤ) < 0) := ⟨by decide⟩
 
 theorem factorization_of_two :
     span {(2 : R)} = (span {2, 1 + sqrtd}) ^ 2 := by
