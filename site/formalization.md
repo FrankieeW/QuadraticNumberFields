@@ -179,6 +179,16 @@ We use automation for routine proofs:
 - `ring` for polynomial identities
 - `field_simp` for field manipulations
 
+## Concrete Examples: $\mathbb{Z}[\sqrt{-5}]$
+
+The formalization now includes a complete worked example for $d = -5$, demonstrating the ideal-theoretic machinery in a concrete setting. The `Examples/ZsqrtdNeg5` module provides:
+
+- **Domain instances** (`Basic.lean`): General `NoZeroDivisors` and `IsDomain` instances for $\mathbb{Z}[\sqrt{d}]$ when $d < 0$
+- **Ideal factorization and primality** (`Ideals.lean`): Explicit factorizations $(2) = \mathfrak{p}_2^2$, $(3) = \mathfrak{p}_{3,1} \cdot \mathfrak{p}_{3,2}$, and $(1 \pm \sqrt{-5}) = \mathfrak{p}_2 \cdot \mathfrak{p}_{3,i}$, with proofs that $\mathfrak{p}_2$, $\mathfrak{p}_{3,1}$, $\mathfrak{p}_{3,2}$ are prime ideals and membership criteria for each
+- **Ramification and inertia** (`RamificationInertia.lean`): Ramification indices $e(\mathfrak{p}_2 \mid 2) = 2$ and $e(\mathfrak{p}_{3,i} \mid 3) = 1$; inertia degrees $f = 1$; quotient ring isomorphisms $\mathbb{Z}[\sqrt{-5}]/\mathfrak{p} \cong \mathbb{Z}/p\mathbb{Z}$; verification of the fundamental identity $efg = 2$
+
+These results serve as a validation of the general theory and a template for formalizing similar computations in other quadratic rings.
+
 ## Future Extensions
 
 Potential directions for extending this formalization:
@@ -187,7 +197,7 @@ Potential directions for extending this formalization:
 2. **Class groups:** Define and compute class numbers
 3. **Unit groups:** Structure theorem for units in real quadratic fields
 4. **Continued fractions:** Connection to Pell's equation
-5. **Factorization:** Algorithms for factoring in rings of integers
+5. **Additional concrete examples:** Extend the `Examples` module to other quadratic rings (e.g., $d = -6$, $d = -10$) following the $\mathbb{Z}[\sqrt{-5}]$ template
 
 ## Performance Considerations
 

@@ -129,6 +129,9 @@ theorem isUnit_zOnePlusSqrtOverTwo_iff_norm_eq_one_or_neg_one
 | `RingOfIntegers/Zsqrtd.lean` | $\mathbb{Z}[\sqrt{d}]$ definitions |
 | `RingOfIntegers/ZOnePlusSqrtOverTwo.lean` | $\mathbb{Z}[\omega]$ definitions |
 | `Euclidean/Basic.lean` | Euclidean domain structure |
+| `Examples/ZsqrtdNeg5/Basic.lean` | `NoZeroDivisors`/`IsDomain` instances for $\mathbb{Z}[\sqrt{d}]$ when $d < 0$ |
+| `Examples/ZsqrtdNeg5/Ideals.lean` | Ideal factorizations in $\mathbb{Z}[\sqrt{-5}]$: $(2)=\mathfrak{p}_2^2$, $(3)=\mathfrak{p}_{3,1}\cdot\mathfrak{p}_{3,2}$, $(1\pm\sqrt{-5})=\mathfrak{p}_2\cdot\mathfrak{p}_{3,i}$; primality and membership criteria |
+| `Examples/ZsqrtdNeg5/RamificationInertia.lean` | Ramification indices $e(\mathfrak{p}_2\mid 2)=2$, $e(\mathfrak{p}_{3,i}\mid 3)=1$; inertia degrees $f=1$; quotient ring isomorphisms; $efg=2$ verification |
 
 ## See Also
 

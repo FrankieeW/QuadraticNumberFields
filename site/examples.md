@@ -141,6 +141,23 @@ A ring of integers $\mathcal{O}_K$ has **unique factorization** if every non-zer
 $$6 = 2 \cdot 3 = (1 + \sqrt{-5})(1 - \sqrt{-5})$$
 - Both factorizations are into irreducibles, showing failure of unique factorization
 
+This failure of unique factorization in $\mathbb{Z}[\sqrt{-5}]$ has been **formally verified** in our Lean formalization. The `Examples/ZsqrtdNeg5` module provides machine-checked proofs of the ideal-theoretic structure that restores unique factorization at the level of ideals:
+
+**Ideal Factorizations (formally verified):**
+- $(2) = \mathfrak{p}_2^2$ where $\mathfrak{p}_2 = (2, 1 + \sqrt{-5})$
+- $(3) = \mathfrak{p}_{3,1} \cdot \mathfrak{p}_{3,2}$ where $\mathfrak{p}_{3,1} = (3, 1 + \sqrt{-5})$ and $\mathfrak{p}_{3,2} = (3, 1 - \sqrt{-5})$
+- $(1 + \sqrt{-5}) = \mathfrak{p}_2 \cdot \mathfrak{p}_{3,1}$ and $(1 - \sqrt{-5}) = \mathfrak{p}_2 \cdot \mathfrak{p}_{3,2}$
+
+**Primality:** The ideals $\mathfrak{p}_2$, $\mathfrak{p}_{3,1}$, and $\mathfrak{p}_{3,2}$ are all proven to be prime ideals, with explicit membership criteria formalized in Lean.
+
+**Ramification and Inertia (formally verified):**
+- The prime 2 **ramifies** in $\mathbb{Z}[\sqrt{-5}]$: ramification index $e(\mathfrak{p}_2 \mid 2) = 2$, inertia degree $f = 1$
+- The prime 3 **splits** in $\mathbb{Z}[\sqrt{-5}]$: ramification index $e(\mathfrak{p}_{3,i} \mid 3) = 1$, inertia degree $f = 1$
+- The fundamental identity $efg = 2$ is verified for both primes
+- Quotient ring isomorphisms $\mathbb{Z}[\sqrt{-5}]/\mathfrak{p} \cong \mathbb{Z}/p\mathbb{Z}$ are established
+
+See the Lean source files in `Examples/ZsqrtdNeg5/` for the complete formalization: `Basic.lean` (domain instances), `Ideals.lean` (ideal factorizations and primality), and `RamificationInertia.lean` (ramification indices, inertia degrees, and quotient isomorphisms).
+
 ## Class Numbers
 
 The **class number** $h_K$ measures the failure of unique factorization in $\mathcal{O}_K$.

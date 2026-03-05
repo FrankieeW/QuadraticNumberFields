@@ -16,6 +16,7 @@ This project provides a complete formalization in Lean 4 of:
 - The classification of their rings of integers
 - Norm and trace properties
 - Integrality criteria and unit structures
+- Concrete examples including ideal factorization and ramification in $\mathbb{Z}[\sqrt{-5}]$
 
 The formalization is fully verified and integrates with mathlib's algebraic hierarchy.
 
@@ -42,6 +43,7 @@ For $d = -3$: Since $-3 \equiv 1 \pmod{4}$, we have $\mathcal{O}_{\mathbb{Q}(\sq
 |-----------|-------------|
 | `Lean/QuadraticNumberFields/` | Core definitions and proofs |
 | `Lean/QuadraticNumberFields/RingOfIntegers/` | Classification theorems |
+| `Lean/QuadraticNumberFields/Examples/ZsqrtdNeg5/` | Concrete examples for $\mathbb{Z}[\sqrt{-5}]$: ideal factorization, primality, ramification and inertia |
 | `Verso/` | Documentation generation |
 | `site/` | Jekyll website |
 
