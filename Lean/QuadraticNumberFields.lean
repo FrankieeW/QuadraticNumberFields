@@ -11,3 +11,5 @@ import QuadraticNumberFields.RingOfIntegers.ZOnePlusSqrtOverTwo
 import QuadraticNumberFields.RingOfIntegers.Integrality
 import QuadraticNumberFields.RingOfIntegers.Classification
 import QuadraticNumberFields.RingOfIntegers.Norm
+import QuadraticNumberFields.Examples.ZsqrtdNeg5.Ideals
+import QuadraticNumberFields.Examples.ZsqrtdNeg5.RamificationInertia

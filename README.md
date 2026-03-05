@@ -24,6 +24,7 @@ This project formalizes:
 - Ring of integers classification (`ringOfIntegers_classification`)
 - Integrality criteria via trace and norm
 - Euclidean domain classification framework: for squarefree `d < 0`, the ring `𝓞 (Q(√d))` is norm-Euclidean iff `d ∈ {-1, -2, -3, -7, -11}`
+- Concrete verified examples for ℤ[√-5]: domain properties, ideal factorization, primality, and ramification/inertia computations
 
 ## Project Structure
 
@@ -42,6 +43,11 @@ QuadraticNumberFields/
 │       ├── Rescale.lean             # Rescaling between Q(√d) forms
 │       ├── Euclidean/
 │       │   └── Basic.lean           # Euclidean domain classification framework
+│       ├── Examples/
+│       │   └── ZsqrtdNeg5/
+│       │       ├── Basic.lean           # NoZeroDivisors/IsDomain for negative d
+│       │       ├── Ideals.lean          # Ideal factorization and primality in ℤ[√-5]
+│       │       └── RamificationInertia.lean  # Ramification indices and inertia degrees
 │       └── RingOfIntegers/
 │           ├── Classification.lean  # Main classification theorem
 │           ├── HalfInt.lean         # Half-integer normal form
