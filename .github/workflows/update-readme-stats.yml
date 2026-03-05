@@ -20,9 +20,6 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
-        run: pip install -q
-
       - name: Generate and update README stats
         run: python3 scripts/update_readme_stats.py
 
