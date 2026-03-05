@@ -1,12 +1,22 @@
 # QuadraticNumberFields
 
-A Lean 4 formalization of quadratic number fields Q(√d) and the classification of their ring of integers.
+A Lean 4 formalization of quadratic number fields `Q(√d)` and the classification
+of their ring of integers, centered on the Lean objects `Qsqrtd`,
+`QuadraticNumberFields`, and `QuadFieldParam`.
 
 **[Documentation site](https://frankieew.github.io/QuadraticNumberFields)**
 
 ## Main Result
 
-For squarefree `d ≠ 1`, the ring of integers `𝓞 (Q(√d))` is classified as follows:
+The final classification lives in
+`Lean/QuadraticNumberFields/RingOfIntegers/Classification.lean`:
+
+- `ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one`
+- `ringOfIntegers_equiv_zOnePlusSqrtOverTwo_of_mod_four_eq_one`
+- `ringOfIntegers_classification`
+
+Mathematically, for `d : ℤ` with `[QuadFieldParam d]`, the ring of integers
+`𝓞 (Q(√d))` is classified as follows:
 
 - If `d % 4 ≠ 1`, then `𝓞 (Q(√d)) ≃+* ℤ√d`.
 - If `d % 4 = 1`, writing `d = 1 + 4k`, then `𝓞 (Q(√d)) ≃+* ℤ[(1+√d)/2]`.
@@ -15,10 +25,21 @@ Classical examples:
 - **Gaussian integers** (`d = -1`): `𝓞 (Q(√(-1))) ≃+* ℤ[i]`
 - **Eisenstein integers** (`d = -3`): `𝓞 (Q(√(-3))) ≃+* ℤ[ω]` where `ω = (1+√(-3))/2`
 
+## Core Lean Objects
+
+- `Qsqrtd (d : ℚ) := QuadraticAlgebra ℚ d 0`
+  (`Lean/QuadraticNumberFields/Basic.lean`)
+- `QuadFieldParam (d : ℤ)` with fields `squarefree : Squarefree d` and `ne_one : d ≠ 1`
+  (`Lean/QuadraticNumberFields/Param.lean`)
+- `QuadraticNumberFields (d : ℤ) [QuadFieldParam d] := Qsqrtd (d : ℚ)`
+  (`Lean/QuadraticNumberFields/Instances.lean`)
+- `Zsqrtd d` and `ZOnePlusSqrtOverTwo k` as the two candidate integral models
+  (`Lean/QuadraticNumberFields/RingOfIntegers/`)
+
 ## Mathematical Content
 
 This project formalizes:
-- Definition of quadratic number fields Q(√d) as `QuadraticAlgebra ℚ d 0`
+- Quadratic number fields through `Qsqrtd` / `QuadraticNumberFields`
 - `QuadFieldParam`: typeclass for squarefree `d ≠ 1` parameters
 - Parametrization and uniqueness of the quadratic field structure
 - Ring of integers classification (`ringOfIntegers_classification`)
@@ -36,11 +57,11 @@ QuadraticNumberFields/
 │   ├── QuadraticNumberFields.lean    # Root module
 │   └── QuadraticNumberFields/
 │       ├── Basic.lean               # Qsqrtd type, norm and trace
-│       ├── Def.lean                 # QuadraticNumberFields definition
+│       ├── Instances.lean           # QuadraticNumberFields alias + field/number field instances
 │       ├── Param.lean               # QuadFieldParam typeclass and instances
 │       ├── ParamUniqueness.lean     # Uniqueness of the quadratic structure
-│       ├── FieldInstance.lean       # Field typeclass instances
 │       ├── Rescale.lean             # Rescaling between Q(√d) forms
+│       ├── TotallyRealComplex.lean  # Totally real / complex place behavior
 │       ├── Euclidean/
 │       │   └── Basic.lean           # Euclidean domain classification framework
 │       ├── Examples/
