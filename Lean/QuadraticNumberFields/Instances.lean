@@ -5,7 +5,6 @@ Authors: Frankie Wang
 -/
 import QuadraticNumberFields.Param
 import Mathlib.NumberTheory.NumberField.Basic
-import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
 
 /-!
 # Field and Number Field Instances
