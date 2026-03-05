@@ -34,6 +34,9 @@ Writing `φ(ω) = a + bi` gives `a² - b² = d` and `2ab = 0`.
 -/
 
 -- Resolve the diamond between `DivisionRing.toRatAlgebra` and `QuadraticAlgebra.instAlgebra`.
+-- NOTE: This is a file-local workaround. The attribute disables the conflicting instance
+-- only within this file's typeclass resolution. Downstream files importing this module
+-- retain the standard `DivisionRing.toRatAlgebra` instance.
 attribute [-instance] DivisionRing.toRatAlgebra
 
 namespace QuadraticNumberFields
@@ -126,9 +129,7 @@ theorem isTotallyComplex (hd : d < 0) :
 
 /-- An imaginary quadratic field `Q(√d)` with `d < 0` is a CM field:
 it is totally complex and a quadratic extension of its totally real subfield `ℚ`. -/
-theorem isCMField (hd : d < 0) :
-    letI := isTotallyComplex hd
-    NumberField.IsCMField (QuadraticNumberFields d) :=
+theorem isCMField (hd : d < 0) : NumberField.IsCMField (QuadraticNumberFields d) :=
   letI := isTotallyComplex hd
   NumberField.IsCMField.ofCMExtension ℚ (QuadraticNumberFields d)
 
