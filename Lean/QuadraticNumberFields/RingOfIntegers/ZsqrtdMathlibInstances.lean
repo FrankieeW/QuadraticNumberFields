@@ -2,12 +2,24 @@
 Copyright (c) 2026 Frankie Wang. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Frankie Wang
-
-General instances for `ℤ[√d]` when `d < 0`: no zero divisors and integral domain.
 -/
 import Mathlib.NumberTheory.Zsqrtd.Basic
 
-open Zsqrtd
+/-!
+# Additional Instances for mathlib `Zsqrtd`
+
+This module adds generic algebraic instances for mathlib's `_root_.Zsqrtd d`
+under the hypothesis `d < 0`.
+
+## Main Definitions
+
+* `Zsqrtd.instNoZeroDivisors`: `NoZeroDivisors (Zsqrtd d)` for `d < 0`.
+* `Zsqrtd.instIsDomain`: `IsDomain (Zsqrtd d)` for `d < 0`.
+
+## Main Theorems
+
+* No new named theorems are introduced in this file.
+-/
 
 namespace Zsqrtd
 

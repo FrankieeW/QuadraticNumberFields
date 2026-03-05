@@ -6,7 +6,7 @@ Authors: Frankie Wang
 Ideal factorization and primality results for ℤ[√-5].
 Ported from the ANT project.
 -/
-import QuadraticNumberFields.Examples.ZsqrtdNeg5.Basic
+import QuadraticNumberFields.RingOfIntegers.ZsqrtdMathlibInstances
 import Mathlib.RingTheory.Ideal.Operations
 import Mathlib.RingTheory.Ideal.Norm.AbsNorm
 import Mathlib.Tactic.NormNum
