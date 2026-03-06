@@ -151,23 +151,26 @@ lemma not_span3_le_P3₂_sq : ¬(span ({(3 : R)} : Set R) : Ideal R) ≤ P3₂ ^
 -- Comap and quotient lemmas (instantiated from general theory)
 -- ============================================================================
 
+instance : Fact (Nat.Prime 2) := ⟨by decide⟩
+instance : Fact (Nat.Prime 3) := ⟨by decide⟩
+
 lemma comap_P2 : Ideal.comap (algebraMap ℤ R) P2 = (span ({(2 : ℤ)} : Set ℤ) : Ideal ℤ) :=
-  Zsqrtd.Ideal.comap_span_two_one_plus_sqrtd (-5) neg5_dvd_two
+  Zsqrtd.Ideal.comap_span_p_one_plus_sqrtd 2 neg5_dvd_two
 
 lemma comap_P3₁ : Ideal.comap (algebraMap ℤ R) P3₁ = (span ({(3 : ℤ)} : Set ℤ) : Ideal ℤ) :=
-  Zsqrtd.Ideal.comap_span_three_one_plus_sqrtd (-5) neg5_dvd_three
+  Zsqrtd.Ideal.comap_span_p_one_plus_sqrtd 3 neg5_dvd_three
 
 lemma comap_P3₂ : Ideal.comap (algebraMap ℤ R) P3₂ = (span ({(3 : ℤ)} : Set ℤ) : Ideal ℤ) :=
-  Zsqrtd.Ideal.comap_span_three_one_minus_sqrtd (-5) neg5_dvd_three
+  Zsqrtd.Ideal.comap_span_p_one_minus_sqrtd 3 neg5_dvd_three
 
 noncomputable def quotEquivP2 : (R ⧸ P2) ≃+* ZMod 2 :=
-  Zsqrtd.Ideal.quotEquivZMod2 (-5) neg5_dvd_two
+  Zsqrtd.Ideal.quotEquivZModPNeg 2 neg5_dvd_two
 
 noncomputable def quotEquivP3₁ : (R ⧸ P3₁) ≃+* ZMod 3 :=
-  Zsqrtd.Ideal.quotEquivZMod3Plus (-5) neg5_dvd_three
+  Zsqrtd.Ideal.quotEquivZModPNeg 3 neg5_dvd_three
 
 noncomputable def quotEquivP3₂ : (R ⧸ P3₂) ≃+* ZMod 3 :=
-  Zsqrtd.Ideal.quotEquivZMod3Minus (-5) neg5_dvd_three
+  Zsqrtd.Ideal.quotEquivZModP 3 neg5_dvd_three
 
 -- ============================================================================
 -- Main Results: Ramification Index
@@ -239,7 +242,7 @@ theorem inertiaDeg_P2 :
   rw [Ideal.inertiaDeg, dif_pos comap_P2]
   have hfin := Algebra.finrank_eq_of_equiv_equiv (Int.quotientSpanNatEquivZMod 2) quotEquivP2 (by
     ext n
-    simp [quotEquivP2, Zsqrtd.Ideal.quotEquivZMod2, Zsqrtd.Ideal.liftMod2, P2])
+    simp [quotEquivP2, Zsqrtd.Ideal.quotEquivZModPNeg, Zsqrtd.Ideal.liftModPNeg, P2])
   exact_mod_cast hfin.trans (by simp [Module.finrank_self])
 
 /-- The inertia degree of P3₁ over (3) is 1. -/
@@ -250,7 +253,7 @@ theorem inertiaDeg_P3₁ :
   rw [Ideal.inertiaDeg, dif_pos comap_P3₁]
   have hfin := Algebra.finrank_eq_of_equiv_equiv (Int.quotientSpanNatEquivZMod 3) quotEquivP3₁ (by
     ext n
-    simp [quotEquivP3₁, Zsqrtd.Ideal.quotEquivZMod3Plus, Zsqrtd.Ideal.liftMod3Plus, P3₁])
+    simp [quotEquivP3₁, Zsqrtd.Ideal.quotEquivZModPNeg, Zsqrtd.Ideal.liftModPNeg, P3₁])
   exact_mod_cast hfin.trans (by simp [Module.finrank_self])
 
 /-- The inertia degree of P3₂ over (3) is 1. -/
@@ -261,7 +264,7 @@ theorem inertiaDeg_P3₂ :
   rw [Ideal.inertiaDeg, dif_pos comap_P3₂]
   have hfin := Algebra.finrank_eq_of_equiv_equiv (Int.quotientSpanNatEquivZMod 3) quotEquivP3₂ (by
     ext n
-    simp [quotEquivP3₂, Zsqrtd.Ideal.quotEquivZMod3Minus, Zsqrtd.Ideal.liftMod3Minus, P3₂])
+    simp [quotEquivP3₂, Zsqrtd.Ideal.quotEquivZModP, Zsqrtd.Ideal.liftModP, P3₂])
   exact_mod_cast hfin.trans (by simp [Module.finrank_self])
 
 end QuadraticNumberFields.Examples.ZsqrtdNeg5

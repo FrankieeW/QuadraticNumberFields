@@ -171,14 +171,17 @@ theorem factorization_of_one_minus_sqrtd :
 
 theorem isPrime_span_two_one_plus_sqrtd :
     IsPrime (span {2, 1 + sqrtd} : Ideal R) :=
-  Zsqrtd.Ideal.isPrime_span_two_one_plus_sqrtd (-5) neg5_dvd_two
+  haveI : Fact (Nat.Prime 2) := ⟨by decide⟩
+  Zsqrtd.Ideal.isPrime_span_p_one_plus_sqrtd 2 neg5_dvd_two
 
 theorem isPrime_span_three_one_plus_sqrtd :
     IsPrime (span {3, 1 + sqrtd} : Ideal R) :=
-  Zsqrtd.Ideal.isPrime_span_three_one_plus_sqrtd (-5) neg5_dvd_three
+  haveI : Fact (Nat.Prime 3) := ⟨by decide⟩
+  Zsqrtd.Ideal.isPrime_span_p_one_plus_sqrtd 3 neg5_dvd_three
 
 theorem isPrime_span_three_one_minus_sqrtd :
     IsPrime (span {3, 1 - sqrtd} : Ideal R) :=
-  Zsqrtd.Ideal.isPrime_span_three_one_minus_sqrtd (-5) neg5_dvd_three
+  haveI : Fact (Nat.Prime 3) := ⟨by decide⟩
+  Zsqrtd.Ideal.isPrime_span_p_one_minus_sqrtd 3 neg5_dvd_three
 
 end QuadraticNumberFields.Examples.ZsqrtdNeg5
