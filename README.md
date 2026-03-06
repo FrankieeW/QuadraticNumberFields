@@ -86,12 +86,12 @@ QuadraticNumberFields/
 
 | Module | Code Lines | Comment Lines | Total Lines |
 |--------|------------|---------------|-------------|
-| `QuadraticNumberFields/RingOfIntegers` | 758 | 299 | 1241 |
-| `QuadraticNumberFields/Examples` | 519 | 124 | 718 |
+| `QuadraticNumberFields/RingOfIntegers` | 980 | 361 | 1564 |
 | `QuadraticNumberFields` | 337 | 195 | 631 |
+| `QuadraticNumberFields/Examples` | 283 | 107 | 457 |
 | `QuadraticNumberFields/Euclidean` | 48 | 25 | 89 |
-| `Root` | 16 | 0 | 16 |
-| **Total** | **1678** | **643** | **2321** |
+| `Root` | 17 | 0 | 17 |
+| **Total** | **1665** | **688** | **2353** |
 
 ## Prerequisites
 
