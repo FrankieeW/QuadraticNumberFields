@@ -7,6 +7,7 @@ import QuadraticNumberFields.Euclidean.Basic
 import QuadraticNumberFields.RingOfIntegers.ModFour
 import QuadraticNumberFields.RingOfIntegers.Zsqrtd
 import QuadraticNumberFields.RingOfIntegers.ZsqrtdMathlibInstances
+import QuadraticNumberFields.RingOfIntegers.ZsqrtdIdeals
 import QuadraticNumberFields.RingOfIntegers.HalfInt
 import QuadraticNumberFields.RingOfIntegers.ZOnePlusSqrtOverTwo
 import QuadraticNumberFields.RingOfIntegers.Integrality
