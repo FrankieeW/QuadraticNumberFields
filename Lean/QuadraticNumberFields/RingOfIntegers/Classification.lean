@@ -121,7 +121,9 @@ theorem ringOfIntegers_classification
 These are classical examples of rings of integers in imaginary quadratic fields.
 
 * **Gaussian integers** `ℤ[i] = ℤ[√(-1)]`: d = -1, d % 4 = 3 ≢ 1
-* **Eisenstein integers** `ℤ[ω]` where `ω = (1+√(-3))/2`: d = -3, d % 4 = 1
+* **Eisenstein integers** `ℤ[(1+√(-3))/2]`: equivalently `ℤ[ω]` for the
+  standard primitive cube root `ω = (-1+√(-3))/2`, since these generators
+  differ by `1`
 -/
 
 /-- **Gaussian integers**: `𝓞(Q(√(-1))) ≃ ℤ[i]`.
@@ -130,7 +132,10 @@ Since -1 % 4 = 3 ≠ 1, we are in the non-1-mod-4 branch. -/
 example : Nonempty (𝓞 (QuadraticNumberFields (-1)) ≃+* Zsqrtd (-1)) :=
   ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one (-1) (by decide)
 
-/-- **Eisenstein integers**: `𝓞(Q(√(-3))) ≃ ℤ[ω]` where `ω = (1+√(-3))/2`.
+/-- **Eisenstein integers**: `𝓞(Q(√(-3))) ≃ ℤ[(1+√(-3))/2]`.
+
+This is the same ring as the usual `ℤ[ω]` for the standard primitive cube root
+`ω = (-1+√(-3))/2`, since `(1+√(-3))/2 = 1 + ω`.
 
 Since -3 % 4 = 1, we are in the 1-mod-4 branch with k = -1
 (since -3 = 1 + 4·(-1)). -/
