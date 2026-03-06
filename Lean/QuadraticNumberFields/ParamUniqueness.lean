@@ -41,17 +41,9 @@ lemma not_isSquare_neg_one_rat : ¬ IsSquare (- (1 : ℚ)) := by
 /-- A squarefree integer that is a perfect square (as an integer) must equal `1`. -/
 lemma nat_eq_one_of_squarefree_intcast_of_isSquare (m : ℕ)
     (hsm : Squarefree (m : ℤ)) (hsq : IsSquare (m : ℤ)) : m = 1 := by
-  rcases hsq with ⟨z, hz⟩
-  by_cases huz : IsUnit z
-  · rcases Int.isUnit_iff.mp huz with hz1 | hz1
-    all_goals
-      have hmz : (m : ℤ) = 1 := by simpa [hz1] using hz
-      norm_num at hmz
-      exact hmz
-  · have hsqz2 : Squarefree (z ^ 2) := by simpa [hz, pow_two] using hsm
-    have h01 : (2 : ℕ) = 0 ∨ (2 : ℕ) = 1 :=
-      Squarefree.eq_zero_or_one_of_pow_of_not_isUnit (x := z) (n := 2) hsqz2 huz
-    norm_num at h01
+  have hmz : (m : ℤ) = 1 :=
+    QuadFieldParam.eq_one_of_squarefree_isSquare hsm hsq
+  exact_mod_cast hmz
 
 /-- If `d₁/d₂` is a rational square and `d₂` is squarefree, then `d₂ ∣ d₁`. -/
 lemma int_dvd_of_ratio_square (d₁ d₂ : ℤ) (hd₂ : d₂ ≠ 0)

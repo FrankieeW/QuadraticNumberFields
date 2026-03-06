@@ -146,6 +146,21 @@ theorem norm_mem_ringOfIntegers (d : ℤ) [QuadFieldParam d]
 
 /-! ## Unit Criterion -/
 
+private theorem isUnit_iff_norm_eq_one_or_neg_one
+    {a b : ℤ} (z : QuadraticAlgebra ℤ a b) :
+    IsUnit z ↔ QuadraticAlgebra.norm z = 1 ∨ QuadraticAlgebra.norm z = -1 := by
+  constructor
+  · intro h
+    have h_norm_unit : IsUnit (QuadraticAlgebra.norm z) :=
+      QuadraticAlgebra.isUnit_iff_norm_isUnit.mp h
+    rcases Int.isUnit_iff.mp h_norm_unit with h1 | hneg1
+    · exact Or.inl h1
+    · exact Or.inr hneg1
+  · intro h
+    rcases h with h1 | hneg1
+    · exact QuadraticAlgebra.isUnit_iff_norm_isUnit.mpr (h1 ▸ isUnit_one)
+    · exact QuadraticAlgebra.isUnit_iff_norm_isUnit.mpr (hneg1 ▸ isUnit_neg_one)
+
 /-- An element of `Zsqrtd d` is a unit iff its norm is `±1`.
 
 Proof sketch:
@@ -153,46 +168,14 @@ Proof sketch:
   Thus `N(z)` divides `1` in `ℤ`, so `N(z) = ±1`.
 * (⟸) If `N(z) = ±1`, then `z · conj(z) = N(z) = ±1`, so `z` is a unit. -/
 theorem isUnit_zsqrtd_iff_norm_eq_one_or_neg_one (d : ℤ) (z : Zsqrtd d) :
-    IsUnit z ↔ Zsqrtd.norm z = 1 ∨ Zsqrtd.norm z = -1 := by
-  constructor
-  · intro h
-    -- N(z) divides 1 in ℤ, hence N(z) = ±1
-    have h_norm_unit : IsUnit (Zsqrtd.norm z) :=
-      QuadraticAlgebra.isUnit_iff_norm_isUnit.mp h
-    rcases Int.isUnit_iff.mp h_norm_unit with h | h
-    · left; exact h
-    · right; linarith
-  · intro h
-    -- If N(z) = ±1, then z · conj(z) = N(z), so z · (conj(z) / N(z)) = 1
-    rcases h with h1 | h_neg1
-    · -- N(z) = 1: z · conj(z) = 1
-      convert QuadraticAlgebra.isUnit_iff_norm_isUnit.mpr ?_
-      simp only [h1]
-      exact isUnit_one
-    · -- N(z) = -1: z · (-conj(z)) = 1
-      convert QuadraticAlgebra.isUnit_iff_norm_isUnit.mpr ?_
-      simp only [h_neg1]
-      exact isUnit_neg_one
+    IsUnit z ↔ Zsqrtd.norm z = 1 ∨ Zsqrtd.norm z = -1 :=
+  by simpa using isUnit_iff_norm_eq_one_or_neg_one z
 
 /-- An element of `ZOnePlusSqrtOverTwo k` is a unit iff its norm is `±1`. -/
 theorem isUnit_zOnePlusSqrtOverTwo_iff_norm_eq_one_or_neg_one
     (k : ℤ) (z : ZOnePlusSqrtOverTwo k) :
-    IsUnit z ↔ QuadraticAlgebra.norm z = 1 ∨ QuadraticAlgebra.norm z = -1 := by
-  constructor
-  · intro h
-    have h_norm_unit : IsUnit (QuadraticAlgebra.norm z) :=
-      QuadraticAlgebra.isUnit_iff_norm_isUnit.mp h
-    rcases Int.isUnit_iff.mp h_norm_unit with h | h
-    · left; exact h
-    · right; linarith
-  · intro h
-    rcases h with h1 | h_neg1
-    · convert QuadraticAlgebra.isUnit_iff_norm_isUnit.mpr ?_
-      simp only [h1]
-      exact isUnit_one
-    · convert QuadraticAlgebra.isUnit_iff_norm_isUnit.mpr ?_
-      simp only [h_neg1]
-      exact isUnit_neg_one
+    IsUnit z ↔ QuadraticAlgebra.norm z = 1 ∨ QuadraticAlgebra.norm z = -1 :=
+  by simpa using isUnit_iff_norm_eq_one_or_neg_one z
 
 end RingOfIntegers
 end QuadraticNumberFields

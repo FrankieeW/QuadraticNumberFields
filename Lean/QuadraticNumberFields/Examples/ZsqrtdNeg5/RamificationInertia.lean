@@ -44,13 +44,6 @@ open Ideal Zsqrtd
 namespace QuadraticNumberFields.Examples.ZsqrtdNeg5
 
 -- ============================================================================
--- Arithmetic conditions for d = -5
--- ============================================================================
-
-private lemma neg5_dvd_two : 2 ∣ ((-5 : ℤ) - 1) := ⟨-3, by norm_num⟩
-private lemma neg5_dvd_three : 3 ∣ ((-5 : ℤ) - 1) := ⟨-2, by norm_num⟩
-
--- ============================================================================
 -- Prime ideal definitions
 -- ============================================================================
 
@@ -75,77 +68,78 @@ noncomputable def phiPlus9 : R →+* ZMod 9 :=
 noncomputable def phiMinus9 : R →+* ZMod 9 :=
   Zsqrtd.lift ⟨((-2 : ℤ) : ZMod 9), by decide⟩
 
+private lemma map_span_pair_le_span3_mod9
+    (φ : R →+* ZMod 9) {x y : R}
+    (hx : φ x ∈ span ({(3 : ZMod 9)} : Set (ZMod 9)))
+    (hy : φ y ∈ span ({(3 : ZMod 9)} : Set (ZMod 9))) :
+    map φ (span ({x, y} : Set R)) ≤ span ({(3 : ZMod 9)} : Set (ZMod 9)) := by
+  rw [Ideal.map_span, Ideal.span_le]
+  intro z hz
+  rw [Set.image_pair] at hz
+  rcases hz with rfl | rfl <;> assumption
+
 lemma map_P3₁_le_span3_mod9 :
     map phiPlus9 P3₁ ≤ span ({(3 : ZMod 9)} : Set (ZMod 9)) := by
   unfold P3₁
-  rw [Ideal.map_span, Ideal.span_le]
-  intro y hy
-  rw [Set.image_pair] at hy
-  rcases hy with rfl | rfl
+  refine map_span_pair_le_span3_mod9 phiPlus9 ?_ ?_
   · exact Ideal.mem_span_singleton.mpr ⟨1, by decide⟩
   · exact Ideal.mem_span_singleton.mpr ⟨1, by decide⟩
 
 lemma map_P3₂_le_span3_mod9 :
     map phiMinus9 P3₂ ≤ span ({(3 : ZMod 9)} : Set (ZMod 9)) := by
   unfold P3₂
-  rw [Ideal.map_span, Ideal.span_le]
-  intro y hy
-  rw [Set.image_pair] at hy
-  rcases hy with rfl | rfl
+  refine map_span_pair_le_span3_mod9 phiMinus9 ?_ ?_
   · exact Ideal.mem_span_singleton.mpr ⟨1, by decide⟩
   · exact Ideal.mem_span_singleton.mpr ⟨1, by decide⟩
+
+private lemma not_span3_le_sq_of_map_le_span3_mod9
+    (φ : R →+* ZMod 9) (P : Ideal R)
+    (hP : map φ P ≤ span ({(3 : ZMod 9)} : Set (ZMod 9)))
+    (hφ3 : (φ (3 : R) : ZMod 9) = 3) :
+    ¬ (span ({(3 : R)} : Set R) : Ideal R) ≤ P ^ (1 + 1) := by
+  intro h
+  have hmap : map φ (span ({(3 : R)} : Set R)) ≤ map φ (P ^ (1 + 1)) :=
+    Ideal.map_mono h
+  have hsq : map φ (P ^ (1 + 1)) ≤ ⊥ := by
+    calc
+      map φ (P ^ (1 + 1)) = (map φ P) ^ (1 + 1) := by
+        simpa using (Ideal.map_pow φ P (1 + 1))
+      _ = map φ P * map φ P := by simp [pow_two]
+      _ ≤ span ({(3 : ZMod 9)} : Set (ZMod 9)) * span ({(3 : ZMod 9)} : Set (ZMod 9)) :=
+        Ideal.mul_mono hP hP
+      _ = (span ({(3 : ZMod 9)} : Set (ZMod 9)) : Ideal (ZMod 9)) ^ (1 + 1) := by
+        simp [pow_two]
+      _ = ⊥ := by
+        have h9 : ((3 : ZMod 9) ^ 2) = 0 := by decide
+        rw [Ideal.span_singleton_pow, h9, Ideal.span_singleton_eq_bot]
+  have hbot : map φ (span ({(3 : R)} : Set R)) = ⊥ :=
+    le_bot_iff.mp (hmap.trans hsq)
+  have hzero : ((3 : ZMod 9)) = 0 := by
+    have hzero' : (φ (3 : R) : ZMod 9) = 0 := by
+      apply (Ideal.span_singleton_eq_bot.mp _)
+      simpa [Ideal.map_span] using hbot
+    simpa [hφ3] using hzero'
+  exact (by decide : (3 : ZMod 9) ≠ 0) hzero
+
+private theorem ramificationIdx_eq_one_of_le_and_not_sq
+    (P : Ideal R)
+    (hP : (span ({(3 : R)} : Set R) : Ideal R) ≤ P)
+    (hnot : ¬ (span ({(3 : R)} : Set R) : Ideal R) ≤ P ^ (1 + 1)) :
+    ramificationIdx (algebraMap ℤ R) (span {(3 : ℤ)}) P = 1 := by
+  rw [ramificationIdx_spec]
+  · rw [Zsqrtd.Ideal.map_span_int_singleton, pow_one]
+    simpa using hP
+  · intro h
+    rw [Zsqrtd.Ideal.map_span_int_singleton] at h
+    exact hnot h
 
 lemma not_span3_le_P3₁_sq : ¬(span ({(3 : R)} : Set R) : Ideal R) ≤ P3₁ ^ (1 + 1) := by
-  intro h
-  have hmap : map phiPlus9 (span ({(3 : R)} : Set R)) ≤ map phiPlus9 (P3₁ ^ (1 + 1)) :=
-    Ideal.map_mono h
-  have hsq : map phiPlus9 (P3₁ ^ (1 + 1)) ≤ ⊥ := by
-    calc
-      map phiPlus9 (P3₁ ^ (1 + 1)) = (map phiPlus9 P3₁) ^ (1 + 1) := by
-        simpa using (Ideal.map_pow phiPlus9 P3₁ (1 + 1))
-      _ = map phiPlus9 P3₁ * map phiPlus9 P3₁ := by simp [pow_two]
-      _ ≤ span ({(3 : ZMod 9)} : Set (ZMod 9)) * span ({(3 : ZMod 9)} : Set (ZMod 9)) :=
-        Ideal.mul_mono map_P3₁_le_span3_mod9 map_P3₁_le_span3_mod9
-      _ = (span ({(3 : ZMod 9)} : Set (ZMod 9)) : Ideal (ZMod 9)) ^ (1 + 1) := by
-        simp [pow_two]
-      _ = ⊥ := by
-        have h9 : ((3 : ZMod 9) ^ 2) = 0 := by decide
-        rw [Ideal.span_singleton_pow, h9, Ideal.span_singleton_eq_bot]
-  have hbot : map phiPlus9 (span ({(3 : R)} : Set R)) = ⊥ :=
-    le_bot_iff.mp (hmap.trans hsq)
-  have hzero : ((3 : ZMod 9)) = 0 := by
-    have hphi3 : (phiPlus9 (3 : R) : ZMod 9) = 3 := by simp [phiPlus9]
-    have hzero' : (phiPlus9 (3 : R) : ZMod 9) = 0 := by
-      apply (Ideal.span_singleton_eq_bot.mp _)
-      simpa [Ideal.map_span] using hbot
-    simpa [hphi3] using hzero'
-  exact (by decide : (3 : ZMod 9) ≠ 0) hzero
+  refine not_span3_le_sq_of_map_le_span3_mod9 phiPlus9 P3₁ map_P3₁_le_span3_mod9 ?_
+  simp [phiPlus9]
 
 lemma not_span3_le_P3₂_sq : ¬(span ({(3 : R)} : Set R) : Ideal R) ≤ P3₂ ^ (1 + 1) := by
-  intro h
-  have hmap : map phiMinus9 (span ({(3 : R)} : Set R)) ≤ map phiMinus9 (P3₂ ^ (1 + 1)) :=
-    Ideal.map_mono h
-  have hsq : map phiMinus9 (P3₂ ^ (1 + 1)) ≤ ⊥ := by
-    calc
-      map phiMinus9 (P3₂ ^ (1 + 1)) = (map phiMinus9 P3₂) ^ (1 + 1) := by
-        simpa using (Ideal.map_pow phiMinus9 P3₂ (1 + 1))
-      _ = map phiMinus9 P3₂ * map phiMinus9 P3₂ := by simp [pow_two]
-      _ ≤ span ({(3 : ZMod 9)} : Set (ZMod 9)) * span ({(3 : ZMod 9)} : Set (ZMod 9)) :=
-        Ideal.mul_mono map_P3₂_le_span3_mod9 map_P3₂_le_span3_mod9
-      _ = (span ({(3 : ZMod 9)} : Set (ZMod 9)) : Ideal (ZMod 9)) ^ (1 + 1) := by
-        simp [pow_two]
-      _ = ⊥ := by
-        have h9 : ((3 : ZMod 9) ^ 2) = 0 := by decide
-        rw [Ideal.span_singleton_pow, h9, Ideal.span_singleton_eq_bot]
-  have hbot : map phiMinus9 (span ({(3 : R)} : Set R)) = ⊥ :=
-    le_bot_iff.mp (hmap.trans hsq)
-  have hzero : ((3 : ZMod 9)) = 0 := by
-    have hphi3 : (phiMinus9 (3 : R) : ZMod 9) = 3 := by simp [phiMinus9]
-    have hzero' : (phiMinus9 (3 : R) : ZMod 9) = 0 := by
-      apply (Ideal.span_singleton_eq_bot.mp _)
-      simpa [Ideal.map_span] using hbot
-    simpa [hphi3] using hzero'
-  exact (by decide : (3 : ZMod 9) ≠ 0) hzero
+  refine not_span3_le_sq_of_map_le_span3_mod9 phiMinus9 P3₂ map_P3₂_le_span3_mod9 ?_
+  simp [phiMinus9]
 
 -- ============================================================================
 -- Comap and quotient lemmas (instantiated from general theory)
@@ -203,29 +197,21 @@ theorem ramificationIdx_P2 :
 
 Mathematical reason: (3) = P3₁ · P3₂, so P3₁ appears with exponent 1. -/
 theorem ramificationIdx_P3₁ :
-    ramificationIdx (algebraMap ℤ R) (span {(3 : ℤ)}) P3₁ = 1 := by
-  rw [ramificationIdx_spec]
-  · rw [Zsqrtd.Ideal.map_span_int_singleton, pow_one]
-    simpa [P3₁, P3₂] using
-      (show (span ({(3 : R)} : Set R) : Ideal R) ≤ P3₁ from by
-        rw [factorization_of_three]
-        exact Ideal.mul_le_right)
-  · intro h
-    rw [Zsqrtd.Ideal.map_span_int_singleton] at h
-    exact not_span3_le_P3₁_sq h
+    ramificationIdx (algebraMap ℤ R) (span {(3 : ℤ)}) P3₁ = 1 :=
+  ramificationIdx_eq_one_of_le_and_not_sq P3₁
+    (by
+      rw [factorization_of_three]
+      exact Ideal.mul_le_right)
+    not_span3_le_P3₁_sq
 
 /-- The ramification index of P3₂ over (3) is 1. -/
 theorem ramificationIdx_P3₂ :
-    ramificationIdx (algebraMap ℤ R) (span {(3 : ℤ)}) P3₂ = 1 := by
-  rw [ramificationIdx_spec]
-  · rw [Zsqrtd.Ideal.map_span_int_singleton, pow_one]
-    simpa [P3₁, P3₂] using
-      (show (span ({(3 : R)} : Set R) : Ideal R) ≤ P3₂ from by
-        rw [factorization_of_three]
-        exact Ideal.mul_le_left)
-  · intro h
-    rw [Zsqrtd.Ideal.map_span_int_singleton] at h
-    exact not_span3_le_P3₂_sq h
+    ramificationIdx (algebraMap ℤ R) (span {(3 : ℤ)}) P3₂ = 1 :=
+  ramificationIdx_eq_one_of_le_and_not_sq P3₂
+    (by
+      rw [factorization_of_three]
+      exact Ideal.mul_le_left)
+    not_span3_le_P3₂_sq
 
 -- ============================================================================
 -- Main Results: Inertia Degree
@@ -242,7 +228,8 @@ theorem inertiaDeg_P2 :
   rw [Ideal.inertiaDeg, dif_pos comap_P2]
   have hfin := Algebra.finrank_eq_of_equiv_equiv (Int.quotientSpanNatEquivZMod 2) quotEquivP2 (by
     ext n
-    simp [quotEquivP2, Zsqrtd.Ideal.quotEquivZModPNeg, Zsqrtd.Ideal.liftModPNeg, P2])
+    simp [quotEquivP2, Zsqrtd.Ideal.quotEquivZModPNeg, Zsqrtd.Ideal.liftModPNeg, P2]
+  )
   exact_mod_cast hfin.trans (by simp [Module.finrank_self])
 
 /-- The inertia degree of P3₁ over (3) is 1. -/
@@ -253,7 +240,8 @@ theorem inertiaDeg_P3₁ :
   rw [Ideal.inertiaDeg, dif_pos comap_P3₁]
   have hfin := Algebra.finrank_eq_of_equiv_equiv (Int.quotientSpanNatEquivZMod 3) quotEquivP3₁ (by
     ext n
-    simp [quotEquivP3₁, Zsqrtd.Ideal.quotEquivZModPNeg, Zsqrtd.Ideal.liftModPNeg, P3₁])
+    simp [quotEquivP3₁, Zsqrtd.Ideal.quotEquivZModPNeg, Zsqrtd.Ideal.liftModPNeg, P3₁]
+  )
   exact_mod_cast hfin.trans (by simp [Module.finrank_self])
 
 /-- The inertia degree of P3₂ over (3) is 1. -/
@@ -264,7 +252,8 @@ theorem inertiaDeg_P3₂ :
   rw [Ideal.inertiaDeg, dif_pos comap_P3₂]
   have hfin := Algebra.finrank_eq_of_equiv_equiv (Int.quotientSpanNatEquivZMod 3) quotEquivP3₂ (by
     ext n
-    simp [quotEquivP3₂, Zsqrtd.Ideal.quotEquivZModP, Zsqrtd.Ideal.liftModP, P3₂])
+    simp [quotEquivP3₂, Zsqrtd.Ideal.quotEquivZModP, Zsqrtd.Ideal.liftModP, P3₂]
+  )
   exact_mod_cast hfin.trans (by simp [Module.finrank_self])
 
 end QuadraticNumberFields.Examples.ZsqrtdNeg5

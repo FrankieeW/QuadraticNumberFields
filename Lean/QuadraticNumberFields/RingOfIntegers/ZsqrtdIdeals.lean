@@ -102,11 +102,77 @@ lemma mul_re_sub_im_eq (a b : Zsqrtd d) :
 
 variable {d}
 
+private lemma prime_int_not_isUnit (p : ℕ) [Fact p.Prime] : ¬ IsUnit (p : ℤ) := by
+  intro hunit
+  exact absurd (Int.isUnit_iff.mp hunit) (by
+    have hp := (Fact.out : p.Prime).one_lt
+    omega)
+
+private lemma not_top_of_one_mem_dvd_one
+    (p : ℕ) [Fact p.Prime] {I : Ideal (Zsqrtd d)}
+    (hcrit : (1 : Zsqrtd d) ∈ I → (p : ℤ) ∣ 1) :
+  I ≠ ⊤ := by
+  intro hI
+  have hpunit : IsUnit (p : ℤ) := isUnit_of_dvd_one (hcrit (by simp [hI]))
+  exact prime_int_not_isUnit p hpunit
+
+private lemma ker_eq_of_apply_eq_intCast
+    (p : ℕ) [Fact p.Prime] (f : Zsqrtd d →+* ZMod p) (I : Ideal (Zsqrtd d))
+    (coord : Zsqrtd d → ℤ)
+    (hf : ∀ z, f z = (coord z : ZMod p))
+    (hI : ∀ z, z ∈ I ↔ (p : ℤ) ∣ coord z) :
+    RingHom.ker f = I := by
+  ext z
+  constructor
+  · intro hz
+    rw [RingHom.mem_ker, hf] at hz
+    exact (hI z).2 ((ZMod.intCast_zmod_eq_zero_iff_dvd _ p).1 hz)
+  · intro hz
+    rw [RingHom.mem_ker, hf]
+    exact (ZMod.intCast_zmod_eq_zero_iff_dvd _ p).2 ((hI z).1 hz)
+
+private lemma comap_eq_span_singleton_of_mem_iff_dvd
+    (p : ℕ) [Fact p.Prime] (I : Ideal (Zsqrtd d))
+    (coord : Zsqrtd d → ℤ)
+    (hI : ∀ z, z ∈ I ↔ (p : ℤ) ∣ coord z)
+    (hcoord_intCast : ∀ z : ℤ, coord (z : Zsqrtd d) = z) :
+    Ideal.comap (algebraMap ℤ (Zsqrtd d)) I =
+      (Ideal.span ({(p : ℤ)} : Set ℤ) : Ideal ℤ) := by
+  ext z
+  constructor
+  · intro hz
+    change ((z : Zsqrtd d) ∈ I) at hz
+    have hz' : (p : ℤ) ∣ coord (z : Zsqrtd d) := (hI (z : Zsqrtd d)).1 hz
+    rw [Ideal.mem_span_singleton]
+    simpa [hcoord_intCast z] using hz'
+  · intro hz
+    change ((z : Zsqrtd d) ∈ I)
+    have hz' : (p : ℤ) ∣ coord (z : Zsqrtd d) := by
+      simpa [hcoord_intCast z, Ideal.mem_span_singleton] using hz
+    exact (hI (z : Zsqrtd d)).2 hz'
+
+private noncomputable def quotEquivZModOfKerEq
+    (p : ℕ) [Fact p.Prime] (f : Zsqrtd d →+* ZMod p) (I : Ideal (Zsqrtd d))
+    (hker : RingHom.ker f = I) :
+    (Zsqrtd d ⧸ I) ≃+* ZMod p :=
+  (Ideal.quotEquivOfEq hker.symm).trans
+    (RingHom.quotientKerEquivOfSurjective (f := f) (ZMod.ringHom_surjective f))
+
 private lemma d_cast_zmodp_eq_one (p : ℕ) [Fact p.Prime] (hd : (p : ℤ) ∣ (d - 1)) :
     (d : ZMod p) = 1 := by
   have h : ((d - 1 : ℤ) : ZMod p) = 0 := (ZMod.intCast_zmod_eq_zero_iff_dvd _ p).2 hd
   have h2 : (d : ZMod p) - 1 = 0 := by push_cast at h; exact h
   exact sub_eq_zero.mp h2
+
+private lemma prime_dvd_or_dvd_of_dvd_mul_add
+    (p : ℕ) [Fact p.Prime] {x y corr : ℤ}
+    (hxy : (p : ℤ) ∣ x * y + corr) (hcorr : (p : ℤ) ∣ corr) :
+    (p : ℤ) ∣ x ∨ (p : ℤ) ∣ y := by
+  have hprod : (p : ℤ) ∣ x * y := by
+    obtain ⟨k1, hk1⟩ := hxy
+    obtain ⟨k2, hk2⟩ := hcorr
+    exact ⟨k1 - k2, by linarith⟩
+  exact (Nat.prime_iff_prime_int.mp Fact.out).dvd_or_dvd hprod
 
 /-- The ring hom `ℤ[√d] →+* ℤ/pℤ` sending `√d ↦ 1`, valid when `p ∣ (d - 1)`
 (since `1² = 1 ≡ d (mod p)`). -/
@@ -191,133 +257,95 @@ theorem isPrime_span_p_one_minus_sqrtd (p : ℕ) [Fact p.Prime] (hd : (p : ℤ) 
     IsPrime (Ideal.span ({(p : Zsqrtd d), 1 - sqrtd} : Set (Zsqrtd d)) : Ideal (Zsqrtd d)) := by
   rw [Ideal.isPrime_iff]
   refine ⟨?_, ?_⟩
-  · intro h
-    have h1 : (1 : Zsqrtd d) ∈
-        (Ideal.span ({(p : Zsqrtd d), 1 - sqrtd} : Set (Zsqrtd d)) : Ideal (Zsqrtd d)) := by
-      rw [h]; trivial
+  · refine not_top_of_one_mem_dvd_one p
+      (I := (Ideal.span ({(p : Zsqrtd d), 1 - sqrtd} : Set (Zsqrtd d)))) ?_
+    intro h1
     rw [mem_span_p_one_minus_sqrtd_iff p hd] at h1
-    norm_num at h1
-    have h1' := Int.isUnit_iff.mp (isUnit_of_dvd_one h1)
-    have := (Fact.out : p.Prime).one_lt
-    omega
+    simpa using h1
   · intro a b hab
     simp only [mem_span_p_one_minus_sqrtd_iff p hd] at hab ⊢
     rw [mul_re_add_im_eq] at hab
     obtain ⟨c, hc⟩ := hd
     have hcorr : ((p : ℤ) ∣ (d - 1) * a.im * b.im) :=
       ⟨c * a.im * b.im, by rw [hc]; ring⟩
-    have hprod : (p : ℤ) ∣ (a.re + a.im) * (b.re + b.im) := by
-      obtain ⟨k1, hk1⟩ := hab; obtain ⟨k2, hk2⟩ := hcorr
-      exact ⟨k1 - k2, by linarith⟩
-    have hp : Prime (p : ℤ) := Nat.prime_iff_prime_int.mp Fact.out
-    exact hp.dvd_or_dvd hprod
+    exact prime_dvd_or_dvd_of_dvd_mul_add p hab hcorr
 
 /-- The ideal `(p, 1+√d)` is prime in `ℤ[√d]` when `p ∣ (d - 1)` for a prime `p`. -/
 theorem isPrime_span_p_one_plus_sqrtd (p : ℕ) [Fact p.Prime] (hd : (p : ℤ) ∣ (d - 1)) :
     IsPrime (Ideal.span ({(p : Zsqrtd d), 1 + sqrtd} : Set (Zsqrtd d)) : Ideal (Zsqrtd d)) := by
   rw [Ideal.isPrime_iff]
   refine ⟨?_, ?_⟩
-  · intro h
-    have h1 : (1 : Zsqrtd d) ∈
-        (Ideal.span ({(p : Zsqrtd d), 1 + sqrtd} : Set (Zsqrtd d)) : Ideal (Zsqrtd d)) := by
-      rw [h]; trivial
+  · refine not_top_of_one_mem_dvd_one p
+      (I := (Ideal.span ({(p : Zsqrtd d), 1 + sqrtd} : Set (Zsqrtd d)))) ?_
+    intro h1
     rw [mem_span_p_one_plus_sqrtd_iff p hd] at h1
-    norm_num at h1
-    have h1' := Int.isUnit_iff.mp (isUnit_of_dvd_one h1)
-    have := (Fact.out : p.Prime).one_lt
-    omega
+    simpa using h1
   · intro a b hab
     simp only [mem_span_p_one_plus_sqrtd_iff p hd] at hab ⊢
     rw [mul_re_sub_im_eq] at hab
     obtain ⟨c, hc⟩ := hd
     have hcorr : ((p : ℤ) ∣ (d - 1) * a.im * b.im) :=
       ⟨c * a.im * b.im, by rw [hc]; ring⟩
-    have hprod : (p : ℤ) ∣ (a.re - a.im) * (b.re - b.im) := by
-      obtain ⟨k1, hk1⟩ := hab; obtain ⟨k2, hk2⟩ := hcorr
-      exact ⟨k1 - k2, by linarith⟩
-    have hp : Prime (p : ℤ) := Nat.prime_iff_prime_int.mp Fact.out
-    exact hp.dvd_or_dvd hprod
+    exact prime_dvd_or_dvd_of_dvd_mul_add p hab hcorr
 
 lemma ker_liftModP (p : ℕ) [Fact p.Prime] (hd : (p : ℤ) ∣ (d - 1)) :
     RingHom.ker (liftModP p hd) =
       (Ideal.span ({(p : Zsqrtd d), 1 - sqrtd} : Set (Zsqrtd d))) := by
-  ext z
-  constructor
-  · intro hz
-    rw [RingHom.mem_ker, liftModP_apply] at hz
-    have hz'' : ((z.re + z.im : ℤ) : ZMod p) = 0 := by simpa [Int.cast_add] using hz
-    have hz' : (p : ℤ) ∣ z.re + z.im := (ZMod.intCast_zmod_eq_zero_iff_dvd _ p).1 hz''
-    simpa [mem_span_p_one_minus_sqrtd_iff p hd] using hz'
-  · intro hz
-    rw [RingHom.mem_ker, liftModP_apply]
-    have hz' : (p : ℤ) ∣ z.re + z.im := by
-      simpa [mem_span_p_one_minus_sqrtd_iff p hd] using hz
-    have hz'' : ((z.re + z.im : ℤ) : ZMod p) = 0 :=
-      (ZMod.intCast_zmod_eq_zero_iff_dvd _ p).2 hz'
-    simpa [Int.cast_add] using hz''
+  refine ker_eq_of_apply_eq_intCast p (liftModP p hd)
+      (Ideal.span ({(p : Zsqrtd d), 1 - sqrtd} : Set (Zsqrtd d)))
+      (fun z => z.re + z.im) ?_ ?_
+  · intro z
+    simpa [Int.cast_add] using liftModP_apply p hd z
+  · intro z
+    exact mem_span_p_one_minus_sqrtd_iff p hd z
 
 lemma ker_liftModPNeg (p : ℕ) [Fact p.Prime] (hd : (p : ℤ) ∣ (d - 1)) :
     RingHom.ker (liftModPNeg p hd) =
       (Ideal.span ({(p : Zsqrtd d), 1 + sqrtd} : Set (Zsqrtd d))) := by
-  ext z
-  constructor
-  · intro hz
-    rw [RingHom.mem_ker, liftModPNeg_apply] at hz
-    have hz'' : ((z.re - z.im : ℤ) : ZMod p) = 0 := by simpa [Int.cast_sub] using hz
-    have hz' : (p : ℤ) ∣ z.re - z.im := (ZMod.intCast_zmod_eq_zero_iff_dvd _ p).1 hz''
-    simpa [mem_span_p_one_plus_sqrtd_iff p hd] using hz'
-  · intro hz
-    rw [RingHom.mem_ker, liftModPNeg_apply]
-    have hz' : (p : ℤ) ∣ z.re - z.im := by
-      simpa [mem_span_p_one_plus_sqrtd_iff p hd] using hz
-    have hz'' : ((z.re - z.im : ℤ) : ZMod p) = 0 :=
-      (ZMod.intCast_zmod_eq_zero_iff_dvd _ p).2 hz'
-    simpa [Int.cast_sub] using hz''
+  refine ker_eq_of_apply_eq_intCast p (liftModPNeg p hd)
+      (Ideal.span ({(p : Zsqrtd d), 1 + sqrtd} : Set (Zsqrtd d)))
+      (fun z => z.re - z.im) ?_ ?_
+  · intro z
+    simpa [Int.cast_sub] using liftModPNeg_apply p hd z
+  · intro z
+    exact mem_span_p_one_plus_sqrtd_iff p hd z
 
 /-- `ℤ[√d] ⧸ (p, 1-√d) ≃+* ℤ/pℤ` when `p ∣ (d - 1)` for a prime `p`. -/
 noncomputable def quotEquivZModP (p : ℕ) [Fact p.Prime] (hd : (p : ℤ) ∣ (d - 1)) :
     (Zsqrtd d) ⧸ (Ideal.span ({(p : Zsqrtd d), 1 - sqrtd} : Set (Zsqrtd d))) ≃+* ZMod p :=
-  (Ideal.quotEquivOfEq (ker_liftModP p hd).symm).trans
-    (RingHom.quotientKerEquivOfSurjective (f := liftModP p hd)
-      (ZMod.ringHom_surjective (liftModP p hd)))
+  quotEquivZModOfKerEq p (liftModP p hd)
+    (Ideal.span ({(p : Zsqrtd d), 1 - sqrtd} : Set (Zsqrtd d)))
+    (ker_liftModP p hd)
 
 /-- `ℤ[√d] ⧸ (p, 1+√d) ≃+* ℤ/pℤ` when `p ∣ (d - 1)` for a prime `p`. -/
 noncomputable def quotEquivZModPNeg (p : ℕ) [Fact p.Prime] (hd : (p : ℤ) ∣ (d - 1)) :
     (Zsqrtd d) ⧸ (Ideal.span ({(p : Zsqrtd d), 1 + sqrtd} : Set (Zsqrtd d))) ≃+* ZMod p :=
-  (Ideal.quotEquivOfEq (ker_liftModPNeg p hd).symm).trans
-    (RingHom.quotientKerEquivOfSurjective (f := liftModPNeg p hd)
-      (ZMod.ringHom_surjective (liftModPNeg p hd)))
+  quotEquivZModOfKerEq p (liftModPNeg p hd)
+    (Ideal.span ({(p : Zsqrtd d), 1 + sqrtd} : Set (Zsqrtd d)))
+    (ker_liftModPNeg p hd)
 
 lemma comap_span_p_one_minus_sqrtd (p : ℕ) [Fact p.Prime] (hd : (p : ℤ) ∣ (d - 1)) :
     Ideal.comap (algebraMap ℤ (Zsqrtd d))
       (Ideal.span ({(p : Zsqrtd d), 1 - sqrtd} : Set (Zsqrtd d))) =
       (Ideal.span ({(p : ℤ)} : Set ℤ) : Ideal ℤ) := by
-  ext z
-  constructor
-  · intro hz
-    change ((z : Zsqrtd d) ∈ Ideal.span ({(p : Zsqrtd d), 1 - sqrtd} : Set (Zsqrtd d))) at hz
-    rw [mem_span_p_one_minus_sqrtd_iff p hd] at hz
-    rw [Ideal.mem_span_singleton]
-    simpa [Zsqrtd.re_intCast, Zsqrtd.im_intCast] using hz
-  · intro hz
-    change ((z : Zsqrtd d) ∈ Ideal.span ({(p : Zsqrtd d), 1 - sqrtd} : Set (Zsqrtd d)))
-    rw [mem_span_p_one_minus_sqrtd_iff p hd]
-    simpa [Zsqrtd.re_intCast, Zsqrtd.im_intCast, Ideal.mem_span_singleton] using hz
+  refine comap_eq_span_singleton_of_mem_iff_dvd p
+      (Ideal.span ({(p : Zsqrtd d), 1 - sqrtd} : Set (Zsqrtd d)))
+      (fun z => z.re + z.im) ?_ ?_
+  · intro z
+    exact mem_span_p_one_minus_sqrtd_iff p hd z
+  · intro z
+    simp [Zsqrtd.re_intCast, Zsqrtd.im_intCast]
 
 lemma comap_span_p_one_plus_sqrtd (p : ℕ) [Fact p.Prime] (hd : (p : ℤ) ∣ (d - 1)) :
     Ideal.comap (algebraMap ℤ (Zsqrtd d))
       (Ideal.span ({(p : Zsqrtd d), 1 + sqrtd} : Set (Zsqrtd d))) =
       (Ideal.span ({(p : ℤ)} : Set ℤ) : Ideal ℤ) := by
-  ext z
-  constructor
-  · intro hz
-    change ((z : Zsqrtd d) ∈ Ideal.span ({(p : Zsqrtd d), 1 + sqrtd} : Set (Zsqrtd d))) at hz
-    rw [mem_span_p_one_plus_sqrtd_iff p hd] at hz
-    rw [Ideal.mem_span_singleton]
-    simpa [Zsqrtd.re_intCast, Zsqrtd.im_intCast] using hz
-  · intro hz
-    change ((z : Zsqrtd d) ∈ Ideal.span ({(p : Zsqrtd d), 1 + sqrtd} : Set (Zsqrtd d)))
-    rw [mem_span_p_one_plus_sqrtd_iff p hd]
-    simpa [Zsqrtd.re_intCast, Zsqrtd.im_intCast, Ideal.mem_span_singleton] using hz
+  refine comap_eq_span_singleton_of_mem_iff_dvd p
+      (Ideal.span ({(p : Zsqrtd d), 1 + sqrtd} : Set (Zsqrtd d)))
+      (fun z => z.re - z.im) ?_ ?_
+  · intro z
+    exact mem_span_p_one_plus_sqrtd_iff p hd z
+  · intro z
+    simp [Zsqrtd.re_intCast, Zsqrtd.im_intCast]
 
 end Zsqrtd.Ideal

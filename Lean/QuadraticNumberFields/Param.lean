@@ -79,6 +79,18 @@ class QuadFieldParam (d : ℤ) : Prop where
 
 namespace QuadFieldParam
 
+/-- A squarefree integer that is a perfect square must equal `1`. -/
+lemma eq_one_of_squarefree_isSquare {d : ℤ} (hd : Squarefree d) (hsq : IsSquare d) : d = 1 := by
+  rcases hsq with ⟨z, hz⟩
+  by_cases huz : IsUnit z
+  · rcases Int.isUnit_iff.mp huz with hz1 | hz1
+    · simpa [hz1] using hz
+    · simpa [hz1] using hz
+  · have hsqz2 : Squarefree (z ^ 2) := by simpa [hz, pow_two] using hd
+    have h01 : (2 : ℕ) = 0 ∨ (2 : ℕ) = 1 :=
+      Squarefree.eq_zero_or_one_of_pow_of_not_isUnit (x := z) (n := 2) hsqz2 huz
+    norm_num at h01
+
 /-- For a quadratic parameter, nonzero follows from squarefreeness. -/
 lemma ne_zero (d : ℤ) [QuadFieldParam d] : d ≠ 0 :=
   (QuadFieldParam.squarefree (d := d)).ne_zero
@@ -86,18 +98,8 @@ lemma ne_zero (d : ℤ) [QuadFieldParam d] : d ≠ 0 :=
 /-- For a valid parameter `d`, the integer `d` is not a perfect square. -/
 lemma not_isSquare (d : ℤ) [QuadFieldParam d] : ¬ IsSquare d := by
   intro hdSq
-  rcases hdSq with ⟨z, hz⟩
-  by_cases huz : IsUnit z
-  · rcases Int.isUnit_iff.mp huz with hz1 | hz1
-    · have : d = 1 := by simpa [hz1] using hz
-      exact (QuadFieldParam.ne_one (d := d)) this
-    · have : d = 1 := by simpa [hz1] using hz
-      exact (QuadFieldParam.ne_one (d := d)) this
-  · have hsqz2 : Squarefree (z ^ 2) := by
-      simpa [hz, pow_two] using (QuadFieldParam.squarefree (d := d))
-    have h01 : (2 : ℕ) = 0 ∨ (2 : ℕ) = 1 :=
-      Squarefree.eq_zero_or_one_of_pow_of_not_isUnit (x := z) (n := 2) hsqz2 huz
-    norm_num at h01
+  exact (QuadFieldParam.ne_one (d := d))
+    (eq_one_of_squarefree_isSquare (QuadFieldParam.squarefree (d := d)) hdSq)
 
 /-- Any squarefree `d ≠ 1` is a valid quadratic-field parameter. -/
 lemma of_squarefree_ne_one (d : ℤ) (hd : Squarefree d) (h1 : d ≠ 1) :

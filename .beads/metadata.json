@@ -2,6 +2,6 @@
   "database": "dolt",
   "backend": "dolt",
   "dolt_mode": "server",
-  "dolt_database": "QuadraticNumberFields",
+  "dolt_database": "dolt",
   "project_id": "ef767c7a-0a2d-4e5e-a820-3c4152e1c2d9"
 }
