@@ -2,7 +2,6 @@
   "database": "dolt",
   "backend": "dolt",
   "dolt_mode": "server",
-  "dolt_server_port": 3306,
   "dolt_database": "QuadraticNumberFields",
-  "project_id": "ca00cb8e-cc95-44d8-a1e3-99977416caee"
+  "project_id": "ef767c7a-0a2d-4e5e-a820-3c4152e1c2d9"
 }
