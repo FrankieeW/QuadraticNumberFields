@@ -113,11 +113,11 @@ def ofMathlib (d : ℤ) : ℤ√d →+* Zsqrtd d where
 
 @[simp] theorem toMathlib_ofMathlib (d : ℤ) (z : ℤ√d) :
     toMathlib d (ofMathlib d z) = z := by
-  ext <;> rfl
+  rfl
 
 @[simp] theorem ofMathlib_toMathlib (d : ℤ) (z : Zsqrtd d) :
     ofMathlib d (toMathlib d z) = z := by
-  ext <;> rfl
+  rfl
 
 /-- Ring isomorphism between QA `Zsqrtd` and mathlib's `ℤ√d`. -/
 def equivMathlib (d : ℤ) : Zsqrtd d ≃+* ℤ√d where

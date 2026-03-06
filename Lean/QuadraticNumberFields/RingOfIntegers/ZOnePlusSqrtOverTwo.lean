@@ -40,8 +40,8 @@ def omega (k : ℤ) : Qsqrtd (d_of_k k) := ⟨(1 / 2 : ℚ), (1 / 2 : ℚ)⟩
 abbrev Zomega (k : ℤ) : Subalgebra ℤ (Qsqrtd (d_of_k k)) :=
   Algebra.adjoin ℤ ({omega k} : Set (Qsqrtd (d_of_k k)))
 
-lemma omega_mem_Zomega (k : ℤ) : omega k ∈ Zomega k := by
-  exact Algebra.subset_adjoin (by simp)
+lemma omega_mem_Zomega (k : ℤ) : omega k ∈ Zomega k :=
+  Algebra.subset_adjoin (by simp)
 
 end Qsqrtd
 
@@ -135,7 +135,7 @@ theorem halfInt_mem_carrierSet_iff_same_parity (k a' b' : ℤ) :
 /-- Equivalent set-membership form of `halfInt_mem_carrierSet_iff_same_parity`. -/
 theorem halfInt_mem_carrierSet_iff_same_parity_set (k a' b' : ℤ) :
     QuadraticNumberFields.RingOfIntegers.halfInt (1 + 4 * k) a' b' ∈ carrierSet k ↔
-      a' % 2 = b' % 2 := by
-  simpa [carrierSet] using (halfInt_mem_carrierSet_iff_same_parity k a' b')
+      a' % 2 = b' % 2 :=
+  by simpa [carrierSet] using (halfInt_mem_carrierSet_iff_same_parity k a' b')
 
 end ZOnePlusSqrtOverTwo

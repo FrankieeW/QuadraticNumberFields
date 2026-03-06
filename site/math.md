@@ -77,7 +77,7 @@ $$N(\alpha) = \alpha \cdot \bar{\alpha} = (a + b\sqrt{d})(a - b\sqrt{d}) = a^2 -
 ### Example 2: Eisenstein Integers ($d = -3$)
 
 - $-3 \equiv 1 \pmod{4}$, so case 2 applies
-- Let $\omega = \frac{1 + \sqrt{-3}}{2}$, a primitive cube root of unity
+- Let $\omega = \frac{-1 + \sqrt{-3}}{2}$, the standard primitive cube root of unity
 - $\mathcal{O}_{\mathbb{Q}(\sqrt{-3})} = \mathbb{Z}[\omega]$
 - Norm: $N(a + b\omega) = a^2 - ab + b^2$
 - Units: $\pm 1, \pm \omega, \pm \omega^2$ (6 units)

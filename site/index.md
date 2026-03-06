@@ -35,7 +35,10 @@ For a square-free integer $d$:
 For $d = -1$: Since $-1 \equiv 3 \pmod{4}$, we have $\mathcal{O}_{\mathbb{Q}(i)} = \mathbb{Z}[i]$.
 
 ### Eisenstein Integers
-For $d = -3$: Since $-3 \equiv 1 \pmod{4}$, we have $\mathcal{O}_{\mathbb{Q}(\sqrt{-3})} = \mathbb{Z}[\omega]$ where $\omega = \frac{1 + \sqrt{-3}}{2}$.
+For $d = -3$: Since $-3 \equiv 1 \pmod{4}$, we have
+$\mathcal{O}_{\mathbb{Q}(\sqrt{-3})} = \mathbb{Z}[\omega]$ where
+$\omega = \frac{-1 + \sqrt{-3}}{2}$ in the standard convention.
+The formal model also uses the equivalent generator $\frac{1 + \sqrt{-3}}{2} = 1 + \omega$.
 
 ## Project Structure
 

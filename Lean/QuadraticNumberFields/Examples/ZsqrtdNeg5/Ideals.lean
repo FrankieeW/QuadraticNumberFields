@@ -39,8 +39,11 @@ instance : Fact ((-5 : ℤ) < 0) := ⟨by decide⟩
 -- Arithmetic conditions for d = -5
 -- ============================================================================
 
-private lemma neg5_dvd_two : 2 ∣ ((-5 : ℤ) - 1) := ⟨-3, by norm_num⟩
-private lemma neg5_dvd_three : 3 ∣ ((-5 : ℤ) - 1) := ⟨-2, by norm_num⟩
+/-- Arithmetic input for the prime `2` in `ℤ[√-5]`: `2 ∣ (-5 - 1)`. -/
+lemma neg5_dvd_two : 2 ∣ ((-5 : ℤ) - 1) := ⟨-3, by norm_num⟩
+
+/-- Arithmetic input for the prime `3` in `ℤ[√-5]`: `3 ∣ (-5 - 1)`. -/
+lemma neg5_dvd_three : 3 ∣ ((-5 : ℤ) - 1) := ⟨-2, by norm_num⟩
 
 -- ============================================================================
 -- Helper lemmas for factorization proofs

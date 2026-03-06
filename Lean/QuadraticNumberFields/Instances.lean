@@ -60,12 +60,9 @@ instance {d : ℤ} [QuadFieldParam d] : NumberField (QuadraticNumberFields d) wh
   to_charZero := by infer_instance
   to_finiteDimensional := by
     letI : Module ℚ (QuadraticNumberFields d) := QuadraticAlgebra.instModule
-    have hfinite : Module.Finite ℚ (QuadraticNumberFields d) := by
-      infer_instance
-    exact module_eq d ▸ hfinite
+    exact module_eq d ▸ (inferInstance : Module.Finite ℚ (QuadraticNumberFields d))
 
 /-- `Q(√d)/ℚ` is a quadratic extension: free of rank 2 over `ℚ`. -/
 instance {d : ℤ} [QuadFieldParam d] :
-    Algebra.IsQuadraticExtension ℚ (QuadraticNumberFields d) := by
-  constructor
-  · exact module_eq d ▸ QuadraticAlgebra.finrank_eq_two (d : ℚ) 0
+    Algebra.IsQuadraticExtension ℚ (QuadraticNumberFields d) where
+  finrank_eq_two' := module_eq d ▸ QuadraticAlgebra.finrank_eq_two (d : ℚ) 0

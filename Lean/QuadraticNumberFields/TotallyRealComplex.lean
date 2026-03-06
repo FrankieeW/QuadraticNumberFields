@@ -109,7 +109,7 @@ theorem isTotallyReal (hd : 0 < d) :
     NumberField.IsTotallyReal (QuadraticNumberFields d) where
   isReal v := by
     rw [NumberField.InfinitePlace.isReal_iff, NumberField.ComplexEmbedding.isReal_iff]
-    exact conjugate_embedding_eq v (embedding_omega_im_eq_zero v hd)
+    simpa using conjugate_embedding_eq v (embedding_omega_im_eq_zero v hd)
 
 /-- An imaginary quadratic field `Q(√d)` with `d < 0` is totally complex:
 no embedding into `ℂ` has image contained in `ℝ`. -/

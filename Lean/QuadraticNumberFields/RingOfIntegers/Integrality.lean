@@ -99,14 +99,20 @@ theorem dvd_four_sub_sq_of_exists_zOnePlusSqrtOverTwo_image_of_one_mod_four
 theorem ringOfIntegers_equiv_of_integralClosure
     (K : Type*) [Field K] [NumberField K]
     (R : Type*) [CommRing R] [Algebra R K] [IsIntegralClosure R ℤ K] :
-    Nonempty (𝓞 K ≃+* R) := by
-  exact ⟨NumberField.RingOfIntegers.equiv (K := K) (R := R)⟩
+    Nonempty (𝓞 K ≃+* R) :=
+  ⟨NumberField.RingOfIntegers.equiv (K := K) (R := R)⟩
+
+/-- Any image of an integral element under a ring hom remains integral over `ℤ`. -/
+private lemma isIntegral_of_intModel_image
+    (R S : Type*) [CommRing R] [CommRing S]
+    [Algebra.IsIntegral ℤ R] (φ : R →+* S) (z : R) :
+    IsIntegral ℤ (φ z) :=
+  map_isIntegral_int φ (Algebra.IsIntegral.isIntegral (R := ℤ) z)
 
 /-- Every element in the image of `Zsqrtd d → Q(√d)` is integral over `ℤ`. -/
 lemma isIntegral_toQsqrtd (d : ℤ) (z : Zsqrtd d) :
-    IsIntegral ℤ (Zsqrtd.toQsqrtdHom d z) := by
-  have hz : IsIntegral ℤ z := Algebra.IsIntegral.isIntegral z
-  exact map_isIntegral_int (Zsqrtd.toQsqrtdHom d) hz
+    IsIntegral ℤ (Zsqrtd.toQsqrtdHom d z) :=
+  isIntegral_of_intModel_image (Zsqrtd d) (Qsqrtd (d : ℚ)) (Zsqrtd.toQsqrtdHom d) z
 
 /-! ## Half-Integer Normal Form -/
 
@@ -247,6 +253,20 @@ lemma exists_halfInt_with_div_four_of_isIntegral
 
 /-! ## Classification Lemmas -/
 
+private lemma exists_intModel_of_isIntegral
+    (d : ℤ) [QuadFieldParam d]
+    (R : Type*) [CommRing R]
+    (φ : R →+* Qsqrtd (d : ℚ))
+    (h_lift :
+      ∀ a' b' : ℤ, 4 ∣ (a' ^ 2 - d * b' ^ 2) →
+        ∃ z : R, φ z = Zsqrtd.halfInt (d := d) a' b')
+    {x : Qsqrtd (d : ℚ)} (hx : IsIntegral ℤ x) :
+    ∃ z : R, φ z = x := by
+  rcases exists_halfInt_with_div_four_of_isIntegral d (x := x) hx with
+    ⟨a', b', hxHalf, hdiv⟩
+  rcases h_lift a' b' hdiv with ⟨z, hz⟩
+  exact ⟨z, by simpa [hxHalf] using hz⟩
+
 /-- Integrality classification in the `d % 4 ≠ 1` branch: integral elements of `Q(√d)`
 lie in the image of `Zsqrtd d`. -/
 lemma exists_zsqrtd_of_isIntegral_of_ne_one_mod_four
@@ -254,17 +274,16 @@ lemma exists_zsqrtd_of_isIntegral_of_ne_one_mod_four
     {x : Qsqrtd (d : ℚ)} (hx : IsIntegral ℤ x) :
     ∃ z : Zsqrtd d, Zsqrtd.toQsqrtdHom d z = x := by
   have hd : Squarefree d := QuadFieldParam.squarefree (d := d)
-  rcases exists_halfInt_with_div_four_of_isIntegral d (x := x) hx with
-    ⟨a', b', hxHalf, hdiv⟩
-  rcases exists_zsqrtd_image_of_dvd_four_sub_sq_of_ne_one_mod_four d a' b' hd hd4 hdiv with ⟨z, hz⟩
-  refine ⟨z, ?_⟩
-  simpa [hxHalf] using hz
+  exact exists_intModel_of_isIntegral d (Zsqrtd d) (Zsqrtd.toQsqrtdHom d)
+    (fun a' b' hdiv =>
+      exists_zsqrtd_image_of_dvd_four_sub_sq_of_ne_one_mod_four d a' b' hd hd4 hdiv)
+    hx
 
 /-- Every element in the image of `ZOnePlusSqrtOverTwo k → Q(√(1 + 4k))` is integral over `ℤ`. -/
 lemma isIntegral_toQsqrtd_of_zOnePlusSqrtOverTwo (k : ℤ) (z : ZOnePlusSqrtOverTwo k) :
-    IsIntegral ℤ (_root_.ZOnePlusSqrtOverTwo.toQsqrtdHom k z) := by
-  have hz : IsIntegral ℤ z := Algebra.IsIntegral.isIntegral z
-  exact map_isIntegral_int (_root_.ZOnePlusSqrtOverTwo.toQsqrtdHom k) hz
+    IsIntegral ℤ (_root_.ZOnePlusSqrtOverTwo.toQsqrtdHom k z) :=
+  isIntegral_of_intModel_image (ZOnePlusSqrtOverTwo k) (Qsqrtd ((1 + 4 * k : ℤ) : ℚ))
+    (_root_.ZOnePlusSqrtOverTwo.toQsqrtdHom k) z
 
 /-- Integrality classification in the `1 mod 4` branch model (`d = 1 + 4k`):
 integral elements of `Q(√(1 + 4k))` lie in the image of `ZOnePlusSqrtOverTwo k`. -/
@@ -273,12 +292,11 @@ lemma exists_zOnePlusSqrtOverTwo_of_isIntegral_of_one_mod_four
     {x : Qsqrtd (((1 + 4 * k : ℤ) : ℚ))} (hx : IsIntegral ℤ x) :
     ∃ z : ZOnePlusSqrtOverTwo k, _root_.ZOnePlusSqrtOverTwo.toQsqrtdHom k z = x := by
   have hd : Squarefree (1 + 4 * k) := QuadFieldParam.squarefree (d := 1 + 4 * k)
-  rcases exists_halfInt_with_div_four_of_isIntegral (d := 1 + 4 * k) (x := x) hx with
-    ⟨a', b', hxHalf, hdiv⟩
-  rcases exists_zOnePlusSqrtOverTwo_image_of_dvd_four_sub_sq_of_one_mod_four k a' b' hd hdiv with
-    ⟨z, hz⟩
-  refine ⟨z, ?_⟩
-  simpa [_root_.ZOnePlusSqrtOverTwo.toQsqrtdHom_apply, hxHalf] using hz
+  exact exists_intModel_of_isIntegral (1 + 4 * k) (ZOnePlusSqrtOverTwo k)
+    (_root_.ZOnePlusSqrtOverTwo.toQsqrtdHom k)
+    (fun a' b' hdiv =>
+      exists_zOnePlusSqrtOverTwo_image_of_dvd_four_sub_sq_of_one_mod_four k a' b' hd hdiv)
+    hx
 
 end RingOfIntegers
 end QuadraticNumberFields
