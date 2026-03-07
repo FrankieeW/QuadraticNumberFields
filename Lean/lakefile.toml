@@ -19,10 +19,5 @@ name = "repl"
 git = "https://github.com/leanprover-community/repl"
 rev = "v4.29.0-rc2"
 
-[[require]]
-name = "LeanPrism"
-git = "https://codeberg.org/wvhulle/lean-prism.git"
-rev = "main"
-
 [[lean_lib]]
 name = "QuadraticNumberFields"
