@@ -1,3 +1,4 @@
+import LeanPrism
 import QuadraticNumberFields.Basic
 import QuadraticNumberFields.Rescale
 import QuadraticNumberFields.Param

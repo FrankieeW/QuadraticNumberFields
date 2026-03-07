@@ -4,7 +4,7 @@ A Lean 4 formalization of quadratic number fields `Q(√d)` and the classificati
 of their ring of integers, centered on the Lean objects `Qsqrtd`,
 `QuadraticNumberFields`, and `QuadFieldParam`.
 
-**[Documentation site](https://frankieew.github.io/QuadraticNumberFields)**
+**[Documentation site](https://frankieew.github.io/QuadraticNumberFields)** | **[Lean-TUI setup](docs/lean-tui.md)**
 
 ## Main Result
 
