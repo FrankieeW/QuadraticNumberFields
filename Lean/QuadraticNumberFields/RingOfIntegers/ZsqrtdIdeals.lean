@@ -5,6 +5,7 @@ Authors: Frankie Wang
 
 General ideal membership, primality, and quotient results for `Zsqrtd d`.
 -/
+import LeanPrism
 import QuadraticNumberFields.RingOfIntegers.ZsqrtdMathlibInstances
 import Mathlib.RingTheory.Ideal.Operations
 import Mathlib.RingTheory.Ideal.Norm.AbsNorm
