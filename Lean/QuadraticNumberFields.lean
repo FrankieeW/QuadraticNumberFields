@@ -3,6 +3,7 @@ import QuadraticNumberFields.Rescale
 import QuadraticNumberFields.Param
 import QuadraticNumberFields.ParamUniqueness
 import QuadraticNumberFields.Instances
+import QuadraticNumberFields.RingEquiv
 import QuadraticNumberFields.Euclidean.Basic
 import QuadraticNumberFields.RingOfIntegers.ModFour
 import QuadraticNumberFields.RingOfIntegers.Zsqrtd

@@ -6,6 +6,7 @@ Authors: Frankie Wang
 import QuadraticNumberFields.RingOfIntegers.Integrality
 import QuadraticNumberFields.RingOfIntegers.ModFour
 import QuadraticNumberFields.RingOfIntegers.ZOnePlusSqrtOverTwo
+import QuadraticNumberFields.RingEquiv
 
 /-!
 # Ring Of Integers Classification
@@ -72,6 +73,89 @@ theorem ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one
     (by
       intro z
       simpa [QuadraticNumberFields] using isIntegral_toQsqrtd d z)
+
+/-- If `d % 4 ≠ 1`, then `ℤ[√d]` is a Dedekind domain because it is the full
+ring of integers of `Q(√d)`. -/
+theorem isDedekindDomain_zsqrtd_of_mod_four_ne_one
+    (d : ℤ) [QuadFieldParam d]
+    (hd4 : d % 4 ≠ 1) :
+    IsDedekindDomain (Zsqrtd d) := by
+  rcases ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one d hd4 with ⟨e⟩
+  letI : IsDedekindDomain (𝓞 (QuadraticNumberFields d)) := inferInstance
+  exact RingEquiv.isDedekindDomain e
+
+/-- If `d % 4 = 1`, then `ℤ[√d]` is not a Dedekind domain. Equivalently,
+it is not integrally closed because `(1 + √d) / 2` is integral but does not lie in
+`ℤ[√d]`. -/
+theorem not_isDedekindDomain_zsqrtd_of_mod_four_eq_one
+    (d : ℤ) [QuadFieldParam d]
+    (hd4 : d % 4 = 1) :
+    ¬ IsDedekindDomain (Zsqrtd d) := by
+  letI : Algebra (Zsqrtd d) (QuadraticNumberFields d) := (Zsqrtd.toQsqrtdHom d).toAlgebra
+  letI : FaithfulSMul (Zsqrtd d) (QuadraticNumberFields d) :=
+    (faithfulSMul_iff_algebraMap_injective (Zsqrtd d) (QuadraticNumberFields d)).mpr
+      (Zsqrtd.toQsqrtdHom_injective d)
+  have hFrac : IsFractionRing (Zsqrtd d) (QuadraticNumberFields d) := by
+    refine IsFractionRing.of_field (R := Zsqrtd d) (K := QuadraticNumberFields d) ?_
+    intro z
+    refine ⟨⟨(z.re.num : ℤ) * z.im.den, (z.im.num : ℤ) * z.re.den⟩,
+        ((z.re.den * z.im.den : ℕ) : Zsqrtd d), ?_⟩
+    refine (eq_div_iff ?_).2 ?_
+    · norm_num [QuadraticNumberFields]
+    · ext
+      · simp only [Nat.cast_mul, map_mul, map_natCast, QuadraticAlgebra.re_mul,
+          QuadraticAlgebra.re_natCast, QuadraticAlgebra.im_natCast, mul_zero, add_zero,
+          QuadraticAlgebra.im_mul, zero_mul]
+        calc
+          z.re * (↑z.re.den * ↑z.im.den) = z.re * (z.re.den : ℚ) * z.im.den := by ring
+          _ = ((z.re.num : ℤ) : ℚ) * z.im.den := by rw [Rat.mul_den_eq_num]
+          _ = (((z.re.num : ℤ) * z.im.den : ℤ) : ℚ) := by norm_num
+      · simp only [Nat.cast_mul, map_mul, map_natCast, QuadraticAlgebra.im_mul,
+          QuadraticAlgebra.re_natCast, QuadraticAlgebra.im_natCast, mul_zero, zero_mul,
+          add_zero, QuadraticAlgebra.re_mul, zero_add]
+        calc
+          z.im * (↑z.re.den * ↑z.im.den) = z.im * (z.im.den : ℚ) * z.re.den := by ring
+          _ = ((z.im.num : ℤ) : ℚ) * z.re.den := by rw [Rat.mul_den_eq_num]
+          _ = (((z.im.num : ℤ) * z.re.den : ℤ) : ℚ) := by norm_num
+  letI : IsFractionRing (Zsqrtd d) (QuadraticNumberFields d) := hFrac
+  intro hDed
+  letI : IsDedekindDomain (Zsqrtd d) := hDed
+  letI : Module (Zsqrtd d) (Zsqrtd d) := Semiring.toModule
+  have hIC : IsIntegrallyClosed (Zsqrtd d) := IsDedekindRing.toIsIntegralClosure
+  letI : IsIntegrallyClosed (Zsqrtd d) := hIC
+  rcases exists_k_of_mod_four_eq_one (d := d) hd4 with ⟨k, hk⟩
+  subst hk
+  let x : QuadraticNumberFields (1 + 4 * k) := halfInt (1 + 4 * k) 1 1
+  have hx_def :
+      x = _root_.ZOnePlusSqrtOverTwo.toQsqrtdFun k (⟨0, 1⟩ : _root_.ZOnePlusSqrtOverTwo k) := by
+    ext <;> simp [x, halfInt, _root_.ZOnePlusSqrtOverTwo.toQsqrtdFun]
+  have hx_integral_Z : IsIntegral ℤ x := by
+    rw [hx_def]
+    simpa [QuadraticNumberFields] using
+      isIntegral_toQsqrtd_of_zOnePlusSqrtOverTwo k (z := (⟨0, 1⟩ : _root_.ZOnePlusSqrtOverTwo k))
+  have hx_integral : IsIntegral (Zsqrtd (1 + 4 * k)) x := hx_integral_Z.tower_top
+  rcases (isIntegrallyClosed_iff (QuadraticNumberFields (1 + 4 * k))).mp hIC hx_integral with
+    ⟨z, hz⟩
+  have h_even : 2 ∣ (1 : ℤ) ∧ 2 ∣ (1 : ℤ) :=
+    (Zsqrtd.halfInt_mem_range_toQsqrtdHom_iff_even_even (1 + 4 * k) 1 1).mp
+      ⟨z, by
+        simpa [x, halfInt, RingHom.toAlgebra, QuadraticNumberFields] using hz⟩
+  omega
+
+/-- For a valid quadratic parameter `d`, `ℤ[√d]` is Dedekind exactly in the
+`d % 4 ≠ 1` branch, i.e. precisely when it is the full ring of integers. -/
+theorem isDedekindDomain_zsqrtd_iff_mod_four_ne_one
+    (d : ℤ) [QuadFieldParam d] :
+    IsDedekindDomain (Zsqrtd d) ↔ d % 4 ≠ 1 := by
+  constructor
+  · intro hDed hd4
+    exact not_isDedekindDomain_zsqrtd_of_mod_four_eq_one d hd4 hDed
+  · exact isDedekindDomain_zsqrtd_of_mod_four_ne_one d
+
+instance instIsDedekindDomain_zsqrtd_of_mod_four_ne_one
+    (d : ℤ) [QuadFieldParam d] [Fact (d % 4 ≠ 1)] :
+    IsDedekindDomain (Zsqrtd d) :=
+  isDedekindDomain_zsqrtd_of_mod_four_ne_one d Fact.out
 
 /-- If `d % 4 = 1`, writing `d = 1 + 4k`,
 then `𝓞 (Q(√d)) ≃+* ZOnePlusSqrtOverTwo k`. -/

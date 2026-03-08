@@ -3,18 +3,27 @@ Copyright (c) 2026 Frankie Wang. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Frankie Wang
 -/
+import QuadraticNumberFields.RingOfIntegers.Classification
+import QuadraticNumberFields.RingEquiv
+import QuadraticNumberFields.RingOfIntegers.Zsqrtd
 import Mathlib.NumberTheory.Zsqrtd.Basic
+import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
+import Mathlib.RingTheory.Noetherian.Basic
 
 /-!
 # Additional Instances for mathlib `Zsqrtd`
 
 This module adds generic algebraic instances for mathlib's `_root_.Zsqrtd d`
-under the hypothesis `d < 0`.
+under useful arithmetic hypotheses.
 
 ## Main Definitions
 
 * `Zsqrtd.instNoZeroDivisors`: `NoZeroDivisors (Zsqrtd d)` for `d < 0`.
 * `Zsqrtd.instIsDomain`: `IsDomain (Zsqrtd d)` for `d < 0`.
+* `Zsqrtd.instIsDedekindDomainOfModFourNeOne`: `IsDedekindDomain (Zsqrtd d)`
+  for valid quadratic parameters with `d % 4 ≠ 1`.
+* `Zsqrtd.not_isDedekindDomain_of_mod_four_eq_one`: `ℤ√d` is not Dedekind when
+  `d % 4 = 1`.
 
 ## Main Theorems
 
@@ -36,5 +45,42 @@ instance instNoZeroDivisors {d : ℤ} [Fact (d < 0)] : NoZeroDivisors (Zsqrtd d)
 
 instance instIsDomain {d : ℤ} [Fact (d < 0)] : IsDomain (Zsqrtd d) :=
   NoZeroDivisors.to_isDomain (Zsqrtd d)
+
+theorem isDedekindDomain_of_mod_four_ne_one
+    (d : ℤ) [QuadFieldParam d]
+    (hd4 : d % 4 ≠ 1) :
+    IsDedekindDomain (Zsqrtd d) := by
+  let e := QuadraticNumberFields.RingOfIntegers.Zsqrtd.equivMathlib d
+  letI : IsDedekindDomain (QuadraticNumberFields.RingOfIntegers.Zsqrtd d) :=
+    QuadraticNumberFields.RingOfIntegers.isDedekindDomain_zsqrtd_of_mod_four_ne_one d hd4
+  exact RingEquiv.isDedekindDomain e
+
+instance instIsDedekindDomainOfModFourNeOne
+    (d : ℤ) [QuadFieldParam d] [Fact (d % 4 ≠ 1)] :
+    IsDedekindDomain (Zsqrtd d) :=
+  isDedekindDomain_of_mod_four_ne_one d Fact.out
+
+theorem not_isDedekindDomain_of_mod_four_eq_one
+    (d : ℤ) [QuadFieldParam d]
+    (hd4 : d % 4 = 1) :
+    ¬ IsDedekindDomain (Zsqrtd d) := by
+  intro hDed
+  letI : IsDedekindDomain (Zsqrtd d) := hDed
+  have hDedQA : IsDedekindDomain (QuadraticNumberFields.RingOfIntegers.Zsqrtd d) :=
+    RingEquiv.isDedekindDomain
+      (QuadraticNumberFields.RingOfIntegers.Zsqrtd.equivMathlib d).symm
+  exact
+    ((QuadraticNumberFields.RingOfIntegers.isDedekindDomain_zsqrtd_iff_mod_four_ne_one d).mp
+      hDedQA) hd4
+
+/-- For a valid quadratic parameter `d`, mathlib's `ℤ√d` is Dedekind exactly in
+the `d % 4 ≠ 1` branch. -/
+theorem isDedekindDomain_iff_mod_four_ne_one
+    (d : ℤ) [QuadFieldParam d] :
+    IsDedekindDomain (Zsqrtd d) ↔ d % 4 ≠ 1 := by
+  constructor
+  · intro hDed hd4
+    exact not_isDedekindDomain_of_mod_four_eq_one d hd4 hDed
+  · exact isDedekindDomain_of_mod_four_ne_one d
 
 end Zsqrtd
