@@ -6,24 +6,45 @@ of their ring of integers, centered on the Lean objects `Qsqrtd`,
 
 **[Documentation site](https://frankieew.github.io/QuadraticNumberFields)**
 
-## Main Result
+## Main Results
 
-The final classification lives in
-`Lean/QuadraticNumberFields/RingOfIntegers/Classification.lean`:
+### Ring of Integers Classification
 
-- `ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one`
-- `ringOfIntegers_equiv_zOnePlusSqrtOverTwo_of_mod_four_eq_one`
-- `ringOfIntegers_classification`
+(`RingOfIntegers/Classification.lean`)
 
-Mathematically, for `d : ℤ` with `[QuadFieldParam d]`, the ring of integers
-`𝓞 (Q(√d))` is classified as follows:
+For squarefree `d ≠ 1`, the ring of integers `𝓞 (ℚ(√d))` is classified as:
 
-- If `d % 4 ≠ 1`, then `𝓞 (Q(√d)) ≃+* ℤ√d`.
-- If `d % 4 = 1`, writing `d = 1 + 4k`, then `𝓞 (Q(√d)) ≃+* ℤ[(1+√d)/2]`.
+- If `d % 4 ≠ 1`, then `𝓞 (ℚ(√d)) ≃+* ℤ√d`.
+- If `d % 4 = 1`, writing `d = 1 + 4k`, then `𝓞 (ℚ(√d)) ≃+* ℤ[(1+√d)/2]`.
+
+Key declarations: `ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one`,
+`ringOfIntegers_equiv_zOnePlusSqrtOverTwo_of_mod_four_eq_one`,
+`ringOfIntegers_classification`.
 
 Classical examples:
-- **Gaussian integers** (`d = -1`): `𝓞 (Q(√(-1))) ≃+* ℤ[i]`
-- **Eisenstein integers** (`d = -3`): `𝓞 (Q(√(-3))) ≃+* ℤ[ω]` where `ω = (1+√(-3))/2`
+- **Gaussian integers** (`d = -1`): `𝓞 (ℚ(√(-1))) ≃+* ℤ[i]`
+- **Eisenstein integers** (`d = -3`): `𝓞 (ℚ(√(-3))) ≃+* ℤ[ω]` where `ω = (1+√(-3))/2`
+
+### Discriminant Formula
+
+(`RingOfIntegers/Discriminant.lean`)
+
+The number field discriminant of `ℚ(√d)` is computed as:
+
+- `discr_formula`: `Δ(ℚ(√d)) = if d % 4 = 1 then d else 4 * d`
+
+Examples: `Δ(ℚ(√(-1))) = -4`, `Δ(ℚ(√(-3))) = -3`, `Δ(ℚ(√(-5))) = -20`.
+
+### Dedekind Domain Characterization
+
+(`RingOfIntegers/ZsqrtdMathlibInstances.lean`)
+
+For squarefree `d ≠ 1`:
+
+- `isDedekindDomain_iff_mod_four_ne_one`: `ℤ√d` is a Dedekind domain if and only if `d % 4 ≠ 1`
+
+This follows from the ring of integers classification — `ℤ√d` is a Dedekind domain
+precisely when it equals the full ring of integers `𝓞 (ℚ(√d))`.
 
 ## Core Lean Objects
 
@@ -43,9 +64,11 @@ This project formalizes:
 - `QuadFieldParam`: typeclass for squarefree `d ≠ 1` parameters
 - Parametrization and uniqueness of the quadratic field structure
 - Ring of integers classification (`ringOfIntegers_classification`)
+- Discriminant formula (`discr_formula`)
+- Dedekind domain characterization (`isDedekindDomain_iff_mod_four_ne_one`)
 - Integrality criteria via trace and norm
-- Euclidean domain classification framework: for squarefree `d < 0`, the ring `𝓞 (Q(√d))` is norm-Euclidean iff `d ∈ {-1, -2, -3, -7, -11}`
-- Concrete verified examples for ℤ[√-5]: domain properties, ideal factorization, primality, and ramification/inertia computations
+- Ideal theory in `ℤ√d`: quotient by prime ideals, ramification
+- Concrete verified examples for `ℤ[√-5]`: ideal factorization, primality, ramification/inertia
 
 ## Project Structure
 
@@ -62,21 +85,24 @@ QuadraticNumberFields/
 │       ├── ParamUniqueness.lean     # Uniqueness of the quadratic structure
 │       ├── Rescale.lean             # Rescaling between Q(√d) forms
 │       ├── TotallyRealComplex.lean  # Totally real / complex place behavior
+│       ├── RingEquiv.lean           # Dedekind domain transfer via ring equivalences
 │       ├── Euclidean/
 │       │   └── Basic.lean           # Euclidean domain classification framework
 │       ├── Examples/
 │       │   └── ZsqrtdNeg5/
-│       │       ├── Basic.lean           # NoZeroDivisors/IsDomain for negative d
 │       │       ├── Ideals.lean          # Ideal factorization and primality in ℤ[√-5]
 │       │       └── RamificationInertia.lean  # Ramification indices and inertia degrees
 │       └── RingOfIntegers/
 │           ├── Classification.lean  # Main classification theorem
+│           ├── Discriminant.lean    # Discriminant formula for quadratic fields
 │           ├── HalfInt.lean         # Half-integer normal form
 │           ├── Integrality.lean     # Integrality criteria
 │           ├── ModFour.lean         # Modulo-4 arithmetic lemmas
-│           ├── Norm.lean            # Norm computations
+│           ├── Norm.lean            # Norm computations and unit criteria
 │           ├── ZOnePlusSqrtOverTwo.lean  # ℤ[(1+√d)/2] ring
-│           └── Zsqrtd.lean          # ℤ√d ring
+│           ├── Zsqrtd.lean          # ℤ√d ring as QuadraticAlgebra
+│           ├── ZsqrtdIdeals.lean    # Ideal theory: quotients by prime ideals
+│           └── ZsqrtdMathlibInstances.lean  # Dedekind domain characterization
 ├── Verso/                 # Documentation generation
 └── site/                  # Jekyll website (GitHub Pages)
 ```
