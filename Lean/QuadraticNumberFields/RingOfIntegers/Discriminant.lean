@@ -187,14 +187,10 @@ theorem discr_gaussian : NumberField.discr (QuadraticNumberFields (-1)) = -4 :=
 theorem discr_eisenstein : NumberField.discr (QuadraticNumberFields (-3)) = -3 :=
   discr_of_mod_four_eq_one (-3) (by decide)
 
-/-- Instance for `Q(√(-5))`, needed for the discriminant example. -/
-instance discr_neg_five_param : QuadFieldParam (-5 : ℤ) := by
-  letI : Fact (Nat.Prime ((-5 : ℤ).natAbs)) := ⟨by decide⟩
-  exact inferInstance
-
 /-- **Q(√(-5))**: `disc(Q(√(-5))) = -20`. -/
-theorem discr_Qsqrtd_neg_five : NumberField.discr (QuadraticNumberFields (-5)) = -20 :=
-  discr_of_mod_four_ne_one (-5) (by decide)
+theorem discr_Qsqrtd_neg_five [QuadFieldParam (-5 : ℤ)] :
+    NumberField.discr (QuadraticNumberFields (-5)) = -20 := by
+  exact discr_of_mod_four_ne_one (-5) (by decide)
 
 end RingOfIntegers
 end QuadraticNumberFields
