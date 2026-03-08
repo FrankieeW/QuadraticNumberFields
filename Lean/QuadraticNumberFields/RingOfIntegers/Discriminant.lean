@@ -111,8 +111,10 @@ We lift the `RingEquiv` from the classification to an `AlgEquiv ℤ` and use
 to the ring of integers `𝓞 K`. -/
 
 /-- Any `RingEquiv` between ℤ-algebras is automatically a ℤ-algebra equivalence,
-since there is a unique ring homomorphism `ℤ → R` for any ring `R`. -/
-private def ringEquivToIntAlgEquiv
+since there is a unique ring homomorphism `ℤ → R` for any ring `R`.
+
+This is useful for transporting discriminants and other algebraic invariants. -/
+def ringEquivToIntAlgEquiv
     {R S : Type*} [CommRing R] [Algebra ℤ R] [CommRing S] [Algebra ℤ S]
     (e : R ≃+* S) : R ≃ₐ[ℤ] S :=
   AlgEquiv.ofRingEquiv (f := e) (fun n => by
@@ -173,30 +175,25 @@ theorem discr_formula (d : ℤ) [QuadFieldParam d] :
   · exact discr_of_mod_four_eq_one d ‹_›
   · exact discr_of_mod_four_ne_one d ‹_›
 
-/-! ## Examples
+/-! ## Named Examples
 
-Regression tests for the discriminant formula on small squarefree values. -/
+Common discriminants for frequently-used quadratic fields. -/
 
-/-- **Gaussian integers**: `disc(Q(√(-1))) = -4`.
+/-- **Gaussian integers**: `disc(Q(√(-1))) = -4`. -/
+theorem discr_gaussian : NumberField.discr (QuadraticNumberFields (-1)) = -4 :=
+  discr_of_mod_four_ne_one (-1) (by decide)
 
-Since `-1 % 4 = 3 ≠ 1`, we get `disc = 4 · (-1) = -4`. -/
-example : NumberField.discr (QuadraticNumberFields (-1)) = -4 := by
-  exact discr_of_mod_four_ne_one (-1) (by decide)
+/-- **Eisenstein integers**: `disc(Q(√(-3))) = -3`. -/
+theorem discr_eisenstein : NumberField.discr (QuadraticNumberFields (-3)) = -3 :=
+  discr_of_mod_four_eq_one (-3) (by decide)
 
-/-- **Eisenstein integers**: `disc(Q(√(-3))) = -3`.
-
-Since `-3 % 4 = 1`, we get `disc = -3`. -/
-example : NumberField.discr (QuadraticNumberFields (-3)) = -3 := by
-  exact discr_of_mod_four_eq_one (-3) (by decide)
-
-/-- **`Q(√(-5))`**: `disc(Q(√(-5))) = -20`.
-
-Since `-5 % 4 = 3 ≠ 1`, we get `disc = 4 · (-5) = -20`. -/
-instance : QuadFieldParam (-5 : ℤ) := by
+/-- Instance for `Q(√(-5))`, needed for the discriminant example. -/
+instance discr_neg_five_param : QuadFieldParam (-5 : ℤ) := by
   letI : Fact (Nat.Prime ((-5 : ℤ).natAbs)) := ⟨by decide⟩
   exact inferInstance
 
-example : NumberField.discr (QuadraticNumberFields (-5)) = -20 :=
+/-- **Q(√(-5))**: `disc(Q(√(-5))) = -20`. -/
+theorem discr_Qsqrtd_neg_five : NumberField.discr (QuadraticNumberFields (-5)) = -20 :=
   discr_of_mod_four_ne_one (-5) (by decide)
 
 end RingOfIntegers
