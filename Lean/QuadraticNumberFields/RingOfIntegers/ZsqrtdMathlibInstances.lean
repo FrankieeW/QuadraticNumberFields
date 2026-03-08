@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Frankie Wang
 -/
 import QuadraticNumberFields.RingOfIntegers.Classification
+import QuadraticNumberFields.RingEquiv
 import QuadraticNumberFields.RingOfIntegers.Zsqrtd
 import Mathlib.NumberTheory.Zsqrtd.Basic
 import Mathlib.RingTheory.IntegralClosure.IntegrallyClosed
@@ -52,42 +53,7 @@ theorem isDedekindDomain_of_mod_four_ne_one
   let e := QuadraticNumberFields.RingOfIntegers.Zsqrtd.equivMathlib d
   letI : IsDedekindDomain (QuadraticNumberFields.RingOfIntegers.Zsqrtd d) :=
     QuadraticNumberFields.RingOfIntegers.isDedekindDomain_zsqrtd_of_mod_four_ne_one d hd4
-  letI : Module
-      (QuadraticNumberFields.RingOfIntegers.Zsqrtd d)
-      (QuadraticNumberFields.RingOfIntegers.Zsqrtd d) := Semiring.toModule
-  letI : IsNoetherianRing (QuadraticNumberFields.RingOfIntegers.Zsqrtd d) :=
-    show
-      IsNoetherian
-        (QuadraticNumberFields.RingOfIntegers.Zsqrtd d)
-        (QuadraticNumberFields.RingOfIntegers.Zsqrtd d) from
-      IsDedekindRing.toIsNoetherian
-  letI : IsDomain (Zsqrtd d) := e.toMulEquiv.isDomain_iff.mp inferInstance
-  letI : IsNoetherianRing (Zsqrtd d) :=
-    isNoetherianRing_of_ringEquiv (QuadraticNumberFields.RingOfIntegers.Zsqrtd d) e
-  letI : IsIntegrallyClosed (Zsqrtd d) := IsIntegrallyClosed.of_equiv e
-  letI : Ring.DimensionLEOne (Zsqrtd d) :=
-    { maximalOfPrime := by
-        intro p hp0 hp
-        have hcomapPrime : (Ideal.comap e p).IsPrime := Ideal.comap_isPrime e p
-        have hcomapNeBot : Ideal.comap e p ≠ ⊥ := by
-          intro hbot
-          have hmap := Ideal.map_comap_eq_self_of_equiv e p
-          rw [hbot, Ideal.map_bot] at hmap
-          exact hp0 hmap.symm
-        have hcomapMax : (Ideal.comap e p).IsMaximal :=
-          Ring.DimensionLEOne.maximalOfPrime hcomapNeBot hcomapPrime
-        letI : (Ideal.comap e p).IsMaximal := hcomapMax
-        have hmapMax : (Ideal.map e (Ideal.comap e p)).IsMaximal :=
-          Ideal.map_isMaximal_of_equiv e
-        simpa [Ideal.map_comap_eq_self_of_equiv] using hmapMax }
-  letI : Module (Zsqrtd d) (Zsqrtd d) := Semiring.toModule
-  letI : IsDedekindRing (Zsqrtd d) :=
-    { toIsNoetherian := show IsNoetherian (Zsqrtd d) (Zsqrtd d) from inferInstance
-      toDimensionLEOne := inferInstance
-      toIsIntegralClosure :=
-        show IsIntegralClosure (Zsqrtd d) (Zsqrtd d) (FractionRing (Zsqrtd d)) from
-          inferInstance }
-  infer_instance
+  exact RingEquiv.isDedekindDomain e
 
 instance instIsDedekindDomainOfModFourNeOne
     (d : ℤ) [QuadFieldParam d] [Fact (d % 4 ≠ 1)] :
@@ -99,50 +65,10 @@ theorem not_isDedekindDomain_of_mod_four_eq_one
     (hd4 : d % 4 = 1) :
     ¬ IsDedekindDomain (Zsqrtd d) := by
   intro hDed
-  let e := QuadraticNumberFields.RingOfIntegers.Zsqrtd.equivMathlib d
   letI : IsDedekindDomain (Zsqrtd d) := hDed
-  letI : Module (Zsqrtd d) (Zsqrtd d) := Semiring.toModule
-  letI : IsNoetherianRing (Zsqrtd d) :=
-    show IsNoetherian (Zsqrtd d) (Zsqrtd d) from IsDedekindRing.toIsNoetherian
-  letI : IsDomain (QuadraticNumberFields.RingOfIntegers.Zsqrtd d) :=
-    e.toMulEquiv.isDomain_iff.mpr inferInstance
-  letI : IsNoetherianRing (QuadraticNumberFields.RingOfIntegers.Zsqrtd d) :=
-    isNoetherianRing_of_ringEquiv (Zsqrtd d) e.symm
-  letI : IsIntegrallyClosed (QuadraticNumberFields.RingOfIntegers.Zsqrtd d) :=
-    IsIntegrallyClosed.of_equiv e.symm
-  letI : Ring.DimensionLEOne (QuadraticNumberFields.RingOfIntegers.Zsqrtd d) :=
-    { maximalOfPrime := by
-        intro p hp0 hp
-        have hmapPrime : (Ideal.map e p).IsPrime := Ideal.map_isPrime_of_equiv e
-        have hcomapMap : Ideal.comap e (Ideal.map e p) = p := by
-          rw [Ideal.comap_map_of_surjective e e.surjective p,
-            Ideal.comap_bot_of_injective e e.injective, sup_bot_eq]
-        have hmapNeBot : Ideal.map e p ≠ ⊥ := by
-          intro hbot
-          rw [hbot, Ideal.comap_bot_of_injective e e.injective] at hcomapMap
-          exact hp0 hcomapMap.symm
-        have hmapMax : (Ideal.map e p).IsMaximal :=
-          Ring.DimensionLEOne.maximalOfPrime hmapNeBot hmapPrime
-        letI : (Ideal.map e p).IsMaximal := hmapMax
-        have hcomapMax : (Ideal.comap e (Ideal.map e p)).IsMaximal :=
-          Ideal.comap_isMaximal_of_equiv e
-        simpa [hcomapMap] using hcomapMax }
-  letI : Module
-      (QuadraticNumberFields.RingOfIntegers.Zsqrtd d)
-      (QuadraticNumberFields.RingOfIntegers.Zsqrtd d) := Semiring.toModule
-  letI : IsDedekindRing (QuadraticNumberFields.RingOfIntegers.Zsqrtd d) :=
-    { toIsNoetherian :=
-        show IsNoetherian
-          (QuadraticNumberFields.RingOfIntegers.Zsqrtd d)
-          (QuadraticNumberFields.RingOfIntegers.Zsqrtd d) from inferInstance
-      toDimensionLEOne := inferInstance
-      toIsIntegralClosure :=
-        show IsIntegralClosure
-          (QuadraticNumberFields.RingOfIntegers.Zsqrtd d)
-          (QuadraticNumberFields.RingOfIntegers.Zsqrtd d)
-          (FractionRing (QuadraticNumberFields.RingOfIntegers.Zsqrtd d)) from
-            inferInstance }
-  have hDedQA : IsDedekindDomain (QuadraticNumberFields.RingOfIntegers.Zsqrtd d) := inferInstance
+  have hDedQA : IsDedekindDomain (QuadraticNumberFields.RingOfIntegers.Zsqrtd d) :=
+    RingEquiv.isDedekindDomain
+      (QuadraticNumberFields.RingOfIntegers.Zsqrtd.equivMathlib d).symm
   exact
     ((QuadraticNumberFields.RingOfIntegers.isDedekindDomain_zsqrtd_iff_mod_four_ne_one d).mp
       hDedQA) hd4
