@@ -73,6 +73,52 @@ theorem ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one
       intro z
       simpa [QuadraticNumberFields] using isIntegral_toQsqrtd d z)
 
+/-- If `d % 4 ≠ 1`, then `ℤ[√d]` is a Dedekind domain because it is the full
+ring of integers of `Q(√d)`. -/
+theorem isDedekindDomain_zsqrtd_of_mod_four_ne_one
+    (d : ℤ) [QuadFieldParam d]
+    (hd4 : d % 4 ≠ 1) :
+    IsDedekindDomain (Zsqrtd d) := by
+  rcases ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one d hd4 with ⟨e⟩
+  letI : Module (𝓞 (QuadraticNumberFields d)) (𝓞 (QuadraticNumberFields d)) :=
+    Semiring.toModule
+  letI : IsDedekindDomain (𝓞 (QuadraticNumberFields d)) := inferInstance
+  letI : IsNoetherianRing (𝓞 (QuadraticNumberFields d)) :=
+    show IsNoetherian (𝓞 (QuadraticNumberFields d)) (𝓞 (QuadraticNumberFields d)) from
+      IsDedekindRing.toIsNoetherian
+  letI : IsDomain (Zsqrtd d) :=
+    e.toMulEquiv.isDomain_iff.mp inferInstance
+  letI : IsNoetherianRing (Zsqrtd d) :=
+    isNoetherianRing_of_ringEquiv (𝓞 (QuadraticNumberFields d)) e
+  letI : IsIntegrallyClosed (Zsqrtd d) := IsIntegrallyClosed.of_equiv e
+  letI : Ring.DimensionLEOne (Zsqrtd d) :=
+    { maximalOfPrime := by
+        intro p hp0 hp
+        have hcomapPrime : (Ideal.comap e p).IsPrime := Ideal.comap_isPrime e p
+        have hcomapNeBot : Ideal.comap e p ≠ ⊥ := by
+          intro hbot
+          have hmap := Ideal.map_comap_eq_self_of_equiv e p
+          rw [hbot, Ideal.map_bot] at hmap
+          exact hp0 hmap.symm
+        have hcomapMax : (Ideal.comap e p).IsMaximal :=
+          Ring.DimensionLEOne.maximalOfPrime hcomapNeBot hcomapPrime
+        have hmapMax : (Ideal.map e (Ideal.comap e p)).IsMaximal :=
+          Ideal.map_isMaximal_of_equiv e
+        simpa [Ideal.map_comap_eq_self_of_equiv] using hmapMax }
+  letI : Module (Zsqrtd d) (Zsqrtd d) := Semiring.toModule
+  letI : IsDedekindRing (Zsqrtd d) :=
+    { toIsNoetherian := show IsNoetherian (Zsqrtd d) (Zsqrtd d) from inferInstance
+      toDimensionLEOne := inferInstance
+      toIsIntegralClosure :=
+        show IsIntegralClosure (Zsqrtd d) (Zsqrtd d) (FractionRing (Zsqrtd d)) from
+          inferInstance }
+  infer_instance
+
+instance instIsDedekindDomain_zsqrtd_of_mod_four_ne_one
+    (d : ℤ) [QuadFieldParam d] [Fact (d % 4 ≠ 1)] :
+    IsDedekindDomain (Zsqrtd d) :=
+  isDedekindDomain_zsqrtd_of_mod_four_ne_one d Fact.out
+
 /-- If `d % 4 = 1`, writing `d = 1 + 4k`,
 then `𝓞 (Q(√d)) ≃+* ZOnePlusSqrtOverTwo k`. -/
 theorem ringOfIntegers_equiv_zOnePlusSqrtOverTwo_of_mod_four_eq_one
