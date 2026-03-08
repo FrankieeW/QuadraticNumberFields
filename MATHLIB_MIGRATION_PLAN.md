@@ -66,25 +66,26 @@ Mathlib/NumberTheory/QuadraticField/
 
 **Content:**
 
-`Qsqrtd` 类型与基本操作:
-- `Qsqrtd (d : ℚ) := QuadraticAlgebra ℚ d 0` — `ℚ(√d)` 的类型别名
-- `Qsqrtd.trace`, `Qsqrtd.norm`, `Qsqrtd.embed` 及其 simp lemmas
+`Qsqrtd` type and basic operations:
+- `Qsqrtd (d : ℚ) := QuadraticAlgebra ℚ d 0` — type alias for `ℚ(√d)`
+- `Qsqrtd.trace`, `Qsqrtd.norm`, `Qsqrtd.embed` with simp lemmas
 
-`QuadFieldParam` 参数类型类:
-- `QuadFieldParam (d : ℤ)`: 包含 `squarefree : Squarefree d` 和 `ne_one : d ≠ 1`
-- 构造器: `of_squarefree_ne_one`, `of_prime`, `of_natAbs_prime`
-- `d = -1`, `d = -3` 的实例
-- 退化情况: `zero_not_isReduced`, `one_not_isField`
+`QuadFieldParam` parameter typeclass:
+- `QuadFieldParam (d : ℤ)`: bundles `squarefree : Squarefree d` and `ne_one : d ≠ 1`
+- Constructors: `of_squarefree_ne_one`, `of_prime`, `of_natAbs_prime`
+- Instances for `d = -1`, `d = -3`
+- Degeneracy lemmas: `zero_not_isReduced`, `one_not_isField`
 
-`QuadraticNumberFields` 及代数实例:
+`QuadraticNumberFields` and algebra instances:
 - `QuadraticNumberFields (d : ℤ) [QuadFieldParam d] := Qsqrtd (d : ℚ)`
 - `Field`, `NumberField`, `IsQuadraticExtension` instances
 - Module diamond resolution
 
 **Migration notes:**
-- 需要在 Zulip 讨论 `QuadFieldParam` 的设计: typeclass vs. 分开的假设
-- `trace`/`norm` 是否应该使用 mathlib 的 `Algebra.trace`/`Algebra.norm` 并证明兼容性
-- Module diamond 的解决方案需要仔细审查
+- Discuss on Zulip whether `QuadFieldParam` should be a typeclass or separate hypotheses
+- Check whether `trace`/`norm` should use mathlib's `Algebra.trace`/`Algebra.norm` with
+  compatibility proofs instead of standalone definitions
+- Module diamond resolution needs careful review
 
 **Review risk:** Medium — design discussion expected.
 
@@ -100,21 +101,21 @@ Mathlib/NumberTheory/QuadraticField/
 
 Rescaling:
 - `rescale d a ha`: algebra isomorphism `ℚ(√d) ≃ₐ[ℚ] ℚ(√(a²d))`
-- `Qsqrtd_iso_int_param`, `Qsqrtd_iso_squarefree_int_param`: 正规化结果
+- `Qsqrtd_iso_int_param`, `Qsqrtd_iso_squarefree_int_param`: normalization results
 
-参数唯一性:
-- `QuadFieldParam.unique`: `ℚ(√d₁) ≃ₐ[ℚ] ℚ(√d₂)` + 两边 squarefree ⟹ `d₁ = d₂`
-- `squarefree_eq_of_rat_sq_mul`: `d₁ = d₂ · r²` + 两边 squarefree ⟹ `d₁ = d₂`
+Parameter uniqueness:
+- `QuadFieldParam.unique`: `ℚ(√d₁) ≃ₐ[ℚ] ℚ(√d₂)` with both squarefree implies `d₁ = d₂`
+- `squarefree_eq_of_rat_sq_mul`: `d₁ = d₂ · r²` with both squarefree implies `d₁ = d₂`
 
-无穷素位:
-- `isTotallyReal`: `d > 0` 时 `ℚ(√d)` totally real
-- `isTotallyComplex`: `d < 0` 时 `ℚ(√d)` totally complex
-- `isCMField`: `d < 0` 时 `ℚ(√d)` 是 CM field
+Infinite places:
+- `isTotallyReal`: `ℚ(√d)` is totally real when `d > 0`
+- `isTotallyComplex`: `ℚ(√d)` is totally complex when `d < 0`
+- `isCMField`: `ℚ(√d)` is a CM field when `d < 0`
 
 **Migration notes:**
-- `TotallyRealComplex.lean` 使用 `attribute [-instance] DivisionRing.toRatAlgebra`
-  来解决 diamond — 需要检查最新 mathlib 是否已修复
-- Rescale 和 ParamUniqueness 是独立的, 可以并行审查
+- `TotallyRealComplex.lean` uses `attribute [-instance] DivisionRing.toRatAlgebra`
+  to resolve a diamond — check whether this is still needed on latest mathlib
+- Rescale and ParamUniqueness are independent and can be reviewed in parallel
 
 **Review risk:** Medium — instance management.
 
@@ -130,32 +131,34 @@ Rescaling:
 
 **Content:**
 
-Mod-4 算术:
-- `squarefree_int_emod_four`: squarefree 整数模 4 余数属于 `{1, 2, 3}`
-- `dvd_four_sub_sq_iff_even_even_or_odd_odd_mod_four_one`: 主判据
+Mod-4 arithmetic:
+- `squarefree_int_emod_four`: squarefree integers have remainder in `{1, 2, 3}` mod 4
+- `dvd_four_sub_sq_iff_even_even_or_odd_odd_mod_four_one`: main criterion
   `4 ∣ (a'² - d·b'²) ↔ (2∣a' ∧ 2∣b') ∨ (both odd ∧ d ≡ 1 mod 4)`
 - `exists_k_of_mod_four_eq_one`: `d % 4 = 1 ↔ ∃ k, d = 1 + 4k`
 
-`ℤ[√d]` 作为 QuadraticAlgebra:
+`ℤ[√d]` as QuadraticAlgebra:
 - `Zsqrtd d := QuadraticAlgebra ℤ d 0`
-- `equivMathlib`: 与 mathlib `ℤ√d` 的 ring equivalence
+- `equivMathlib`: ring equivalence with mathlib's `ℤ√d`
 - `toQsqrtdHom`: embedding into `ℚ(√d)` + injectivity
 - `NoZeroDivisors`, `IsDomain` instances (for `d < 0`)
 - `halfInt_mem_range_toQsqrtdHom_iff_even_even`
 
-Half-integer 与 `ℤ[(1+√d)/2]`:
-- `halfInt d a' b'`: `(a' + b'√d) / 2`
-- `ZOnePlusSqrtOverTwo k := QuadraticAlgebra ℤ k 1` (因为 `ω² = ω + k`)
+Half-integer form and `ℤ[(1+√d)/2]`:
+- `halfInt d a' b'`: element `(a' + b'√d) / 2`
+- `ZOnePlusSqrtOverTwo k := QuadraticAlgebra ℤ k 1` (since `ω² = ω + k`)
 - `toQsqrtdHom` + injectivity
 - `halfInt_mem_carrierSet_iff_same_parity`
 
 **Migration notes:**
-- **关键设计决策:** 保留自己的 `Zsqrtd` (作为 `QuadraticAlgebra ℤ d 0`) 还是直接
-  扩展 mathlib 的 `ℤ√d`? 建议: `NoZeroDivisors`/`IsDomain` 直接贡献给
-  `Mathlib.NumberTheory.Zsqrtd.Basic`, `QuadraticAlgebra` equivalence 作为兼容层
-- 部分 mod-4 引理 (e.g. `Int.sq_emod_four_of_even`) 可能已经存在或应放在
+- **Key design decision:** keep our own `Zsqrtd` (as `QuadraticAlgebra ℤ d 0`) or extend
+  mathlib's `ℤ√d` directly? Recommendation: contribute `NoZeroDivisors`/`IsDomain`
+  directly to `Mathlib.NumberTheory.Zsqrtd.Basic`, and add the `QuadraticAlgebra`
+  equivalence as a compatibility layer
+- Some mod-4 lemmas (e.g. `Int.sq_emod_four_of_even`) may already exist or belong in
   `Mathlib.Data.Int.Parity`
-- `ZOnePlusSqrtOverTwo` 使用 `QuadraticAlgebra ℤ k 1` 的参数化需要清楚文档化
+- The `ZOnePlusSqrtOverTwo` parameterization via `QuadraticAlgebra ℤ k 1` needs clear
+  documentation
 
 **Review risk:** High — largest PR, `Zsqrtd` duplication discussion.
 
@@ -170,36 +173,37 @@ Half-integer 与 `ℤ[(1+√d)/2]`:
 
 **Content:**
 
-Integrality 判据:
-- `exists_halfInt_with_div_four_of_isIntegral`: 每个整元都有形式
-  `(a' + b'√d)/2` 且 `4 ∣ (a'² - d·b'²)` (~250 行证明)
-- `exists_zsqrtd_of_isIntegral_of_ne_one_mod_four`: `d % 4 ≠ 1` 的前向方向
-- `exists_zOnePlusSqrtOverTwo_of_isIntegral_of_one_mod_four`: `d % 4 = 1` 的前向方向
-- `isIntegral_toQsqrtd`, `isIntegral_toQsqrtd_of_zOnePlusSqrtOverTwo`: 反向方向
+Integrality criteria:
+- `exists_halfInt_with_div_four_of_isIntegral`: every integral element has form
+  `(a' + b'√d)/2` with `4 ∣ (a'² - d·b'²)` (~250 line proof)
+- `exists_zsqrtd_of_isIntegral_of_ne_one_mod_four`: forward direction for `d % 4 ≠ 1`
+- `exists_zOnePlusSqrtOverTwo_of_isIntegral_of_one_mod_four`: forward direction for `d % 4 = 1`
+- `isIntegral_toQsqrtd`, `isIntegral_toQsqrtd_of_zOnePlusSqrtOverTwo`: reverse directions
 
 **Main Classification Theorem:**
 - `ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one`:
   `d % 4 ≠ 1 → 𝓞(ℚ(√d)) ≃+* ℤ[√d]`
 - `ringOfIntegers_equiv_zOnePlusSqrtOverTwo_of_mod_four_eq_one`:
   `d % 4 = 1 → 𝓞(ℚ(√d)) ≃+* ℤ[(1+√d)/2]`
-- `ringOfIntegers_classification`: 合并版本
-- 具体例子: Gaussian integers (`d = -1`), Eisenstein integers (`d = -3`)
+- `ringOfIntegers_classification`: combined statement
+- Concrete examples: Gaussian integers (`d = -1`), Eisenstein integers (`d = -3`)
 
-Norm 计算:
-- `norm_mul`, `norm_zsqrtd`, `norm_zOnePlusSqrtOverTwo`: 显式公式
-- `isUnit_zsqrtd_iff_norm_eq_one_or_neg_one`: `ℤ[√d]` 的 unit 判据
-- `isUnit_zOnePlusSqrtOverTwo_iff_norm_eq_one_or_neg_one`: `ℤ[(1+√d)/2]` 的 unit 判据
+Norm computations:
+- `norm_mul`, `norm_zsqrtd`, `norm_zOnePlusSqrtOverTwo`: explicit formulas
+- `isUnit_zsqrtd_iff_norm_eq_one_or_neg_one`: unit criterion for `ℤ[√d]`
+- `isUnit_zOnePlusSqrtOverTwo_iff_norm_eq_one_or_neg_one`: unit criterion for `ℤ[(1+√d)/2]`
 
-Ideal 理论 (一般框架, 任意 squarefree `d`, prime `p ∣ (d-1)`):
+Ideal theory (general framework for any squarefree `d` and prime `p ∣ (d-1)`):
 - `liftModP`, `liftModPNeg`: ring homs `ℤ[√d] →+* ZMod p`
 - `quotEquivZModP`, `quotEquivZModPNeg`: quotient ring equivalences
 - `isPrime_span_p_one_minus_sqrtd`, `isPrime_span_p_one_plus_sqrtd`: primality
 
 **Migration notes:**
-- `Integrality.lean` 是最复杂的文件, 审查者可能要求简化
-- **必须先修复** `Norm.lean` 中 `norm_mem_ringOfIntegers` 的 `sorry`
-- 这是项目的核心定理
-- `ZsqrtdIdeals.lean` 与 Classification 无依赖, 但放在同一 PR 以减少 PR 数量
+- `Integrality.lean` is the most complex file; reviewers may request simplification
+- **Must fix** the `sorry` in `norm_mem_ringOfIntegers` in `Norm.lean` before submitting
+- This is the core theorem of the project
+- `ZsqrtdIdeals.lean` has no dependency on Classification but is included in this PR
+  to reduce the total number of PRs
 
 **Pre-work required:**
 - [ ] Fix `sorry` in `norm_mem_ringOfIntegers`
@@ -212,28 +216,28 @@ Ideal 理论 (一般框架, 任意 squarefree `d`, prime `p ∣ (d-1)`):
 
 | File | Reason |
 |---|---|
-| `Euclidean/Basic.lean` | 骨架文件, 所有证明都是 `sorry` — 留待将来完成 |
-| `Examples/ZsqrtdNeg5/` | 具体例子 (`ℤ[√-5]` 分解/ramification), 适合留在外部项目或后续提交到 `Mathlib.Archive` |
-| `Verso/` | 文档生成工具, 非数学内容 |
-| `site/` | 网站, 与 mathlib 无关 |
+| `Euclidean/Basic.lean` | Skeleton file with all proofs `sorry` — deferred to future work |
+| `Examples/ZsqrtdNeg5/` | Concrete examples (`ℤ[√-5]` factorization/ramification); better suited for the external project or a future `Mathlib.Archive` submission |
+| `Verso/` | Documentation tooling, not mathematical content |
+| `site/` | Website, not relevant to mathlib |
 
 ---
 
 ## Pre-Migration Checklist
 
 - [ ] **Fix `sorry`** in `Norm.lean`: `norm_mem_ringOfIntegers`
-- [ ] **Zulip 讨论** — 发帖到 `#mathlib4 > new PR` 或 `#Is there code for X?`
-  - 主题: "Quadratic number fields: ring of integers classification"
-  - 关键设计问题:
-    1. `QuadFieldParam` typeclass vs. 分开的假设?
-    2. 自己的 `Zsqrtd` vs. 直接扩展 mathlib 的 `ℤ√d`?
-    3. 目标目录 `Mathlib.NumberTheory.QuadraticField` 是否合适?
-- [ ] **Bump to latest mathlib** — 确保与 `master` 兼容
+- [ ] **Zulip discussion** — post to `#mathlib4 > new PR` or `#Is there code for X?`
+  - Topic: "Quadratic number fields: ring of integers classification"
+  - Key design questions:
+    1. `QuadFieldParam` as typeclass vs. separate hypotheses?
+    2. Own `Zsqrtd` vs. extend mathlib's `ℤ√d` directly?
+    3. Target directory `Mathlib.NumberTheory.QuadraticField` — acceptable?
+- [ ] **Bump to latest mathlib** — ensure compatibility with `master`
 - [ ] **Run `#lint`** on all files
 - [ ] **Add copyright headers** — `Copyright (c) 2026 Frankie Wang. All rights reserved.`
-- [ ] **Add module docstrings** — `/-! ... -/` 包含 `## Main Definitions` / `## Main Theorems`
-- [ ] **Remove ANCHOR comments** — mathlib 不需要
-- [ ] **Remove `repl` dependency** — mathlib PR 不需要
+- [ ] **Add module docstrings** — `/-! ... -/` with `## Main Definitions` / `## Main Theorems`
+- [ ] **Remove ANCHOR comments** — not needed for mathlib
+- [ ] **Remove `repl` dependency** — not needed for mathlib PRs
 
 ---
 
@@ -250,11 +254,41 @@ PR 1 (Foundation: Qsqrtd + Param + Instances)
 
 | Phase | PRs | Description |
 |---|---|---|
-| Phase 1 | PR 1 | Foundation (先开) |
-| Phase 2 | PR 2, PR 3 | Structure theory + ring models (并行) |
+| Phase 1 | PR 1 | Foundation (open first) |
+| Phase 2 | PR 2, PR 3 | Structure theory + ring models (in parallel) |
 | Phase 3 | PR 4 | Classification theorem + ideal theory |
 
-每个 PR 预计 2–4 周审查周期, 整体 ~2–3 个月完成迁移。
+Expected review cycle: 2–4 weeks per PR. Overall migration: ~2–3 months.
+
+---
+
+## PR Description Template
+
+Each PR description should include the following to give reviewers full context:
+
+```markdown
+## Context
+
+This PR is part of a series upstreaming the [QuadraticNumberFields](https://github.com/FrankieeW/QuadraticNumberFields) project, which formalizes quadratic number fields `ℚ(√d)` and classifies their ring of integers.
+
+The full migration consists of 4 PRs:
+1. **Foundation** — `Qsqrtd` type, `QuadFieldParam` typeclass, `Field`/`NumberField` instances *(this PR / merged as #XXXX)*
+2. **Structure theory** — Rescaling isomorphisms, parameter uniqueness, totally real/complex/CM classification
+3. **Ring of integers models** — Mod-4 arithmetic, `ℤ[√d]` as `QuadraticAlgebra`, `ℤ[(1+√d)/2]` ring
+4. **Classification theorem** — Integrality criteria, `𝓞(ℚ(√d)) ≃+* ℤ[√d]` or `ℤ[(1+√d)/2]`, norm/unit criteria, ideal theory
+
+### Main result (PR 4)
+
+For squarefree `d ≠ 1`:
+- `d % 4 ≠ 1 → 𝓞(ℚ(√d)) ≃+* ℤ[√d]`
+- `d % 4 = 1 → 𝓞(ℚ(√d)) ≃+* ℤ[(1+√d)/2]`
+
+## This PR
+
+*(describe this PR's specific content here)*
+```
+
+Update the list as PRs are merged (replace `this PR` / fill in merged PR numbers).
 
 ---
 
