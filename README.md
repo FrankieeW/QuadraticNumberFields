@@ -142,6 +142,12 @@ git worktree add .worktrees/<prefix>/<feature> main -b <prefix>/<feature>
 
 This project was originally developed at [ClassificationOfIntegersOfQuadraticNumberFields](https://github.com/FrankieeW/ClassificationOfIntegersOfQuadraticNumberFields). It has since been restructured and expanded in this repository.
 
-## References
+## Contributions to mathlib
+
+- [PR #36347](https://github.com/leanprover-community/mathlib4/pull/36347): Define quadratic number fields as `QuadraticAlgebra ℚ d 0`
+- [PR #36387](https://github.com/leanprover-community/mathlib4/pull/36387): Parameter uniqueness for quadratic fields
+
+## Zulip
 
 - [Z[(1+sqrt(1+4k))/2] discussion (Lean Zulip)](https://leanprover.zulipchat.com/#narrow/channel/217875-Is-there-code-for-X.3F/topic/Z.5B.281.2Bsqrt.281.2B4k.29.29.2F2.5D/near/520523635)
+- [Quadratic number fields discussion (mathlib4 Zulip)](https://leanprover.zulipchat.com/#narrow/channel/287929-mathlib4/topic/quadratic.20number.20fields/)
