@@ -1,6 +1,7 @@
 import QuadraticNumberFields.Basic
 import QuadraticNumberFields.Parameters
 import QuadraticNumberFields.Instances
+import QuadraticNumberFields.FieldClassification
 import QuadraticNumberFields.RingEquiv
 import QuadraticNumberFields.Euclidean.Basic
 import QuadraticNumberFields.RingOfIntegers.ModFour
