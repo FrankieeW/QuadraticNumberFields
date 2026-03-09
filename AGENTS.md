@@ -76,6 +76,70 @@ The Lean source lives under `Lean/QuadraticNumberFields/`. The base type is
 - Use `git worktree` to create a separate branch for each new feature or bug fix
 - Follow standard GitHub flow: PR, code review, merge into main
 
+### mathlib Contributions (Bidirectional Sync)
+
+This project maintains a **bidirectional sync** with mathlib PRs:
+
+#### Active PRs
+
+| PR | Topic | Status | Key Files |
+|----|-------|--------|-----------|
+| [#36347](https://github.com/leanprover-community/mathlib4/pull/36347) | `Qsqrtd` definition, `IsQuadraticField` | OPEN | `NumberTheory/QuadraticField/Basic.lean` |
+| [#36387](https://github.com/leanprover-community/mathlib4/pull/36387) | Parameter uniqueness | OPEN | `NumberTheory/QuadraticField/Basic.lean` |
+
+#### Project → mathlib Flow
+
+When adding features that belong in mathlib:
+
+1. **Develop in this project first** — iterate faster with local builds
+2. **Identify mathlib-scope content**:
+   - ✅ Basic definitions: `Qsqrtd`, `IsQuadraticField`, trace/norm
+   - ✅ General lemmas: squarefree, rescaling, parameter uniqueness
+   - ❌ Project-specific: ring of integers classification, discriminant formula (too advanced)
+3. **Port to PR**: Copy relevant code to mathlib PR, adapt to mathlib style
+4. **Update PR description** with link to project commit
+
+```bash
+# Check PR diff vs project
+gh pr diff 36347 --repo leanprover-community/mathlib4 > /tmp/pr.diff
+diff Lean/QuadraticNumberFields/Basic.lean <(gh pr view 36347 --repo leanprover-community/mathlib4 --json files --jq '.files[].path' | xargs cat)
+```
+
+#### mathlib PR → Project Flow
+
+When PR receives review feedback:
+
+1. **Address review in PR first** — mathlib standards take priority
+2. **Sync back to project** after changes are approved:
+   ```bash
+   # After addressing review in PR, sync the change pattern back
+   # Example: if reviewer asked to generalize trace, update project's trace definition too
+   ```
+3. **Document sync**: Note in project commit which PR review was addressed
+
+#### Sync Checklist
+
+Before syncing, verify:
+- [ ] Definition signatures match (type parameters, instances)
+- [ ] Docstrings are compatible (mathlib uses stricter format)
+- [ ] No project-only dependencies (e.g., `CommonInstances.lean`)
+- [ ] Test with `lake build` in both repos
+
+#### Content Classification
+
+| Content | mathlib? | Project-only? |
+|---------|----------|---------------|
+| `Qsqrtd d = QuadraticAlgebra ℚ d 0` | ✅ | — |
+| `IsQuadraticField` predicate | ✅ | — |
+| Trace/norm basic lemmas | ✅ | — |
+| Rescale isomorphisms | ✅ | — |
+| Parameter uniqueness | ✅ | — |
+| Ring of integers classification | ❌ | ✅ (future separate PR) |
+| Discriminant formula | ❌ | ✅ (future separate PR) |
+| Dedekind domain for `Zsqrtd` | ❌ | ✅ (future separate PR) |
+| Euclidean domain classification | ❌ | ✅ |
+| Ideal theory examples | ❌ | ✅ |
+
 ### Commit Messages
 - Do not include Claude session URLs in commit messages
 - Use conventional commit format: `type: description`
