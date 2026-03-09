@@ -1,0 +1,30 @@
+#!/bin/bash
+# Pre-push hook: Update README stats before pushing to main
+
+# Get the current branch
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+
+# Only run on main branch
+if [ "$current_branch" = "main" ]; then
+    echo "📊 Updating README stats before push..."
+    python3 scripts/update_readme_stats.py
+
+    # Check if there are changes to README.md
+    if ! git diff --quiet README.md; then
+        # Check if the last commit was NOT from GitHub Actions
+        last_msg=$(git log -1 --pretty=%B | head -1)
+        if [[ "$last_msg" == "docs: update code statistics"* ]]; then
+            # Last commit is from action, don't amend
+            echo "⚠️  README modified by your changes but last commit was from CI."
+            echo "   Please commit manually: git add README.md && git commit --amend --no-edit"
+        else
+            # Amend the previous commit to include README changes
+            echo "📝 Adding README changes to previous commit..."
+            git add README.md
+            git commit --amend --no-edit
+            echo "✅ README update amended to previous commit"
+        fi
+    else
+        echo "✅ README is up to date"
+    fi
+fi
