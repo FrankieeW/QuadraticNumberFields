@@ -135,7 +135,7 @@ lake build
 
 ## Worktree
 ```bash
-git worktree add .worktrees/<prefix>-<feature> main -b <prefix>/<feature>
+git worktree add .worktrees/<prefix>/<feature> main -b <prefix>/<feature>
 ```
 
 ## History
