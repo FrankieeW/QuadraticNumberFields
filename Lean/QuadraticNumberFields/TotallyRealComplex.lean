@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Frankie Wang
 -/
 import QuadraticNumberFields.Instances
+import QuadraticNumberFields.Basic
 import Mathlib.NumberTheory.NumberField.InfinitePlace.TotallyRealComplex
 import Mathlib.NumberTheory.NumberField.CMField
 
@@ -18,9 +19,9 @@ This file classifies quadratic number fields `Q(√d)` according to the sign of 
 
 ## Main Theorems
 
-* `QuadraticNumberFields.isTotallyReal`: `Q(√d)` is totally real when `0 < d`.
-* `QuadraticNumberFields.isTotallyComplex`: `Q(√d)` is totally complex when `d < 0`.
-* `QuadraticNumberFields.isCMField`: `Q(√d)` is a CM field when `d < 0`.
+* `Qsqrtd.isTotallyReal`: `Q(√d)` is totally real when `0 < d`.
+* `Qsqrtd.isTotallyComplex`: `Q(√d)` is totally complex when `d < 0`.
+* `Qsqrtd.isCMField`: `Q(√d)` is a CM field when `d < 0`.
 
 ## Proof Strategy
 
@@ -34,30 +35,31 @@ Writing `φ(ω) = a + bi` gives `a² - b² = d` and `2ab = 0`.
 -/
 
 -- Resolve the diamond between `DivisionRing.toRatAlgebra` and `QuadraticAlgebra.instAlgebra`.
--- NOTE: This is a file-local workaround. The attribute disables the conflicting instance
--- only within this file's typeclass resolution. Downstream files importing this module
--- retain the standard `DivisionRing.toRatAlgebra` instance.
+-- NOTE: This is a file-local workaround.
 attribute [-instance] DivisionRing.toRatAlgebra
 
-namespace QuadraticNumberFields
+namespace Qsqrtd
 
-variable {d : ℤ} [QuadFieldParam d]
+section InternalLemmas
+
+variable {d : ℤ} [Fact (¬ IsSquare ((d : ℤ) : ℚ))]
 
 /-- With the `ℚ`-algebra diamond resolved, `IsQuadraticExtension` follows directly from
-`QuadraticAlgebra.finrank_eq_two`. This re-derives the instance from `Instances.lean` in the
-context where `DivisionRing.toRatAlgebra` is disabled. -/
-instance : Algebra.IsQuadraticExtension ℚ (QuadraticNumberFields d) where
+`QuadraticAlgebra.finrank_eq_two`. This re-derives the instance in the context where
+`DivisionRing.toRatAlgebra` is disabled. -/
+instance : Algebra.IsQuadraticExtension ℚ (Qsqrtd (d : ℚ)) where
   finrank_eq_two' := QuadraticAlgebra.finrank_eq_two (d : ℚ) 0
 
 /-- For any infinite place `v` of `Q(√d)`, the image of `ω` satisfies `φ(ω)² = d`. -/
-theorem embedding_omega_sq (v : NumberField.InfinitePlace (QuadraticNumberFields d)) :
+theorem embedding_omega_sq
+    (v : NumberField.InfinitePlace (Qsqrtd (d : ℚ))) :
     v.embedding QuadraticAlgebra.omega ^ 2 = ((d : ℚ) : ℂ) := by
   rw [sq, ← map_mul, QuadraticAlgebra.omega_mul_omega_eq_add]
   simp [Algebra.smul_def]
 
 /-- The real part of `φ(ω)²` decomposes as `re² - im²`. -/
 private theorem embedding_omega_sq_re
-    (v : NumberField.InfinitePlace (QuadraticNumberFields d)) :
+    (v : NumberField.InfinitePlace (Qsqrtd (d : ℚ))) :
     (v.embedding QuadraticAlgebra.omega).re ^ 2 -
     (v.embedding QuadraticAlgebra.omega).im ^ 2 = (d : ℝ) := by
   have := congr_arg Complex.re (embedding_omega_sq v)
@@ -65,16 +67,16 @@ private theorem embedding_omega_sq_re
 
 /-- The imaginary part of `φ(ω)²` gives `2 · re · im = 0`. -/
 private theorem embedding_omega_sq_im
-    (v : NumberField.InfinitePlace (QuadraticNumberFields d)) :
+    (v : NumberField.InfinitePlace (Qsqrtd (d : ℚ))) :
     2 * (v.embedding QuadraticAlgebra.omega).re *
     (v.embedding QuadraticAlgebra.omega).im = 0 := by
   have := congr_arg Complex.im (embedding_omega_sq v)
   simp [sq, Complex.mul_im] at this; linarith
 
-/-- When `d > 0`, the image of `ω` under any embedding is real (imaginary part is zero).
-From `2ab = 0`: if `a = 0` then `-b² = d > 0`, contradiction; so `b = 0`. -/
+/-- When `d > 0`, the image of `ω` under any embedding is real (imaginary part is zero). -/
 private theorem embedding_omega_im_eq_zero
-    (v : NumberField.InfinitePlace (QuadraticNumberFields d)) (hd : 0 < d) :
+    (v : NumberField.InfinitePlace (Qsqrtd (d : ℚ)))
+    (hd : 0 < d) :
     (v.embedding QuadraticAlgebra.omega).im = 0 := by
   have hre := embedding_omega_sq_re v
   have him := embedding_omega_sq_im v
@@ -86,15 +88,14 @@ private theorem embedding_omega_im_eq_zero
                  (show (d : ℝ) > 0 from by exact_mod_cast hd)]
   · exact h
 
-/-- If `im(φ(ω)) = 0`, then `conj ∘ φ = φ`. We lift both `RingHom`s to `ℚ`-`AlgHom`s and
-apply `QuadraticAlgebra.algHom_ext`: they agree on `ω`, hence on all of `Q(√d)`. -/
+/-- If `im(φ(ω)) = 0`, then `conj ∘ φ = φ`. -/
 private theorem conjugate_embedding_eq
-    (v : NumberField.InfinitePlace (QuadraticNumberFields d))
+    (v : NumberField.InfinitePlace (Qsqrtd (d : ℚ)))
     (hω_im : (v.embedding QuadraticAlgebra.omega).im = 0) :
     NumberField.ComplexEmbedding.conjugate v.embedding = v.embedding := by
-  rw [← @RingHom.toRatAlgHom_toRingHom (QuadraticNumberFields d) ℂ _ _ _ _
+  rw [← @RingHom.toRatAlgHom_toRingHom (Qsqrtd (d : ℚ)) ℂ _ _ _ _
     (NumberField.ComplexEmbedding.conjugate v.embedding),
-    ← @RingHom.toRatAlgHom_toRingHom (QuadraticNumberFields d) ℂ _ _ _ _
+    ← @RingHom.toRatAlgHom_toRingHom (Qsqrtd (d : ℚ)) ℂ _ _ _ _
     v.embedding]
   congr 1
   apply QuadraticAlgebra.algHom_ext
@@ -103,34 +104,46 @@ private theorem conjugate_embedding_eq
   simp only [RingHom.toRatAlgHom_apply, NumberField.ComplexEmbedding.conjugate_coe_eq]
   exact Complex.conj_eq_iff_im.mpr hω_im
 
+end InternalLemmas
+
+section FieldLevel
+
+variable (d : ℤ) [Fact (¬ IsSquare ((d : ℤ) : ℚ))]
+
 /-- A real quadratic field `Q(√d)` with `d > 0` is totally real:
 all embeddings into `ℂ` have image contained in `ℝ`. -/
 theorem isTotallyReal (hd : 0 < d) :
-    NumberField.IsTotallyReal (QuadraticNumberFields d) where
-  isReal v := by
-    rw [NumberField.InfinitePlace.isReal_iff, NumberField.ComplexEmbedding.isReal_iff]
-    simpa using conjugate_embedding_eq v (embedding_omega_im_eq_zero v hd)
+    NumberField.IsTotallyReal (Qsqrtd (d : ℚ)) := by
+  exact {
+    isReal := fun v => by
+      rw [NumberField.InfinitePlace.isReal_iff, NumberField.ComplexEmbedding.isReal_iff]
+      simpa using conjugate_embedding_eq v (embedding_omega_im_eq_zero v hd)
+  }
 
 /-- An imaginary quadratic field `Q(√d)` with `d < 0` is totally complex:
 no embedding into `ℂ` has image contained in `ℝ`. -/
 theorem isTotallyComplex (hd : d < 0) :
-    NumberField.IsTotallyComplex (QuadraticNumberFields d) where
-  isComplex v := by
-    rw [NumberField.InfinitePlace.isComplex_iff, NumberField.ComplexEmbedding.isReal_iff]
-    intro hreal
-    have hω_real : (v.embedding QuadraticAlgebra.omega).im = 0 := by
-      have h := RingHom.congr_fun hreal QuadraticAlgebra.omega
-      simp only [NumberField.ComplexEmbedding.conjugate_coe_eq] at h
-      exact Complex.conj_eq_iff_im.mp h
-    have hre := embedding_omega_sq_re v
-    rw [hω_real] at hre; simp at hre
-    linarith [sq_nonneg (v.embedding QuadraticAlgebra.omega).re,
-              (show (d : ℝ) < 0 from by exact_mod_cast hd)]
+    NumberField.IsTotallyComplex (Qsqrtd (d : ℚ)) := by
+  exact {
+    isComplex := fun v => by
+      rw [NumberField.InfinitePlace.isComplex_iff, NumberField.ComplexEmbedding.isReal_iff]
+      intro hreal
+      have hω_real : (v.embedding QuadraticAlgebra.omega).im = 0 := by
+        have h := RingHom.congr_fun hreal QuadraticAlgebra.omega
+        simp only [NumberField.ComplexEmbedding.conjugate_coe_eq] at h
+        exact Complex.conj_eq_iff_im.mp h
+      have hre := embedding_omega_sq_re v
+      rw [hω_real] at hre; simp at hre
+      linarith [sq_nonneg (v.embedding QuadraticAlgebra.omega).re,
+                (show (d : ℝ) < 0 from by exact_mod_cast hd)]
+  }
 
-/-- An imaginary quadratic field `Q(√d)` with `d < 0` is a CM field:
-it is totally complex and a quadratic extension of its totally real subfield `ℚ`. -/
-theorem isCMField (hd : d < 0) : NumberField.IsCMField (QuadraticNumberFields d) :=
-  letI := isTotallyComplex hd
-  NumberField.IsCMField.ofCMExtension ℚ (QuadraticNumberFields d)
+/-- An imaginary quadratic field `Q(√d)` with `d < 0` is a CM field. -/
+theorem isCMField (hd : d < 0) :
+    NumberField.IsCMField (Qsqrtd (d : ℚ)) := by
+  letI := isTotallyComplex d hd
+  exact NumberField.IsCMField.ofCMExtension ℚ (Qsqrtd (d : ℚ))
 
-end QuadraticNumberFields
+end FieldLevel
+
+end Qsqrtd

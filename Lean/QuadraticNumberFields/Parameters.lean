@@ -5,18 +5,23 @@ Authors: Frankie Wang
 -/
 import Mathlib.Algebra.Squarefree.Basic
 import Mathlib.Tactic
-import QuadraticNumberFields.Param
+import QuadraticNumberFields.Basic
 
 /-!
-# Uniqueness of Quadratic Field Parameters
+# Quadratic Field Parameters
 
-This file proves that the squarefree integer parameter `d` of a quadratic field
-`ℚ(√d)` is unique up to equality. That is, if `ℚ(√d₁) ≃ₐ[ℚ] ℚ(√d₂)` with both
-`d₁` and `d₂` squarefree, then `d₁ = d₂`.
+This file collects the main results about integer parameters for quadratic
+fields `ℚ(√d)`: rescaling by rational squares, normalization to integer or
+squarefree integer parameters, and uniqueness of the squarefree parameter.
 
 ## Main Results
 
-* `QuadFieldParam.unique`: The main uniqueness theorem.
+* `Qsqrtd.rescale`: `ℚ(√d) ≃ₐ[ℚ] ℚ(√(a²d))` for `a ≠ 0`.
+* `Qsqrtd_iso_int_param`: every quadratic field is isomorphic to one with an
+  integer parameter.
+* `Qsqrtd_iso_squarefree_int_param`: every quadratic field is isomorphic to one
+  with a squarefree integer parameter.
+* `Qsqrtd.param_unique`: The main uniqueness theorem.
 * `squarefree_eq_of_rat_sq_mul`: Helper lemma relating squarefree integers
   connected by a rational square factor.
 
@@ -30,6 +35,74 @@ the main theorem:
 * `int_dvd_of_ratio_square`: Divisibility criterion from square ratios.
 -/
 
+/-! ## Rescaling Isomorphisms -/
+
+/-- `ℚ(√d) ≃ₐ[ℚ] ℚ(√(a²d))` via `⟨r, s⟩ ↦ ⟨r, s·a⁻¹⟩`.
+
+This shows that scaling the parameter by a rational square yields an
+isomorphic quadratic field. -/
+def Qsqrtd.rescale (d : ℚ) (a : ℚ) (ha : a ≠ 0) :
+    Qsqrtd d ≃ₐ[ℚ] Qsqrtd (a ^ 2 * d) := by
+  have h1d : (1 : Qsqrtd d) = ⟨1, 0⟩ := by ext <;> rfl
+  have h1a : (1 : Qsqrtd (a ^ 2 * d)) = ⟨1, 0⟩ := by
+    ext <;> rfl
+  exact AlgEquiv.ofLinearEquiv
+    { toFun := fun x => ⟨x.re, x.im * a⁻¹⟩
+      invFun := fun y => ⟨y.re, y.im * a⟩
+      map_add' := by intro x y; ext <;> simp [add_mul]
+      map_smul' := by intro c x; ext <;> simp [mul_assoc]
+      left_inv := by
+        intro x; ext <;> simp [mul_assoc, inv_mul_cancel₀ ha]
+      right_inv := by
+        intro y; ext <;> simp [mul_assoc, mul_inv_cancel₀ ha] }
+    (by simp [h1d, h1a])
+    (by intro x y; ext <;> simp <;> field_simp)
+
+/-- Every quadratic field `Q(√d)` is isomorphic to one with an integer parameter:
+`∃ z ∈ ℤ, Q(√d) ≃ₐ[ℚ] Q(√z)`. -/
+theorem Qsqrtd_iso_int_param (d : ℚ) :
+    ∃ z : ℤ, Nonempty (Qsqrtd d ≃ₐ[ℚ] Qsqrtd (z : ℚ)) := by
+  obtain ⟨m, n, hn0, hd⟩ : ∃ m n : ℤ, n ≠ 0 ∧ d = m / n := by
+    have hd := ne_of_gt (Rat.den_pos d)
+    exact ⟨d.num, d.den, Int.ofNat_ne_zero.mpr hd, (Rat.num_div_den d).symm⟩
+  use m * n
+  have ha : (n : ℚ) ≠ 0 := by exact_mod_cast hn0
+  have hrescale : Qsqrtd d ≃ₐ[ℚ] Qsqrtd (n ^ 2 * d) := Qsqrtd.rescale d n ha
+  have heq : (n : ℚ) ^ 2 * d = m * n := by
+    rw [hd]
+    field_simp [mul_assoc]
+  have hcast : (m * n : ℚ) = (m * n : ℤ) := (Int.cast_mul m n).symm
+  exact ⟨hrescale.trans (AlgEquiv.cast (by rw [heq, hcast]))⟩
+
+/-- Every quadratic field `Q(√d)` is isomorphic to one with a squarefree integer
+parameter: `∃ z ∈ ℤ, Squarefree z ∧ Q(√d) ≃ₐ[ℚ] Q(√z)`. -/
+theorem Qsqrtd_iso_squarefree_int_param {d : ℤ} (hd : d ≠ 0) :
+    ∃ z : ℤ, Squarefree z ∧ Nonempty (Qsqrtd (d : ℚ) ≃ₐ[ℚ] Qsqrtd (z : ℚ)) := by
+  obtain ⟨a, b, heq, ha⟩ := Nat.sq_mul_squarefree d.natAbs
+  have hb : b ≠ 0 := by
+    intro hb
+    subst hb
+    simp at heq
+    exact hd (Int.natAbs_eq_zero.mp heq.symm)
+  refine ⟨d.sign * ↑a, ?_, ?_⟩
+  · rw [← Int.squarefree_natAbs]
+    rwa [Int.natAbs_mul, Int.natAbs_sign_of_ne_zero hd, Int.natAbs_natCast, one_mul]
+  · have hbQ : (b : ℚ) ≠ 0 := Nat.cast_ne_zero.mpr hb
+    have hrescale := Qsqrtd.rescale (↑d) (↑b)⁻¹ (inv_ne_zero hbQ)
+    have hd_int : d = d.sign * (↑b ^ 2 * ↑a) := by
+      conv_lhs => rw [(Int.sign_mul_natAbs d).symm]
+      congr 1
+      exact_mod_cast heq.symm
+    have hkey : ((↑b : ℚ)⁻¹) ^ 2 * (↑d : ℚ) = ↑(d.sign * (↑a : ℤ)) := by
+      have hd_rat : (d : ℚ) = (d.sign : ℚ) * ((b : ℚ) ^ 2 * (a : ℚ)) := by
+        exact_mod_cast hd_int
+      rw [hd_rat]
+      field_simp
+      push_cast
+      rfl
+    exact ⟨hrescale.trans
+      (AlgEquiv.cast (A := fun d => QuadraticAlgebra ℚ d 0) hkey)⟩
+
 /-! ## Helper Lemmas -/
 
 /-- `-1` is not a square in `ℚ`. -/
@@ -42,7 +115,7 @@ lemma not_isSquare_neg_one_rat : ¬ IsSquare (- (1 : ℚ)) := by
 lemma nat_eq_one_of_squarefree_intcast_of_isSquare (m : ℕ)
     (hsm : Squarefree (m : ℤ)) (hsq : IsSquare (m : ℤ)) : m = 1 := by
   have hmz : (m : ℤ) = 1 :=
-    QuadFieldParam.eq_one_of_squarefree_isSquare hsm hsq
+    eq_one_of_squarefree_isSquare hsm hsq
   exact_mod_cast hmz
 
 /-- If `d₁/d₂` is a rational square and `d₂` is squarefree, then `d₂ ∣ d₁`. -/
@@ -104,11 +177,18 @@ lemma squarefree_eq_of_rat_sq_mul {d₁ d₂ : ℤ}
 
 /-! ## Main Theorem -/
 
+section ParamLevel
+
+variable (d₁ d₂ : ℤ) [Fact (Squarefree d₁)] [Fact (d₁ ≠ 1)]
+  [Fact (Squarefree d₂)] [Fact (d₂ ≠ 1)]
+
 /-- The squarefree integer parameter of a quadratic field is unique:
-    `ℚ(√d₁) ≃ₐ[ℚ] ℚ(√d₂)` with both squarefree implies `d₁ = d₂`. -/
-theorem QuadFieldParam.unique {d₁ d₂ : ℤ}
-    [h₁ : QuadFieldParam d₁] [h₂ : QuadFieldParam d₂]
-    (φ : Qsqrtd (d₁ : ℚ) ≃ₐ[ℚ] Qsqrtd (d₂ : ℚ)) : d₁ = d₂ := by
+    `ℚ(√d₁) ≃ₐ[ℚ] ℚ(√d₂)` with both squarefree and `≠ 1` implies `d₁ = d₂`. -/
+theorem Qsqrtd.param_unique (φ : Qsqrtd (d₁ : ℚ) ≃ₐ[ℚ] Qsqrtd (d₂ : ℚ)) : d₁ = d₂ := by
+  have hsf₁ : Squarefree d₁ := Fact.out
+  have h1₁ : d₁ ≠ 1 := Fact.out
+  have hsf₂ : Squarefree d₂ := Fact.out
+  have _h1₂ : d₂ ≠ 1 := Fact.out
   set a := (φ ⟨0, 1⟩).re
   set b := (φ ⟨0, 1⟩).im
   have hε_sq : (⟨0, 1⟩ : Qsqrtd (d₁ : ℚ)) * ⟨0, 1⟩ = ⟨(d₁ : ℚ), 0⟩ := by
@@ -134,10 +214,13 @@ theorem QuadFieldParam.unique {d₁ d₂ : ℤ}
   have hb : b ≠ 0 := by
     intro hb0; simp [hb0] at hre
     have : IsSquare ((d₁ : ℤ) : ℚ) := ⟨a, by nlinarith⟩
-    exact (QuadFieldParam.not_isSquare d₁) (Rat.isSquare_intCast_iff.mp this)
+    exact not_isSquare_int_of_squarefree_ne_one hsf₁ h1₁
+      (Rat.isSquare_intCast_iff.mp this)
   have ha : a = 0 := by
     rcases mul_eq_zero.mp him with h | h
     · exact (mul_eq_zero.mp h).resolve_left (by norm_num)
     · exact absurd h hb
   have hr : (d₁ : ℚ) = d₂ * b ^ 2 := by nlinarith [hre, ha]
-  exact squarefree_eq_of_rat_sq_mul h₁.squarefree h₂.squarefree hr
+  exact squarefree_eq_of_rat_sq_mul hsf₁ hsf₂ hr
+
+end ParamLevel

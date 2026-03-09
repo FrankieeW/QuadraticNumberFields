@@ -10,10 +10,10 @@ import Mathlib.NumberTheory.NumberField.Discriminant.Defs
 /-!
 # Discriminant of Quadratic Number Fields
 
-This file proves the explicit discriminant formula for `QuadraticNumberFields d`:
+This file proves the explicit discriminant formula for `Qsqrtd (d : ℚ)`:
 
-* If `d % 4 = 1`, then `NumberField.discr (QuadraticNumberFields d) = d`.
-* If `d % 4 ≠ 1`, then `NumberField.discr (QuadraticNumberFields d) = 4 * d`.
+* If `d % 4 = 1`, then `NumberField.discr (Qsqrtd (d : ℚ)) = d`.
+* If `d % 4 ≠ 1`, then `NumberField.discr (Qsqrtd (d : ℚ)) = 4 * d`.
 
 ## Main Definitions
 
@@ -23,19 +23,11 @@ This file proves the explicit discriminant formula for `QuadraticNumberFields d`
 
 ## Main Theorems
 
-* `discr_of_mod_four_ne_one`: `NumberField.discr (QuadraticNumberFields d) = 4 * d`
+* `discr_of_mod_four_ne_one`: `NumberField.discr (Qsqrtd (d : ℚ)) = 4 * d`
   when `d % 4 ≠ 1`.
-* `discr_of_mod_four_eq_one`: `NumberField.discr (QuadraticNumberFields d) = d`
+* `discr_of_mod_four_eq_one`: `NumberField.discr (Qsqrtd (d : ℚ)) = d`
   when `d % 4 = 1`.
 * `discr_formula`: Unified discriminant formula combining both cases.
-
-## Strategy
-
-1. Compute `Algebra.trace ℤ (QuadraticAlgebra ℤ a b) x = 2 * x.re + b * x.im`
-   using the left-multiplication matrix and the standard QA basis.
-2. Compute `Algebra.discr ℤ (QuadraticAlgebra.basis a b)` via the trace matrix determinant.
-3. Transport to `NumberField.discr` using the classification isomorphism
-   (`𝓞 K ≃+* R`) lifted to an `AlgEquiv ℤ`.
 -/
 
 open scoped NumberField
@@ -80,10 +72,7 @@ theorem traceMatrix_qa (a b : ℤ) :
   fin_cases i <;> fin_cases j <;>
     simp [trace_qa, QuadraticAlgebra.basis]; ring
 
-/-- The discriminant of the standard basis of `QuadraticAlgebra ℤ a b` is `4a + b²`.
-
-For `ℤ[√d]` (a=d, b=0): discriminant = 4d.
-For `ℤ[(1+√d)/2]` (a=k, b=1 where d=1+4k): discriminant = 4k+1 = d. -/
+/-- The discriminant of the standard basis of `QuadraticAlgebra ℤ a b` is `4a + b²`. -/
 theorem discr_qa_basis (a b : ℤ) :
     Algebra.discr ℤ (QuadraticAlgebra.basis a b) = 4 * a + b ^ 2 := by
   rw [Algebra.discr_def, traceMatrix_qa]
@@ -104,16 +93,13 @@ theorem discr_zOnePlusSqrtOverTwo_basis (k : ℤ) :
   rw [discr_qa_basis]
   ring
 
-/-! ## Transport to NumberField.discr
+/-! ## Transport to NumberField.discr -/
 
-We lift the `RingEquiv` from the classification to an `AlgEquiv ℤ` and use
-`Algebra.discr_eq_discr_of_algEquiv` to transport the discriminant calculation
-to the ring of integers `𝓞 K`. -/
+section ParamLevel
 
-/-- Any `RingEquiv` between ℤ-algebras is automatically a ℤ-algebra equivalence,
-since there is a unique ring homomorphism `ℤ → R` for any ring `R`.
+variable (d : ℤ) [Fact (Squarefree d)] [Fact (d ≠ 1)]
 
-This is useful for transporting discriminants and other algebraic invariants. -/
+/-- Any `RingEquiv` between ℤ-algebras is automatically a ℤ-algebra equivalence. -/
 def ringEquivToIntAlgEquiv
     {R S : Type*} [CommRing R] [Algebra ℤ R] [CommRing S] [Algebra ℤ S]
     (e : R ≃+* S) : R ≃ₐ[ℤ] S :=
@@ -124,73 +110,91 @@ def ringEquivToIntAlgEquiv
 
 When `d % 4 ≠ 1`, the ring of integers is `𝓞 ≅ ℤ[√d]` with ℤ-basis `{1, √d}`,
 giving discriminant `4d`. -/
-theorem discr_of_mod_four_ne_one (d : ℤ) [QuadFieldParam d]
-    (hd4 : d % 4 ≠ 1) :
-    NumberField.discr (QuadraticNumberFields d) = 4 * d := by
-  -- Obtain the ring isomorphism 𝓞 K ≃+* Zsqrtd d
+theorem discr_of_mod_four_ne_one (hd4 : d % 4 ≠ 1) :
+    NumberField.discr (Qsqrtd (d : ℚ)) = 4 * d := by
   obtain ⟨e⟩ := ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one d hd4
-  -- Lift to ℤ-algebra equiv
-  let f : Zsqrtd d ≃ₐ[ℤ] 𝓞 (QuadraticNumberFields d) :=
+  let f : Zsqrtd d ≃ₐ[ℤ] 𝓞 (Qsqrtd (d : ℚ)) :=
     ringEquivToIntAlgEquiv e.symm
-  -- The transported family forms a basis of 𝓞 K
-  let b' : Module.Basis (Fin 2) ℤ (𝓞 (QuadraticNumberFields d)) :=
+  let b' : Module.Basis (Fin 2) ℤ (𝓞 (Qsqrtd (d : ℚ))) :=
     (QuadraticAlgebra.basis d 0).map f.toLinearEquiv
-  -- Use NumberField.discr_eq_discr
-  rw [← NumberField.discr_eq_discr (QuadraticNumberFields d) b']
-  -- b'.apply = f ∘ (QA.basis) so discr is preserved
+  rw [← NumberField.discr_eq_discr (Qsqrtd (d : ℚ)) b']
   change Algebra.discr ℤ (⇑f ∘ ⇑(QuadraticAlgebra.basis d 0)) = 4 * d
   rw [← Algebra.discr_eq_discr_of_algEquiv _ f]
   exact discr_zsqrtd_basis d
 
-/-- **Discriminant of `Q(√d)` when `d % 4 = 1`.**
-
-When `d % 4 = 1`, writing `d = 1 + 4k`, the ring of integers is
-`𝓞 ≅ ℤ[(1+√d)/2]` with ℤ-basis `{1, ω}` where `ω = (1+√d)/2`,
-giving discriminant `d`. -/
-theorem discr_of_mod_four_eq_one (d : ℤ) [QuadFieldParam d]
-    (hd4 : d % 4 = 1) :
-    NumberField.discr (QuadraticNumberFields d) = d := by
-  -- Obtain the ring isomorphism
-  obtain ⟨k, hk, ⟨e⟩⟩ := ringOfIntegers_equiv_zOnePlusSqrtOverTwo_of_mod_four_eq_one d hd4
+/-- **Discriminant of `Q(√d)` when `d % 4 = 1`.** -/
+theorem discr_of_mod_four_eq_one (hd4 : d % 4 = 1) :
+    NumberField.discr (Qsqrtd (d : ℚ)) = d := by
+  obtain ⟨k, hk, ⟨e⟩⟩ :=
+    ringOfIntegers_equiv_zOnePlusSqrtOverTwo_of_mod_four_eq_one d hd4
   subst hk
-  -- Lift to ℤ-algebra equiv
-  let f : ZOnePlusSqrtOverTwo k ≃ₐ[ℤ] 𝓞 (QuadraticNumberFields (1 + 4 * k)) :=
+  let f : ZOnePlusSqrtOverTwo k ≃ₐ[ℤ] 𝓞 (Qsqrtd (((1 + 4 * k : ℤ) : ℚ))) :=
     ringEquivToIntAlgEquiv e.symm
-  let b' : Module.Basis (Fin 2) ℤ (𝓞 (QuadraticNumberFields (1 + 4 * k))) :=
+  let b' : Module.Basis (Fin 2) ℤ (𝓞 (Qsqrtd (((1 + 4 * k : ℤ) : ℚ)))) :=
     (QuadraticAlgebra.basis k 1).map f.toLinearEquiv
-  rw [← NumberField.discr_eq_discr (QuadraticNumberFields (1 + 4 * k)) b']
+  rw [← NumberField.discr_eq_discr (Qsqrtd (((1 + 4 * k : ℤ) : ℚ))) b']
   change Algebra.discr ℤ (⇑f ∘ ⇑(QuadraticAlgebra.basis k 1)) = 1 + 4 * k
   rw [← Algebra.discr_eq_discr_of_algEquiv _ f]
   exact discr_zOnePlusSqrtOverTwo_basis k
 
-/-- **Unified discriminant formula for `Q(√d)`.**
-
-For squarefree `d`:
-* `NumberField.discr (Q(√d)) = d` if `d ≡ 1 (mod 4)`,
-* `NumberField.discr (Q(√d)) = 4d` otherwise. -/
-theorem discr_formula (d : ℤ) [QuadFieldParam d] :
-    NumberField.discr (QuadraticNumberFields d) =
-      if d % 4 = 1 then d else 4 * d := by
+/-- **Unified discriminant formula for `Q(√d)`.** -/
+theorem discr_formula :
+    NumberField.discr (Qsqrtd (d : ℚ)) = if d % 4 = 1 then d else 4 * d := by
   split
   · exact discr_of_mod_four_eq_one d ‹_›
   · exact discr_of_mod_four_ne_one d ‹_›
 
-/-! ## Named Examples
-
-Common discriminants for frequently-used quadratic fields. -/
+/-! ## Named Examples -/
 
 /-- **Gaussian integers**: `disc(Q(√(-1))) = -4`. -/
-theorem discr_gaussian : NumberField.discr (QuadraticNumberFields (-1)) = -4 :=
-  discr_of_mod_four_ne_one (-1) (by decide)
+theorem discr_gaussian :
+    (by
+      letI : Fact (Squarefree (-1 : ℤ)) := by
+        refine ⟨?_⟩
+        exact (Int.squarefree_natAbs (n := (-1 : ℤ))).1
+          (by exact squarefree_one)
+      letI : Fact ((-1 : ℤ) ≠ 1) := ⟨by decide⟩
+      exact NumberField.discr (Qsqrtd ((-1 : ℤ) : ℚ)) = -4) := by
+  letI : Fact (Squarefree (-1 : ℤ)) := by
+    refine ⟨?_⟩
+    exact (Int.squarefree_natAbs (n := (-1 : ℤ))).1
+      (by exact squarefree_one)
+  letI : Fact ((-1 : ℤ) ≠ 1) := ⟨by decide⟩
+  exact discr_of_mod_four_ne_one (-1) (by decide)
 
 /-- **Eisenstein integers**: `disc(Q(√(-3))) = -3`. -/
-theorem discr_eisenstein : NumberField.discr (QuadraticNumberFields (-3)) = -3 :=
-  discr_of_mod_four_eq_one (-3) (by decide)
+theorem discr_eisenstein :
+    (by
+      letI : Fact (Squarefree (-3 : ℤ)) := by
+        refine ⟨?_⟩
+        letI : Fact (Nat.Prime ((-3 : ℤ).natAbs)) := ⟨by decide⟩
+        exact (Int.prime_iff_natAbs_prime.2 Fact.out).squarefree
+      letI : Fact ((-3 : ℤ) ≠ 1) := ⟨by decide⟩
+      exact NumberField.discr (Qsqrtd ((-3 : ℤ) : ℚ)) = -3) := by
+  letI : Fact (Squarefree (-3 : ℤ)) := by
+    refine ⟨?_⟩
+    letI : Fact (Nat.Prime ((-3 : ℤ).natAbs)) := ⟨by decide⟩
+    exact (Int.prime_iff_natAbs_prime.2 Fact.out).squarefree
+  letI : Fact ((-3 : ℤ) ≠ 1) := ⟨by decide⟩
+  exact discr_of_mod_four_eq_one (-3) (by decide)
 
 /-- **Q(√(-5))**: `disc(Q(√(-5))) = -20`. -/
-theorem discr_Qsqrtd_neg_five [QuadFieldParam (-5 : ℤ)] :
-    NumberField.discr (QuadraticNumberFields (-5)) = -20 := by
+theorem discr_Qsqrtd_neg_five :
+    (by
+      letI : Fact (Squarefree (-5 : ℤ)) := by
+        refine ⟨?_⟩
+        letI : Fact (Nat.Prime ((-5 : ℤ).natAbs)) := ⟨by decide⟩
+        exact (Int.prime_iff_natAbs_prime.2 Fact.out).squarefree
+      letI : Fact ((-5 : ℤ) ≠ 1) := ⟨by decide⟩
+      exact NumberField.discr (Qsqrtd ((-5 : ℤ) : ℚ)) = -20) := by
+  letI : Fact (Squarefree (-5 : ℤ)) := by
+    refine ⟨?_⟩
+    letI : Fact (Nat.Prime ((-5 : ℤ).natAbs)) := ⟨by decide⟩
+    exact (Int.prime_iff_natAbs_prime.2 Fact.out).squarefree
+  letI : Fact ((-5 : ℤ) ≠ 1) := ⟨by decide⟩
   exact discr_of_mod_four_ne_one (-5) (by decide)
+
+end ParamLevel
 
 end RingOfIntegers
 end QuadraticNumberFields
