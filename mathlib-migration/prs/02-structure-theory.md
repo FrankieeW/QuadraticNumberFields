@@ -22,9 +22,11 @@ Prove that every quadratic field `ℚ(√d)` can be normalized to have a squaref
 
 ## Helper Lemmas
 
-- `squarefree_eq_of_rat_sq_mul`: if `d₁ = d₂ · r²` with both squarefree, then `d₁ = d₂`
-- `int_dvd_of_ratio_square`: if `d₁/d₂` is a rational square and `d₂` is squarefree, then `d₂ ∣ d₁`
-- `not_isSquare_neg_one_rat`: `-1` is not a square in `ℚ`
+| Lemma | Statement |
+|-------|-----------|
+| `squarefree_eq_of_rat_sq_mul` | If `d₁ = d₂ · r²` with both squarefree, then `d₁ = d₂` |
+| `int_dvd_of_ratio_square` | If `d₁/d₂` is a rational square and `d₂` is squarefree, then `d₂ ∣ d₁` |
+| `not_isSquare_neg_one_rat` | `-1` is not a square in `ℚ` |
 
 ## Target Location
 
@@ -36,17 +38,17 @@ Mathlib/NumberTheory/QuadraticField/Basic.lean
 
 ## Review History
 
-### Review 1 — (in progress)
+### Review 1 — (awaiting review)
 
-**Date:** (ongoing)
+**Status:** No human review comments yet (only automated bot comments)
 
-#### Comments
+**Automated Comments:**
+- ✅ Welcome message from `github-actions`
+- ✅ PR summary generated (imports, declarations diff)
+- ✅ Dependency detected: depends on #36347
 
-(pending review feedback)
-
-#### Action Items
-
-- [ ] (pending)
+**Action Items:**
+- [ ] Awaiting review after #36347 is addressed
 
 ---
 
@@ -60,5 +62,5 @@ Mathlib/NumberTheory/QuadraticField/Basic.lean
 
 ## Notes
 
-- This PR depends on #36347 being merged first
-- Forms the foundation for ring of integers classification (PR 3, PR 4)
+- This PR is blocked on #36347 review completion
+- Will likely receive similar feedback about generalization to `QuadraticAlgebra ℚ a b`
