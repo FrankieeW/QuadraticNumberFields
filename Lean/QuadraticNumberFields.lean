@@ -1,7 +1,5 @@
 import QuadraticNumberFields.Basic
-import QuadraticNumberFields.Rescale
-import QuadraticNumberFields.Param
-import QuadraticNumberFields.ParamUniqueness
+import QuadraticNumberFields.Parameters
 import QuadraticNumberFields.Instances
 import QuadraticNumberFields.RingEquiv
 import QuadraticNumberFields.Euclidean.Basic
@@ -17,3 +15,4 @@ import QuadraticNumberFields.RingOfIntegers.Norm
 import QuadraticNumberFields.RingOfIntegers.Discriminant
 import QuadraticNumberFields.Examples.ZsqrtdNeg5.Ideals
 import QuadraticNumberFields.Examples.ZsqrtdNeg5.RamificationInertia
+import QuadraticNumberFields.TotallyRealComplex

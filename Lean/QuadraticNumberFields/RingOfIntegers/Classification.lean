@@ -3,16 +3,18 @@ Copyright (c) 2026 Frankie Wang. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Frankie Wang
 -/
+import QuadraticNumberFields.RingOfIntegers.CommonInstances
 import QuadraticNumberFields.RingOfIntegers.Integrality
 import QuadraticNumberFields.RingOfIntegers.ModFour
 import QuadraticNumberFields.RingOfIntegers.ZOnePlusSqrtOverTwo
 import QuadraticNumberFields.RingEquiv
+import QuadraticNumberFields.Instances
 
 /-!
 # Ring Of Integers Classification
 
 This file contains the final classification theorem for
-`𝓞 (QuadraticNumberFields d)`.
+`𝓞 (Qsqrtd (d : ℚ))`.
 
 ## Main Results
 
@@ -36,6 +38,8 @@ open scoped NumberField
 namespace QuadraticNumberFields
 namespace RingOfIntegers
 
+section FieldLevel
+
 private theorem ringOfIntegers_equiv_of_embedding
     (K : Type*) [Field K] [NumberField K]
     (R : Type*) [CommRing R]
@@ -58,50 +62,54 @@ private theorem ringOfIntegers_equiv_of_embedding
           simpa [RingHom.toAlgebra] using h_integral z }
   exact ringOfIntegers_equiv_of_integralClosure K R
 
+end FieldLevel
+
+section ParamLevel
+
+variable (d : ℤ) [Fact (Squarefree d)] [Fact (d ≠ 1)]
+
 /-- If `d % 4 ≠ 1`, then `𝓞 (Q(√d)) ≃+* ℤ√d`. -/
-theorem ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one
-    (d : ℤ) [QuadFieldParam d]
-    (hd4 : d % 4 ≠ 1) :
-    Nonempty (𝓞 (QuadraticNumberFields d) ≃+* Zsqrtd d) :=
-  ringOfIntegers_equiv_of_embedding (QuadraticNumberFields d) (Zsqrtd d)
+theorem ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one (hd4 : d % 4 ≠ 1) :
+    Nonempty (𝓞 (Qsqrtd (d : ℚ)) ≃+* Zsqrtd d) := by
+  have hd_sf : Squarefree d := Fact.out
+  have hd_ne : d ≠ 1 := Fact.out
+  exact ringOfIntegers_equiv_of_embedding (Qsqrtd (d : ℚ)) (Zsqrtd d)
     (Zsqrtd.toQsqrtdHom d)
-    (by simpa [QuadraticNumberFields] using (Zsqrtd.toQsqrtdHom_injective d))
+    (Zsqrtd.toQsqrtdHom_injective d)
     (by
       intro x hx
-      rcases exists_zsqrtd_of_isIntegral_of_ne_one_mod_four d hd4 (x := x) hx with ⟨z, hz⟩
-      exact ⟨z, by simpa [QuadraticNumberFields] using hz⟩)
+      exact exists_zsqrtd_of_isIntegral_of_ne_one_mod_four d hd_sf hd_ne hd4 hx)
     (by
       intro z
-      simpa [QuadraticNumberFields] using isIntegral_toQsqrtd d z)
+      exact isIntegral_toQsqrtd d z)
 
 /-- If `d % 4 ≠ 1`, then `ℤ[√d]` is a Dedekind domain because it is the full
 ring of integers of `Q(√d)`. -/
-theorem isDedekindDomain_zsqrtd_of_mod_four_ne_one
-    (d : ℤ) [QuadFieldParam d]
-    (hd4 : d % 4 ≠ 1) :
+theorem isDedekindDomain_zsqrtd_of_mod_four_ne_one (hd4 : d % 4 ≠ 1) :
     IsDedekindDomain (Zsqrtd d) := by
   rcases ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one d hd4 with ⟨e⟩
-  letI : IsDedekindDomain (𝓞 (QuadraticNumberFields d)) := inferInstance
+  letI : IsDedekindDomain (𝓞 (Qsqrtd (d : ℚ))) := inferInstance
   exact RingEquiv.isDedekindDomain e
 
 /-- If `d % 4 = 1`, then `ℤ[√d]` is not a Dedekind domain. Equivalently,
 it is not integrally closed because `(1 + √d) / 2` is integral but does not lie in
 `ℤ[√d]`. -/
 theorem not_isDedekindDomain_zsqrtd_of_mod_four_eq_one
-    (d : ℤ) [QuadFieldParam d]
     (hd4 : d % 4 = 1) :
     ¬ IsDedekindDomain (Zsqrtd d) := by
-  letI : Algebra (Zsqrtd d) (QuadraticNumberFields d) := (Zsqrtd.toQsqrtdHom d).toAlgebra
-  letI : FaithfulSMul (Zsqrtd d) (QuadraticNumberFields d) :=
-    (faithfulSMul_iff_algebraMap_injective (Zsqrtd d) (QuadraticNumberFields d)).mpr
+  have hd_sf : Squarefree d := Fact.out
+  have hd_ne : d ≠ 1 := Fact.out
+  letI : Algebra (Zsqrtd d) (Qsqrtd (d : ℚ)) := (Zsqrtd.toQsqrtdHom d).toAlgebra
+  letI : FaithfulSMul (Zsqrtd d) (Qsqrtd (d : ℚ)) :=
+    (faithfulSMul_iff_algebraMap_injective (Zsqrtd d) (Qsqrtd (d : ℚ))).mpr
       (Zsqrtd.toQsqrtdHom_injective d)
-  have hFrac : IsFractionRing (Zsqrtd d) (QuadraticNumberFields d) := by
-    refine IsFractionRing.of_field (R := Zsqrtd d) (K := QuadraticNumberFields d) ?_
+  have hFrac : IsFractionRing (Zsqrtd d) (Qsqrtd (d : ℚ)) := by
+    refine IsFractionRing.of_field (R := Zsqrtd d) (K := Qsqrtd (d : ℚ)) ?_
     intro z
     refine ⟨⟨(z.re.num : ℤ) * z.im.den, (z.im.num : ℤ) * z.re.den⟩,
         ((z.re.den * z.im.den : ℕ) : Zsqrtd d), ?_⟩
     refine (eq_div_iff ?_).2 ?_
-    · norm_num [QuadraticNumberFields]
+    · norm_num
     · ext
       · simp only [Nat.cast_mul, map_mul, map_natCast, QuadraticAlgebra.re_mul,
           QuadraticAlgebra.re_natCast, QuadraticAlgebra.im_natCast, mul_zero, add_zero,
@@ -117,7 +125,7 @@ theorem not_isDedekindDomain_zsqrtd_of_mod_four_eq_one
           z.im * (↑z.re.den * ↑z.im.den) = z.im * (z.im.den : ℚ) * z.re.den := by ring
           _ = ((z.im.num : ℤ) : ℚ) * z.re.den := by rw [Rat.mul_den_eq_num]
           _ = (((z.im.num : ℤ) * z.re.den : ℤ) : ℚ) := by norm_num
-  letI : IsFractionRing (Zsqrtd d) (QuadraticNumberFields d) := hFrac
+  letI : IsFractionRing (Zsqrtd d) (Qsqrtd (d : ℚ)) := hFrac
   intro hDed
   letI : IsDedekindDomain (Zsqrtd d) := hDed
   letI : Module (Zsqrtd d) (Zsqrtd d) := Semiring.toModule
@@ -125,107 +133,86 @@ theorem not_isDedekindDomain_zsqrtd_of_mod_four_eq_one
   letI : IsIntegrallyClosed (Zsqrtd d) := hIC
   rcases exists_k_of_mod_four_eq_one (d := d) hd4 with ⟨k, hk⟩
   subst hk
-  let x : QuadraticNumberFields (1 + 4 * k) := halfInt (1 + 4 * k) 1 1
+  let x : Qsqrtd (((1 + 4 * k : ℤ) : ℚ)) := halfInt (1 + 4 * k) 1 1
   have hx_def :
       x = _root_.ZOnePlusSqrtOverTwo.toQsqrtdFun k (⟨0, 1⟩ : _root_.ZOnePlusSqrtOverTwo k) := by
     ext <;> simp [x, halfInt, _root_.ZOnePlusSqrtOverTwo.toQsqrtdFun]
   have hx_integral_Z : IsIntegral ℤ x := by
     rw [hx_def]
-    simpa [QuadraticNumberFields] using
-      isIntegral_toQsqrtd_of_zOnePlusSqrtOverTwo k (z := (⟨0, 1⟩ : _root_.ZOnePlusSqrtOverTwo k))
+    exact isIntegral_toQsqrtd_of_zOnePlusSqrtOverTwo k
+      (z := (⟨0, 1⟩ : _root_.ZOnePlusSqrtOverTwo k))
   have hx_integral : IsIntegral (Zsqrtd (1 + 4 * k)) x := hx_integral_Z.tower_top
-  rcases (isIntegrallyClosed_iff (QuadraticNumberFields (1 + 4 * k))).mp hIC hx_integral with
+  rcases (isIntegrallyClosed_iff (Qsqrtd (((1 + 4 * k : ℤ) : ℚ)))).mp hIC hx_integral with
     ⟨z, hz⟩
   have h_even : 2 ∣ (1 : ℤ) ∧ 2 ∣ (1 : ℤ) :=
     (Zsqrtd.halfInt_mem_range_toQsqrtdHom_iff_even_even (1 + 4 * k) 1 1).mp
       ⟨z, by
-        simpa [x, halfInt, RingHom.toAlgebra, QuadraticNumberFields] using hz⟩
+        simpa [x, halfInt, RingHom.toAlgebra] using hz⟩
   omega
 
 /-- For a valid quadratic parameter `d`, `ℤ[√d]` is Dedekind exactly in the
 `d % 4 ≠ 1` branch, i.e. precisely when it is the full ring of integers. -/
 theorem isDedekindDomain_zsqrtd_iff_mod_four_ne_one
-    (d : ℤ) [QuadFieldParam d] :
+    :
     IsDedekindDomain (Zsqrtd d) ↔ d % 4 ≠ 1 := by
   constructor
   · intro hDed hd4
     exact not_isDedekindDomain_zsqrtd_of_mod_four_eq_one d hd4 hDed
   · exact isDedekindDomain_zsqrtd_of_mod_four_ne_one d
 
-instance instIsDedekindDomain_zsqrtd_of_mod_four_ne_one
-    (d : ℤ) [QuadFieldParam d] [Fact (d % 4 ≠ 1)] :
-    IsDedekindDomain (Zsqrtd d) :=
-  isDedekindDomain_zsqrtd_of_mod_four_ne_one d Fact.out
-
 /-- If `d % 4 = 1`, writing `d = 1 + 4k`,
 then `𝓞 (Q(√d)) ≃+* ZOnePlusSqrtOverTwo k`. -/
 theorem ringOfIntegers_equiv_zOnePlusSqrtOverTwo_of_mod_four_eq_one
-    (d : ℤ) [QuadFieldParam d]
     (hd4 : d % 4 = 1) :
     ∃ k : ℤ, d = 1 + 4 * k ∧
-      Nonempty (𝓞 (QuadraticNumberFields d) ≃+*
-        ZOnePlusSqrtOverTwo k) := by
+      Nonempty (𝓞 (Qsqrtd (d : ℚ)) ≃+* ZOnePlusSqrtOverTwo k) := by
+  have hd_sf : Squarefree d := Fact.out
+  have hd_ne : d ≠ 1 := Fact.out
   rcases exists_k_of_mod_four_eq_one (d := d) hd4 with ⟨k, hk⟩
   refine ⟨k, hk, ?_⟩
   subst hk
+  have hd_ne' : (1 + 4 * k) ≠ 1 := hd_ne
   exact ringOfIntegers_equiv_of_embedding
-    (QuadraticNumberFields (1 + 4 * k)) (ZOnePlusSqrtOverTwo k)
+    (Qsqrtd (((1 + 4 * k : ℤ) : ℚ))) (ZOnePlusSqrtOverTwo k)
     (_root_.ZOnePlusSqrtOverTwo.toQsqrtdHom k)
-    (by
-      simpa [QuadraticNumberFields] using
-        (_root_.ZOnePlusSqrtOverTwo.toQsqrtdHom_injective k))
+    (_root_.ZOnePlusSqrtOverTwo.toQsqrtdHom_injective k)
     (by
       intro x hx
-      rcases exists_zOnePlusSqrtOverTwo_of_isIntegral_of_one_mod_four k (x := x) hx with ⟨z, hz⟩
-      exact ⟨z, by simpa [QuadraticNumberFields] using hz⟩)
+      exact exists_zOnePlusSqrtOverTwo_of_isIntegral_of_one_mod_four k hd_sf hd_ne' hx)
     (by
       intro z
-      simpa [QuadraticNumberFields] using isIntegral_toQsqrtd_of_zOnePlusSqrtOverTwo k z)
+      exact isIntegral_toQsqrtd_of_zOnePlusSqrtOverTwo k z)
 
 /-- **Classification of the ring of integers of `Q(√d)`.**
 
-For squarefree `d`, exactly one of the following holds:
+For squarefree `d ≠ 1`, exactly one of the following holds:
 * If `d % 4 ≠ 1`, then `𝓞 (Q(√d)) ≃+* ℤ√d`.
 * If `d % 4 = 1`, then writing `d = 1 + 4k`,
   `𝓞 (Q(√d)) ≃+* ℤ[(1+√d)/2]`. -/
 theorem ringOfIntegers_classification
-    (d : ℤ) [QuadFieldParam d]
     :
     (d % 4 ≠ 1 ∧
-      Nonempty (𝓞 (QuadraticNumberFields d) ≃+* Zsqrtd d)) ∨
+      Nonempty (𝓞 (Qsqrtd (d : ℚ)) ≃+* Zsqrtd d)) ∨
     (∃ k : ℤ, d = 1 + 4 * k ∧
-      Nonempty (𝓞 (QuadraticNumberFields d) ≃+*
-        ZOnePlusSqrtOverTwo k)) := by
+      Nonempty (𝓞 (Qsqrtd (d : ℚ)) ≃+* ZOnePlusSqrtOverTwo k)) := by
   by_cases hd4 : d % 4 = 1
   · exact Or.inr <| ringOfIntegers_equiv_zOnePlusSqrtOverTwo_of_mod_four_eq_one d hd4
   · exact Or.inl ⟨hd4, ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one d hd4⟩
 
-/-! ## Example 2.8 (Boxer Notes): Gaussian and Eisenstein Integers
+/-! ## Example 2.8 (Boxer Notes): Gaussian and Eisenstein Integers -/
 
-These are classical examples of rings of integers in imaginary quadratic fields.
-
-* **Gaussian integers** `ℤ[i] = ℤ[√(-1)]`: d = -1, d % 4 = 3 ≢ 1
-* **Eisenstein integers** `ℤ[(1+√(-3))/2]`: equivalently `ℤ[ω]` for the
-  standard primitive cube root `ω = (-1+√(-3))/2`, since these generators
-  differ by `1`
--/
-
-/-- **Gaussian integers**: `𝓞(Q(√(-1))) ≃ ℤ[i]`.
-
-Since -1 % 4 = 3 ≠ 1, we are in the non-1-mod-4 branch. -/
-example : Nonempty (𝓞 (QuadraticNumberFields (-1)) ≃+* Zsqrtd (-1)) :=
+/-- **Gaussian integers**: `𝓞(Q(√(-1))) ≃ ℤ[i]`. -/
+example : Nonempty (𝓞 (Qsqrtd ((-1 : ℤ) : ℚ)) ≃+* Zsqrtd (-1)) :=
   ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one (-1) (by decide)
 
-/-- **Eisenstein integers**: `𝓞(Q(√(-3))) ≃ ℤ[(1+√(-3))/2]`.
 
-This is the same ring as the usual `ℤ[ω]` for the standard primitive cube root
-`ω = (-1+√(-3))/2`, since `(1+√(-3))/2 = 1 + ω`.
-
-Since -3 % 4 = 1, we are in the 1-mod-4 branch with k = -1
-(since -3 = 1 + 4·(-1)). -/
+/-- **Eisenstein integers**: `𝓞(Q(√(-3))) ≃ ℤ[(1+√(-3))/2]`. -/
 example : ∃ k : ℤ, (-3 : ℤ) = 1 + 4 * k ∧
-    Nonempty (𝓞 (QuadraticNumberFields (-3)) ≃+* ZOnePlusSqrtOverTwo k) :=
+    Nonempty (𝓞 (Qsqrtd ((-3 : ℤ) : ℚ)) ≃+* ZOnePlusSqrtOverTwo k) :=
   ringOfIntegers_equiv_zOnePlusSqrtOverTwo_of_mod_four_eq_one (-3) (by decide)
+
+
+end ParamLevel
 
 end RingOfIntegers
 end QuadraticNumberFields

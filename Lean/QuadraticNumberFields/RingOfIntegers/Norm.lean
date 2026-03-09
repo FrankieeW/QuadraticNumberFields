@@ -97,12 +97,11 @@ theorem norm_zOnePlusSqrtOverTwo (k : ℤ) (z : ZOnePlusSqrtOverTwo k) :
 
 /-- The norm of `a + b·ω` embeds correctly to `ℚ`.
 
-For `z = (a, b) : ZOnePlusSqrtOverTwo k`, the embedding
-`toQsqrtdHom k z = (a + b/2, b/2)` in `Q(√(1 + 4k))` has norm `a² + a·b - k·b²`. -/
+For `z = (a, b) : ZOnePlusSqrtOverTwo k`, the embedding `toQsqrtdHom k z = (a + b/2, b/2)`
+in `Q(√(1 + 4k))` has norm `a² + a·b - k·b²`. -/
 theorem norm_zOnePlusSqrtOverTwo_toQsqrtd (k : ℤ) (z : ZOnePlusSqrtOverTwo k) :
     Qsqrtd.norm (ZOnePlusSqrtOverTwo.toQsqrtdHom k z) =
       ((QuadraticAlgebra.norm z : ℤ) : ℚ) := by
-  -- Use the fact that the embedding commutes with the norm via the RingHom structure
   have h1 : (ZOnePlusSqrtOverTwo.toQsqrtdHom k z).re = (z.re : ℚ) + (z.im : ℚ) / 2 := rfl
   have h2 : (ZOnePlusSqrtOverTwo.toQsqrtdHom k z).im = (z.im : ℚ) / 2 := rfl
   simp only [Qsqrtd.norm, QuadraticAlgebra.norm, MonoidHom.coe_mk, OneHom.coe_mk]
@@ -119,30 +118,33 @@ theorem norm_mem_zOnePlusSqrtOverTwo (k : ℤ) (z : ZOnePlusSqrtOverTwo k) :
 
 /-! ## Combined Norm Integrality via Classification -/
 
+section ParamLevel
+
+variable (d : ℤ) [Fact (Squarefree d)] [Fact (d ≠ 1)]
+
 /-- For `α ∈ 𝓞(Q(√d))`, the norm `N(α)` is an integer.
 
-This follows from the classification theorem: elements of the ring of
-integers live in either `ℤ[√d]` or `ℤ[(1 + √d)/2]`, both of which have
-integer-valued norm.
+This follows from the classification theorem: elements of the ring of integers
+live in either `ℤ[√d]` or `ℤ[(1+√d)/2]`, both of which have integer-valued norm.
 
 TODO: This proof requires establishing that the ring isomorphism from the
 classification commutes with the coercion to the number field. -/
-theorem norm_mem_ringOfIntegers (d : ℤ) [QuadFieldParam d]
-    (α : 𝓞 (QuadraticNumberFields d)) :
-    ∃ n : ℤ, Qsqrtd.norm (α : QuadraticNumberFields d) = n := by
+theorem norm_mem_ringOfIntegers (α : 𝓞 (Qsqrtd (d : ℚ))) :
+    ∃ n : ℤ, Qsqrtd.norm (α : Qsqrtd (d : ℚ)) = n := by
   rcases ringOfIntegers_classification d with ⟨hd4, h_equiv⟩ | ⟨k, hk, h_equiv⟩
   · -- d % 4 ≠ 1 branch: 𝓞 ≃ ℤ[√d]
     let e := Classical.choice h_equiv
     let z : Zsqrtd d := e α
-    -- TODO: Prove that (α : QuadraticNumberFields d) = Zsqrtd.toQsqrtd z
-    -- This requires showing the ring isomorphism commutes with embeddings
+    -- TODO: Prove that (α : Qsqrtd (d : ℚ)) = Zsqrtd.toQsqrtd z
     sorry
   · -- d % 4 = 1 branch: 𝓞 ≃ ℤ[(1 + √d)/2]
     subst hk
     let e := Classical.choice h_equiv
     let z : ZOnePlusSqrtOverTwo k := e α
-    -- TODO: Prove that (α : QuadraticNumberFields (1 + 4 * k)) = toQsqrtdHom k z
+    -- TODO: Prove that (α : Qsqrtd ...) = toQsqrtdHom k z
     sorry
+
+end ParamLevel
 
 /-! ## Unit Criterion -/
 
@@ -163,7 +165,7 @@ private theorem isUnit_iff_norm_eq_one_or_neg_one
 
 /-- An element of `Zsqrtd d` is a unit iff its norm is `±1`.
 
-Proof sketch:
+**Proof sketch:**
 * (⟹) If `z` is a unit with inverse `w`, then `1 = N(1) = N(z·w) = N(z)·N(w)`.
   Thus `N(z)` divides `1` in `ℤ`, so `N(z) = ±1`.
 * (⟸) If `N(z) = ±1`, then `z · conj(z) = N(z) = ±1`, so `z` is a unit. -/
