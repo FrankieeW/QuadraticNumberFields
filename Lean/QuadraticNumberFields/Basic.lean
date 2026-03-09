@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Frankie Wang
 -/
 import Mathlib.Algebra.QuadraticAlgebra.Basic
+import Mathlib.LinearAlgebra.Dimension.Finrank
 import Mathlib.RingTheory.Trace.Basic
 import Init.Data.Rat.Basic
 
@@ -16,14 +17,20 @@ trace, norm, and the canonical embedding of ℚ.
 
 ## Main Definitions
 
+* `IsQuadraticField K`: A predicate asserting that `K` is a quadratic extension of ℚ.
 * `Qsqrtd d`: The quadratic algebra `QuadraticAlgebra ℚ d 0`, representing `ℚ(√d)`.
 * `Qsqrtd.trace`: The trace `Tr(x)`, defined via mathlib's `Algebra.trace`.
 * `Qsqrtd.norm`: The norm `N(x) = x · x̄ = x.re² - d · x.im²`.
 * `Qsqrtd.embed`: The canonical embedding `ℚ → Q(√d)`.
 -/
 
+/-- A field `K` is a quadratic field if it is a 2-dimensional ℚ-algebra. -/
+def IsQuadraticField (K : Type*) [Field K] [Algebra ℚ K] :=
+  FiniteDimensional ℚ K ∧ Module.finrank ℚ K = 2
+
 /-- The quadratic field `ℚ(√d)` as a type alias for `QuadraticAlgebra ℚ d 0`. -/
 abbrev Qsqrtd (d : ℚ) : Type := QuadraticAlgebra ℚ d 0
+notation "ℚ√" d => Qsqrtd d
 
 namespace Qsqrtd
 
