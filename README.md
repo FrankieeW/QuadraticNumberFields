@@ -133,9 +133,10 @@ lake exe cache get  # Download mathlib cache (required, speeds up build signific
 lake build
 ```
 
-## Template
-
-This repository follows the structure of [Polychromatic](https://github.com/b-mehta/Polychromatic).
+## Worktree
+```bash
+git worktree add .worktrees/<prefix>-<feature> main -b <prefix>/<feature>
+```
 
 ## History
 
