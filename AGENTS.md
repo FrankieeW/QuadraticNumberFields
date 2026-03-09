@@ -9,8 +9,7 @@ classification of their ring of integers.
 
 Core objects:
 - `Qsqrtd (d : ℚ) := QuadraticAlgebra ℚ d 0`
-- `QuadFieldParam d`: stores `Squarefree d` and `d ≠ 1`
-- `QuadraticNumberFields (d : ℤ) [QuadFieldParam d] := Qsqrtd (d : ℚ)`
+- Parameters: `[Fact (Squarefree d)] [Fact (d ≠ 1)]` (explicit Fact instances)
 
 Main ring-of-integers theorems (`RingOfIntegers/Classification.lean`):
 - `ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one`
@@ -30,15 +29,14 @@ Only run `lake build` if Lean files were actually modified. Use `lean_diagnostic
 ## Key Architecture
 
 The Lean source lives under `Lean/QuadraticNumberFields/`. The base type is
-`Qsqrtd`; `QuadraticNumberFields d` is the integer-parameter alias used by the
-main theorems, with parameter validity gated by `QuadFieldParam d`.
+`Qsqrtd`; parameters are provided via explicit `[Fact (Squarefree d)]` and
+`[Fact (d ≠ 1)]` instances rather than a bundled typeclass.
 
 - **`Basic.lean`** — Defines `Qsqrtd d` with trace, norm, and ℚ-embedding
-- **`Instances.lean`** — Defines `QuadraticNumberFields d` and `Field`/`NumberField` instances
-- **`Param.lean`** — `QuadFieldParam d` typeclass (squarefree `d ≠ 1`), instances for `-1`, `-3`, primes
-- **`Rescale.lean`** — Isomorphisms between `Q(√d)` and `Q(√(c²d))`
-- **`ParamUniqueness.lean`** — Uniqueness of the quadratic field parameter
+- **`Instances.lean`** — `Field`/`NumberField` instances for `Qsqrtd`
+- **`Parameters.lean`** — Common `Fact` instances (squarefree, `d ≠ 1`), rescaling isomorphisms, and parameter uniqueness
 - **`TotallyRealComplex.lean`** — Totally real / complex place behavior for `Q(√d)`
+- **`RingEquiv.lean`** — Dedekind domain transfer via ring equivalences
 - **`RingOfIntegers/`** — Classification theorem:
   - `Integrality.lean` — `IsIntegralClosure` constructions, half-integer normal form
   - `ModFour.lean` — Modulo-4 arithmetic lemmas
@@ -46,7 +44,9 @@ main theorems, with parameter validity gated by `QuadFieldParam d`.
   - `ZOnePlusSqrtOverTwo.lean` — ℤ[(1+√d)/2] ring
   - `HalfInt.lean` — Half-integer normal form
   - `Norm.lean` — Norm computations
+  - `Discriminant.lean` — Discriminant formula for quadratic fields
   - `Classification.lean` — Final `ringOfIntegers_classification` theorem
+  - `ZsqrtdMathlibInstances.lean` — Dedekind domain characterization for mathlib's `Zsqrtd`
 - **`Euclidean/Basic.lean`** — Norm-Euclidean classification: `d ∈ {-1, -2, -3, -7, -11}` iff norm-Euclidean
 - **`Examples/`** — Concrete verified examples:
   - `ZsqrtdNeg5/Basic.lean` — General `NoZeroDivisors`/`IsDomain` for negative `d`

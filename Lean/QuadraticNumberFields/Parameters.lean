@@ -14,6 +14,10 @@ This file collects the main results about integer parameters for quadratic
 fields `ℚ(√d)`: rescaling by rational squares, normalization to integer or
 squarefree integer parameters, and uniqueness of the squarefree parameter.
 
+According to the uniqueness result,
+`variable (d : ℤ) [Fact (Squarefree d)] [Fact (d ≠ 1)]`
+will be sufficient to pin down a unique quadratic field `ℚ(√d)` up to isomorphism.
+
 ## Main Results
 
 * `Qsqrtd.rescale`: `ℚ(√d) ≃ₐ[ℚ] ℚ(√(a²d))` for `a ≠ 0`.

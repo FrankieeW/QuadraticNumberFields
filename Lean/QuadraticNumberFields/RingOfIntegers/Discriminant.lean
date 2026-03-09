@@ -3,6 +3,7 @@ Copyright (c) 2026 Frankie Wang. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Frankie Wang
 -/
+import QuadraticNumberFields.RingOfIntegers.CommonInstances
 import QuadraticNumberFields.RingOfIntegers.Classification
 import Mathlib.RingTheory.Discriminant
 import Mathlib.NumberTheory.NumberField.Discriminant.Defs
@@ -99,7 +100,8 @@ section ParamLevel
 
 variable (d : ℤ) [Fact (Squarefree d)] [Fact (d ≠ 1)]
 
-/-- Any `RingEquiv` between ℤ-algebras is automatically a ℤ-algebra equivalence. -/
+/-- Lift a `RingEquiv` to an `AlgEquiv ℤ` using the uniqueness of the
+ring homomorphism `ℤ → R` for any ring `R`. -/
 def ringEquivToIntAlgEquiv
     {R S : Type*} [CommRing R] [Algebra ℤ R] [CommRing S] [Algebra ℤ S]
     (e : R ≃+* S) : R ≃ₐ[ℤ] S :=
@@ -122,7 +124,10 @@ theorem discr_of_mod_four_ne_one (hd4 : d % 4 ≠ 1) :
   rw [← Algebra.discr_eq_discr_of_algEquiv _ f]
   exact discr_zsqrtd_basis d
 
-/-- **Discriminant of `Q(√d)` when `d % 4 = 1`.** -/
+/-- **Discriminant of `Q(√d)` when `d % 4 = 1`.**
+
+Uses the ℤ-basis `{1, ω}` where `ω = (1 + √d)/2` for `𝓞 = ℤ[(1+√d)/2]`
+to compute `disc = d`. -/
 theorem discr_of_mod_four_eq_one (hd4 : d % 4 = 1) :
     NumberField.discr (Qsqrtd (d : ℚ)) = d := by
   obtain ⟨k, hk, ⟨e⟩⟩ :=
@@ -137,62 +142,38 @@ theorem discr_of_mod_four_eq_one (hd4 : d % 4 = 1) :
   rw [← Algebra.discr_eq_discr_of_algEquiv _ f]
   exact discr_zOnePlusSqrtOverTwo_basis k
 
-/-- **Unified discriminant formula for `Q(√d)`.** -/
+/-- **Unified discriminant formula for `Q(√d)`.**
+
+For squarefree `d ≠ 1`:
+* `disc(Q(√d)) = d`   if `d ≡ 1 (mod 4)`
+* `disc(Q(√d)) = 4d`  if `d ≢ 1 (mod 4)` -/
 theorem discr_formula :
     NumberField.discr (Qsqrtd (d : ℚ)) = if d % 4 = 1 then d else 4 * d := by
   split
   · exact discr_of_mod_four_eq_one d ‹_›
   · exact discr_of_mod_four_ne_one d ‹_›
 
-/-! ## Named Examples -/
+/-! ## Named Examples
+
+Common discriminants for frequently-used quadratic fields. -/
 
 /-- **Gaussian integers**: `disc(Q(√(-1))) = -4`. -/
 theorem discr_gaussian :
-    (by
-      letI : Fact (Squarefree (-1 : ℤ)) := by
-        refine ⟨?_⟩
-        exact (Int.squarefree_natAbs (n := (-1 : ℤ))).1
-          (by exact squarefree_one)
-      letI : Fact ((-1 : ℤ) ≠ 1) := ⟨by decide⟩
-      exact NumberField.discr (Qsqrtd ((-1 : ℤ) : ℚ)) = -4) := by
-  letI : Fact (Squarefree (-1 : ℤ)) := by
-    refine ⟨?_⟩
-    exact (Int.squarefree_natAbs (n := (-1 : ℤ))).1
-      (by exact squarefree_one)
-  letI : Fact ((-1 : ℤ) ≠ 1) := ⟨by decide⟩
-  exact discr_of_mod_four_ne_one (-1) (by decide)
+    NumberField.discr (Qsqrtd ((-1 : ℤ) : ℚ)) = -4 :=
+  discr_of_mod_four_ne_one (-1) (by decide)
+
 
 /-- **Eisenstein integers**: `disc(Q(√(-3))) = -3`. -/
 theorem discr_eisenstein :
-    (by
-      letI : Fact (Squarefree (-3 : ℤ)) := by
-        refine ⟨?_⟩
-        letI : Fact (Nat.Prime ((-3 : ℤ).natAbs)) := ⟨by decide⟩
-        exact (Int.prime_iff_natAbs_prime.2 Fact.out).squarefree
-      letI : Fact ((-3 : ℤ) ≠ 1) := ⟨by decide⟩
-      exact NumberField.discr (Qsqrtd ((-3 : ℤ) : ℚ)) = -3) := by
-  letI : Fact (Squarefree (-3 : ℤ)) := by
-    refine ⟨?_⟩
-    letI : Fact (Nat.Prime ((-3 : ℤ).natAbs)) := ⟨by decide⟩
-    exact (Int.prime_iff_natAbs_prime.2 Fact.out).squarefree
-  letI : Fact ((-3 : ℤ) ≠ 1) := ⟨by decide⟩
-  exact discr_of_mod_four_eq_one (-3) (by decide)
+    NumberField.discr (Qsqrtd ((-3 : ℤ) : ℚ)) = -3 :=
+  discr_of_mod_four_eq_one (-3) (by decide)
+
 
 /-- **Q(√(-5))**: `disc(Q(√(-5))) = -20`. -/
 theorem discr_Qsqrtd_neg_five :
-    (by
-      letI : Fact (Squarefree (-5 : ℤ)) := by
-        refine ⟨?_⟩
-        letI : Fact (Nat.Prime ((-5 : ℤ).natAbs)) := ⟨by decide⟩
-        exact (Int.prime_iff_natAbs_prime.2 Fact.out).squarefree
-      letI : Fact ((-5 : ℤ) ≠ 1) := ⟨by decide⟩
-      exact NumberField.discr (Qsqrtd ((-5 : ℤ) : ℚ)) = -20) := by
-  letI : Fact (Squarefree (-5 : ℤ)) := by
-    refine ⟨?_⟩
-    letI : Fact (Nat.Prime ((-5 : ℤ).natAbs)) := ⟨by decide⟩
-    exact (Int.prime_iff_natAbs_prime.2 Fact.out).squarefree
-  letI : Fact ((-5 : ℤ) ≠ 1) := ⟨by decide⟩
-  exact discr_of_mod_four_ne_one (-5) (by decide)
+    NumberField.discr (Qsqrtd ((-5 : ℤ) : ℚ)) = -20 :=
+  discr_of_mod_four_ne_one (-5) (by decide)
+
 
 end ParamLevel
 

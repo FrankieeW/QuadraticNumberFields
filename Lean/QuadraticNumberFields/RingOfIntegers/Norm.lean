@@ -95,7 +95,10 @@ theorem norm_zOnePlusSqrtOverTwo (k : ℤ) (z : ZOnePlusSqrtOverTwo k) :
   simp only [MonoidHom.coe_mk, OneHom.coe_mk]
   ring
 
-/-- The norm of `a + b·ω` embeds correctly to `ℚ`. -/
+/-- The norm of `a + b·ω` embeds correctly to `ℚ`.
+
+For `z = (a, b) : ZOnePlusSqrtOverTwo k`, the embedding `toQsqrtdHom k z = (a + b/2, b/2)`
+in `Q(√(1 + 4k))` has norm `a² + a·b - k·b²`. -/
 theorem norm_zOnePlusSqrtOverTwo_toQsqrtd (k : ℤ) (z : ZOnePlusSqrtOverTwo k) :
     Qsqrtd.norm (ZOnePlusSqrtOverTwo.toQsqrtdHom k z) =
       ((QuadraticAlgebra.norm z : ℤ) : ℚ) := by
@@ -120,6 +123,9 @@ section ParamLevel
 variable (d : ℤ) [Fact (Squarefree d)] [Fact (d ≠ 1)]
 
 /-- For `α ∈ 𝓞(Q(√d))`, the norm `N(α)` is an integer.
+
+This follows from the classification theorem: elements of the ring of integers
+live in either `ℤ[√d]` or `ℤ[(1+√d)/2]`, both of which have integer-valued norm.
 
 TODO: This proof requires establishing that the ring isomorphism from the
 classification commutes with the coercion to the number field. -/
@@ -157,7 +163,12 @@ private theorem isUnit_iff_norm_eq_one_or_neg_one
     · exact QuadraticAlgebra.isUnit_iff_norm_isUnit.mpr (h1 ▸ isUnit_one)
     · exact QuadraticAlgebra.isUnit_iff_norm_isUnit.mpr (hneg1 ▸ isUnit_neg_one)
 
-/-- An element of `Zsqrtd d` is a unit iff its norm is `±1`. -/
+/-- An element of `Zsqrtd d` is a unit iff its norm is `±1`.
+
+**Proof sketch:**
+* (⟹) If `z` is a unit with inverse `w`, then `1 = N(1) = N(z·w) = N(z)·N(w)`.
+  Thus `N(z)` divides `1` in `ℤ`, so `N(z) = ±1`.
+* (⟸) If `N(z) = ±1`, then `z · conj(z) = N(z) = ±1`, so `z` is a unit. -/
 theorem isUnit_zsqrtd_iff_norm_eq_one_or_neg_one (d : ℤ) (z : Zsqrtd d) :
     IsUnit z ↔ Zsqrtd.norm z = 1 ∨ Zsqrtd.norm z = -1 :=
   by simpa using isUnit_iff_norm_eq_one_or_neg_one z

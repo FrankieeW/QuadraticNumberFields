@@ -3,6 +3,7 @@ Copyright (c) 2026 Frankie Wang. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Frankie Wang
 -/
+import QuadraticNumberFields.RingOfIntegers.CommonInstances
 import QuadraticNumberFields.RingOfIntegers.Integrality
 import QuadraticNumberFields.RingOfIntegers.ModFour
 import QuadraticNumberFields.RingOfIntegers.ZOnePlusSqrtOverTwo
@@ -201,36 +202,15 @@ theorem ringOfIntegers_classification
 /-! ## Example 2.8 (Boxer Notes): Gaussian and Eisenstein Integers -/
 
 /-- **Gaussian integers**: `𝓞(Q(√(-1))) ≃ ℤ[i]`. -/
-example :
-    (by
-      letI : Fact (Squarefree (-1 : ℤ)) := by
-        refine ⟨?_⟩
-        exact (Int.squarefree_natAbs (n := (-1 : ℤ))).1
-          (by exact squarefree_one)
-      letI : Fact ((-1 : ℤ) ≠ 1) := ⟨by decide⟩
-      exact Nonempty (𝓞 (Qsqrtd ((-1 : ℤ) : ℚ)) ≃+* Zsqrtd (-1))) := by
-  letI : Fact (Squarefree (-1 : ℤ)) := by
-    refine ⟨?_⟩
-    exact (Int.squarefree_natAbs (n := (-1 : ℤ))).1
-      (by exact squarefree_one)
-  letI : Fact ((-1 : ℤ) ≠ 1) := ⟨by decide⟩
-  exact ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one (-1) (by decide)
+example : Nonempty (𝓞 (Qsqrtd ((-1 : ℤ) : ℚ)) ≃+* Zsqrtd (-1)) :=
+  ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one (-1) (by decide)
+
 
 /-- **Eisenstein integers**: `𝓞(Q(√(-3))) ≃ ℤ[(1+√(-3))/2]`. -/
 example : ∃ k : ℤ, (-3 : ℤ) = 1 + 4 * k ∧
-    (by
-      letI : Fact (Squarefree (-3 : ℤ)) := by
-        refine ⟨?_⟩
-        letI : Fact (Nat.Prime ((-3 : ℤ).natAbs)) := ⟨by decide⟩
-        exact (Int.prime_iff_natAbs_prime.2 Fact.out).squarefree
-      letI : Fact ((-3 : ℤ) ≠ 1) := ⟨by decide⟩
-      exact Nonempty (𝓞 (Qsqrtd ((-3 : ℤ) : ℚ)) ≃+* ZOnePlusSqrtOverTwo k)) := by
-  letI : Fact (Squarefree (-3 : ℤ)) := by
-    refine ⟨?_⟩
-    letI : Fact (Nat.Prime ((-3 : ℤ).natAbs)) := ⟨by decide⟩
-    exact (Int.prime_iff_natAbs_prime.2 Fact.out).squarefree
-  letI : Fact ((-3 : ℤ) ≠ 1) := ⟨by decide⟩
-  exact ringOfIntegers_equiv_zOnePlusSqrtOverTwo_of_mod_four_eq_one (-3) (by decide)
+    Nonempty (𝓞 (Qsqrtd ((-3 : ℤ) : ℚ)) ≃+* ZOnePlusSqrtOverTwo k) :=
+  ringOfIntegers_equiv_zOnePlusSqrtOverTwo_of_mod_four_eq_one (-3) (by decide)
+
 
 end ParamLevel
 

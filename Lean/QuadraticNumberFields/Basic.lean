@@ -28,9 +28,9 @@ trace, norm, and the canonical embedding of ℚ.
   with `d ≠ 1` give genuine quadratic fields.
 -/
 
-/-- A field `K` is a quadratic field if it is a 2-dimensional ℚ-algebra. -/
-def IsQuadraticField (K : Type*) [Field K] [Algebra ℚ K] :=
-  FiniteDimensional ℚ K ∧ Module.finrank ℚ K = 2
+/-- A field `K` is a quadratic field if it is a quadratic extension of `ℚ`. -/
+abbrev IsQuadraticField (K : Type*) [Field K] [Algebra ℚ K] : Prop :=
+  Algebra.IsQuadraticExtension ℚ K
 
 /-- The quadratic field `ℚ(√d)` as a type alias for `QuadraticAlgebra ℚ d 0`. -/
 abbrev Qsqrtd (d : ℚ) : Type := QuadraticAlgebra ℚ d 0

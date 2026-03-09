@@ -22,6 +22,8 @@ under useful arithmetic hypotheses.
 * `Zsqrtd.instIsDomain`: `IsDomain (Zsqrtd d)` for `d < 0`.
 * `Zsqrtd.isDedekindDomain_of_mod_four_ne_one`: `IsDedekindDomain (Zsqrtd d)`
   for squarefree `d ≠ 1` with `d % 4 ≠ 1`.
+* `Zsqrtd.instIsDedekindDomain_zsqrtd_of_mod_four_ne_one`: instance providing
+  `IsDedekindDomain (Zsqrtd d)` when `[Fact (d % 4 ≠ 1)]` is available.
 * `Zsqrtd.not_isDedekindDomain_of_mod_four_eq_one`: `ℤ√d` is not Dedekind when
   `d % 4 = 1`.
 -/
@@ -53,6 +55,11 @@ theorem isDedekindDomain_of_mod_four_ne_one (hd4 : d % 4 ≠ 1) :
     QuadraticNumberFields.RingOfIntegers.isDedekindDomain_zsqrtd_of_mod_four_ne_one
       d hd4
   exact RingEquiv.isDedekindDomain e
+instance instIsDedekindDomain_zsqrtd_of_mod_four_ne_one
+    [Fact (d % 4 ≠ 1)] :
+    IsDedekindDomain (Zsqrtd d) :=
+  isDedekindDomain_of_mod_four_ne_one d Fact.out
+
 
 theorem not_isDedekindDomain_of_mod_four_eq_one
     (hd4 : d % 4 = 1) :
