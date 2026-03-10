@@ -16,8 +16,11 @@ import QuadraticNumberFields.RingOfIntegers.ZsqrtdMathlibInstances
 import QuadraticNumberFields.RingOfIntegers.ZsqrtdIdeals
 import QuadraticNumberFields.RingOfIntegers.HalfInt
 import QuadraticNumberFields.RingOfIntegers.ZOnePlusSqrtOverTwo
+import QuadraticNumberFields.RingOfIntegers.TraceNorm
+import QuadraticNumberFields.RingOfIntegers.Embedding
 import QuadraticNumberFields.RingOfIntegers.Integrality
 import QuadraticNumberFields.RingOfIntegers.Classification
+import QuadraticNumberFields.RingOfIntegers.ExplicitNorm
 import QuadraticNumberFields.RingOfIntegers.Norm
 import QuadraticNumberFields.RingOfIntegers.Discriminant
 import QuadraticNumberFields.Examples.ZsqrtdNeg5.Ideals

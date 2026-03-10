@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Frankie Wang
 -/
 import QuadraticNumberFields.RingOfIntegers.CommonInstances
+import QuadraticNumberFields.RingOfIntegers.Embedding
 import QuadraticNumberFields.RingOfIntegers.Integrality
 import QuadraticNumberFields.RingOfIntegers.ModFour
 import QuadraticNumberFields.RingOfIntegers.ZOnePlusSqrtOverTwo
@@ -35,10 +36,6 @@ then splits into the two branches above.
 
 ## Main Results
 
-* `ringOfIntegers_equiv_of_embedding`: General criterion identifying `𝓞 K` with any
-  ring that embeds injectively into `K` and has the correct integral image.
-  **mathlib target: `Mathlib.NumberTheory.NumberField.RingOfIntegers`**
-
 * `ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one`:
   `d % 4 ≠ 1 → 𝓞(ℚ(√d)) ≃+* ℤ[√d]`.
   **mathlib target: `Mathlib.NumberTheory.QuadraticField.RingOfIntegers`**
@@ -57,71 +54,15 @@ then splits into the two branches above.
 ## Design
 
 Integrality ingredients (`IsIntegralClosure` constructions, half-integer normal form,
-etc.) live in `Integrality.lean`. This file assembles the final `𝓞 ≃+* R` isomorphisms
-and the top-level classification.
+etc.) live in `Integrality.lean`, while the abstract embedding criterion lives in
+`Embedding.lean`. This file assembles the final `𝓞 ≃+* R` isomorphisms and the
+top-level classification.
 -/
 
 open scoped NumberField
 
 namespace QuadraticNumberFields
 namespace RingOfIntegers
-
-section FieldLevel
-
-/-! ## General Criterion for Ring of Integers Identification
-
-The following theorem is **not specific to quadratic fields**: it provides a general
-way to identify the ring of integers `𝓞 K` of any number field `K` with an explicit
-model ring `R`, given an embedding `φ : R →+* K` whose image is exactly the set of
-integral elements.
-
-This is the "practical" form of the universal property of integral closure: rather
-than constructing an `IsIntegralClosure` instance by hand, one supplies three
-checkable conditions (injectivity, surjectivity onto integrals, integrality of the
-image) and obtains the ring isomorphism.
-
-**mathlib target: `Mathlib.NumberTheory.NumberField.RingOfIntegers`** — this would
-complement `NumberField.RingOfIntegers.equiv` which requires `IsIntegralClosure`
-as a typeclass hypothesis. -/
-
-/-- **General criterion for identifying the ring of integers.**
-
-If `φ : R →+* K` is an injective ring homomorphism from a commutative ring `R` into a
-number field `K`, and the image of `φ` is exactly the set of elements integral over `ℤ`,
-then `𝓞 K ≃+* R`.
-
-The three hypotheses correspond to:
-* `h_inj`: `φ` is injective — `R` embeds faithfully into `K`
-* `h_exists`: every integral element of `K` lies in `φ(R)` — surjectivity onto integrals
-* `h_integral`: every element of `φ(R)` is integral — the image stays inside the
-  integral closure
-
-This is the practical workhorse behind all concrete ring-of-integers identifications. -/
-theorem ringOfIntegers_equiv_of_embedding
-    (K : Type*) [Field K] [NumberField K]
-    (R : Type*) [CommRing R]
-    (φ : R →+* K)
-    (h_inj : Function.Injective φ)
-    (h_exists : ∀ x : K, IsIntegral ℤ x → ∃ z : R, φ z = x)
-    (h_integral : ∀ z : R, IsIntegral ℤ (φ z)) :
-    Nonempty (𝓞 K ≃+* R) := by
-  -- Build the `IsIntegralClosure` instance from the three hypotheses,
-  -- then invoke the universal property of the ring of integers.
-  letI : Algebra R K := φ.toAlgebra
-  letI : IsIntegralClosure R ℤ K :=
-    { algebraMap_injective := by
-        simpa [RingHom.toAlgebra] using h_inj
-      isIntegral_iff := by
-        intro x
-        constructor
-        · intro hx
-          rcases h_exists x hx with ⟨z, hz⟩
-          exact ⟨z, by simpa [RingHom.toAlgebra] using hz⟩
-        · rintro ⟨z, rfl⟩
-          simpa [RingHom.toAlgebra] using h_integral z }
-  exact ringOfIntegers_equiv_of_integralClosure K R
-
-end FieldLevel
 
 section ParamLevel
 

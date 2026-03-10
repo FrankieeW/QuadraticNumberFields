@@ -7,7 +7,6 @@ import QuadraticNumberFields.RingOfIntegers.HalfInt
 import QuadraticNumberFields.RingOfIntegers.ModFour
 import QuadraticNumberFields.RingOfIntegers.TraceNorm
 import QuadraticNumberFields.RingOfIntegers.ZOnePlusSqrtOverTwo
-import QuadraticNumberFields.Parameters
 
 /-!
 # Integrality Criteria for Quadratic Fields
@@ -37,8 +36,6 @@ membership in various carrier sets, used by `Classification.lean`.
 
 namespace QuadraticNumberFields
 namespace RingOfIntegers
-
-open scoped NumberField
 
 /-! ## Divisibility-Carrier Equivalences -/
 
@@ -99,40 +96,6 @@ theorem dvd_four_sub_sq_of_exists_zOnePlusSqrtOverTwo_image_of_one_mod_four
         QuadraticNumberFields.RingOfIntegers.halfInt (1 + 4 * k) a' b') :
     4 ∣ (a' ^ 2 - (1 + 4 * k) * b' ^ 2) :=
   (dvd_four_sub_sq_iff_exists_zOnePlusSqrtOverTwo_image_of_one_mod_four k a' b' hd).2 hz
-
-/-- **Generic fact**: the ring of integers `𝓞 K` is ring-isomorphic to any
-commutative ring `R` equipped with an `IsIntegralClosure R ℤ K` instance.
-
-This is the universal property of the integral closure, packaged as a `RingEquiv`.
-It is **not specific to quadratic fields**.
-
-**mathlib target: already in mathlib as `NumberField.RingOfIntegers.equiv`,
-but this wrapper with explicit algebra argument is more ergonomic.** -/
-theorem ringOfIntegers_equiv_of_integralClosure
-    (K : Type*) [Field K] [NumberField K]
-    (R : Type*) [CommRing R] [Algebra R K] [IsIntegralClosure R ℤ K] :
-    Nonempty (𝓞 K ≃+* R) :=
-  -- The ring of integers is characterized by the integral-closure universal property.
-  ⟨NumberField.RingOfIntegers.equiv (K := K) (R := R)⟩
-
-/-- Any image of an integral element under a ring hom remains integral over `ℤ`.
-
-This is a **general integrality-transport lemma**: if `R` is an integral `ℤ`-algebra
-(i.e., every element of `R` is integral over `ℤ`), then ring homomorphisms preserve
-integrality. The proof uses `map_isIntegral_int`.
-
-**mathlib target: `Mathlib.RingTheory.IntegralClosure.IsIntegral`** -/
-private lemma isIntegral_of_intModel_image
-    (R S : Type*) [CommRing R] [CommRing S]
-    [Algebra.IsIntegral ℤ R] (φ : R →+* S) (z : R) :
-    IsIntegral ℤ (φ z) :=
-  -- Integrality is preserved by ring homomorphisms.
-  map_isIntegral_int φ (Algebra.IsIntegral.isIntegral (R := ℤ) z)
-
-/-- Every element in the image of `Zsqrtd d → Q(√d)` is integral over `ℤ`. -/
-lemma isIntegral_toQsqrtd (d : ℤ) (z : Zsqrtd d) :
-    IsIntegral ℤ (Zsqrtd.toQsqrtdHom d z) :=
-  isIntegral_of_intModel_image (Zsqrtd d) (Qsqrtd (d : ℚ)) (Zsqrtd.toQsqrtdHom d) z
 
 /-! ## Half-Integer Normal Form -/
 
@@ -209,12 +172,6 @@ lemma exists_zsqrtd_of_isIntegral_of_ne_one_mod_four
     (fun a' b' hdiv =>
       exists_zsqrtd_image_of_dvd_four_sub_sq_of_ne_one_mod_four d a' b' hd_sf hd4 hdiv)
     hx
-
-/-- Every element in the image of `ZOnePlusSqrtOverTwo k → Q(√(1 + 4k))` is integral over `ℤ`. -/
-lemma isIntegral_toQsqrtd_of_zOnePlusSqrtOverTwo (k : ℤ) (z : ZOnePlusSqrtOverTwo k) :
-    IsIntegral ℤ (_root_.ZOnePlusSqrtOverTwo.toQsqrtdHom k z) :=
-  isIntegral_of_intModel_image (ZOnePlusSqrtOverTwo k) (Qsqrtd ((1 + 4 * k : ℤ) : ℚ))
-    (_root_.ZOnePlusSqrtOverTwo.toQsqrtdHom k) z
 
 /-- Integrality classification in the `1 mod 4` branch model (`d = 1 + 4k`):
 integral elements of `Q(√(1 + 4k))` lie in the image of `ZOnePlusSqrtOverTwo k`. -/
