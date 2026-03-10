@@ -103,7 +103,7 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description='Count lines in Lean code files')
-    parser.add_argument('path', nargs='?', default='Lean', help='Directory to analyze (default: Lean)')
+    parser.add_argument('path', nargs='?', default='QuadraticNumberFields', help='Directory to analyze (default: QuadraticNumberFields)')
     parser.add_argument('-v', '--verbose', action='store_true', help='Show detailed stats for each file')
     parser.add_argument('-e', '--exclude', nargs='*', default=[], help='Additional directories to exclude')
     parser.add_argument('--no-exclude-lake', action='store_true', help='Do not exclude .lake directory')

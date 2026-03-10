@@ -19,7 +19,6 @@ Main ring-of-integers theorems (`RingOfIntegers/Classification.lean`):
 ## Build Commands
 
 ```bash
-cd Lean
 lake exe cache get    # Download mathlib cache (required before first build)
 lake build            # Build the project
 ```
@@ -28,7 +27,7 @@ Only run `lake build` if Lean files were actually modified. Use `lean_diagnostic
 
 ## Key Architecture
 
-The Lean source lives under `Lean/QuadraticNumberFields/`. The base type is
+The Lean source lives under `QuadraticNumberFields/`. The base type is
 `Qsqrtd`; parameters are provided via explicit `[Fact (Squarefree d)]` and
 `[Fact (d ≠ 1)]` instances rather than a bundled typeclass.
 
@@ -102,7 +101,7 @@ When adding features that belong in mathlib:
 ```bash
 # Check PR diff vs project
 gh pr diff 36347 --repo leanprover-community/mathlib4 > /tmp/pr.diff
-diff Lean/QuadraticNumberFields/Basic.lean <(gh pr view 36347 --repo leanprover-community/mathlib4 --json files --jq '.files[].path' | xargs cat)
+diff QuadraticNumberFields/Basic.lean <(gh pr view 36347 --repo leanprover-community/mathlib4 --json files --jq '.files[].path' | xargs cat)
 ```
 
 #### mathlib PR → Project Flow

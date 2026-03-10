@@ -5,7 +5,7 @@ title: API Atlas
 
 # API Atlas
 
-This page is the source-driven declaration atlas for `Lean/QuadraticNumberFields`.
+This page is the source-driven declaration atlas for `QuadraticNumberFields`.
 It is designed around four questions for each named declaration:
 
 1. What mathematical object or statement is this encoding?
@@ -16,7 +16,7 @@ It is designed around four questions for each named declaration:
 ## How To Read This Page
 
 - `Module Dependency Map` gives the local import graph inside this repository.
-- `Declaration Atlas` expands module by module and lists every named top-level declaration found under `Lean/QuadraticNumberFields`.
+- `Declaration Atlas` expands module by module and lists every named top-level declaration found under `QuadraticNumberFields`.
 - `Mathematical Form` is taken from the declaration docstring when available, otherwise inferred from the declaration name and module role.
 - `Lean Motivation` explains why the declaration is packaged the way it is for reuse in proofs, typeclass inference, rewriting, or transport across equivalences.
 - `Dependency Focus` highlights the nearest symbols or module layer the declaration sits on top of.

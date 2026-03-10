@@ -85,40 +85,39 @@ This project formalizes:
 
 ## Project Structure
 
-```
+```text
 QuadraticNumberFields/
-├── Lean/                  # Lean formal proofs
-│   ├── lakefile.toml
-│   ├── lean-toolchain
-│   ├── QuadraticNumberFields.lean    # Root import module
-│   └── QuadraticNumberFields/
-│       ├── Basic.lean               # Qsqrtd type, norm, trace, field instances
-│       ├── Instances.lean           # NumberField instance for quadratic extensions
-│       ├── Parameters.lean          # Rescaling, squarefree normalization, uniqueness
-│       ├── FieldClassification.lean # Quadratic field ↔ squarefree parameter
-│       ├── TotallyRealComplex.lean  # Totally real / complex / CM classification
-│       ├── RingEquiv.lean           # Dedekind domain transfer via ring equivalences
-│       ├── Euclidean/
-│       │   └── Basic.lean           # Norm-Euclidean classification framework
-│       ├── Examples/
-│       │   └── ZsqrtdNeg5/
-│       │       ├── Ideals.lean          # Ideal factorization and primality in ℤ[√(-5)]
-│       │       └── RamificationInertia.lean  # Ramification indices and inertia degrees
-│       └── RingOfIntegers/
-│           ├── Classification.lean      # Main classification theorem
-│           ├── CommonInstances.lean     # Fact instances for d = -1, -3, -5
-│           ├── Discriminant.lean        # Discriminant formula
-│           ├── HalfInt.lean             # Half-integer normal form (a'+b'√d)/2
-│           ├── Integrality.lean         # Integrality transport and normal forms
-│           ├── ModFour.lean             # Modulo-4 arithmetic lemmas
-│           ├── Norm.lean                # Norm formulas and unit criteria
-│           ├── TraceNorm.lean           # Trace/norm integrality preliminaries
-│           ├── ZOnePlusSqrtOverTwo.lean # ℤ[(1+√d)/2] ring model
-│           ├── Zsqrtd.lean              # ℤ[√d] ring model and mathlib bridge
-│           ├── ZsqrtdIdeals.lean        # Ideal theory: membership, primality, quotients
-│           └── ZsqrtdMathlibInstances.lean  # Dedekind domain for mathlib's ℤ√d
-├── Verso/                 # Documentation generation (Verso/Subverso)
-└── site/                  # Jekyll website (GitHub Pages)
+├── lakefile.toml
+├── lean-toolchain
+├── QuadraticNumberFields.lean        # Root import module
+├── QuadraticNumberFields/
+│   ├── Basic.lean                    # Qsqrtd type, norm, trace, field instances
+│   ├── Instances.lean                # NumberField instance for quadratic extensions
+│   ├── Parameters.lean               # Rescaling, squarefree normalization, uniqueness
+│   ├── FieldClassification.lean      # Quadratic field ↔ squarefree parameter
+│   ├── TotallyRealComplex.lean       # Totally real / complex / CM classification
+│   ├── RingEquiv.lean                # Dedekind domain transfer via ring equivalences
+│   ├── Euclidean/
+│   │   └── Basic.lean                # Norm-Euclidean classification framework
+│   ├── Examples/
+│   │   └── ZsqrtdNeg5/
+│   │       ├── Ideals.lean           # Ideal factorization and primality in ℤ[√(-5)]
+│   │       └── RamificationInertia.lean  # Ramification indices and inertia degrees
+│   └── RingOfIntegers/
+│       ├── Classification.lean       # Main classification theorem
+│       ├── CommonInstances.lean      # Fact instances for d = -1, -3, -5
+│       ├── Discriminant.lean         # Discriminant formula
+│       ├── HalfInt.lean              # Half-integer normal form (a'+b'√d)/2
+│       ├── Integrality.lean          # Integrality transport and normal forms
+│       ├── ModFour.lean              # Modulo-4 arithmetic lemmas
+│       ├── Norm.lean                 # Norm formulas and unit criteria
+│       ├── TraceNorm.lean            # Trace/norm integrality preliminaries
+│       ├── ZOnePlusSqrtOverTwo.lean  # ℤ[(1+√d)/2] ring model
+│       ├── Zsqrtd.lean               # ℤ[√d] ring model and mathlib bridge
+│       ├── ZsqrtdIdeals.lean         # Ideal theory: membership, primality, quotients
+│       └── ZsqrtdMathlibInstances.lean  # Dedekind domain for mathlib's ℤ√d
+├── Verso/                            # Documentation generation (Verso/Subverso)
+└── site/                             # Jekyll website (GitHub Pages)
 ```
 
 
@@ -130,8 +129,7 @@ QuadraticNumberFields/
 | `QuadraticNumberFields` | 556 | 258 | 934 |
 | `QuadraticNumberFields/Examples` | 274 | 106 | 449 |
 | `QuadraticNumberFields/Euclidean` | 52 | 25 | 93 |
-| `Root` | 20 | 18 | 44 |
-| **Total** | **2182** | **971** | **3153** |
+| **Total** | **2162** | **953** | **3115** |
 
 ## Prerequisites
 
@@ -142,7 +140,6 @@ QuadraticNumberFields/
 ## Build Instructions
 
 ```bash
-cd Lean
 lake exe cache get  # Download mathlib cache (required, speeds up build significantly)
 lake build
 ```

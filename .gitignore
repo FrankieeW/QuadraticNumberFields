@@ -6,6 +6,7 @@
 # Lake build directory
 lake/
 .lake/
+build/
 
 # Mathlib cache
 ~/.lean/cache/
@@ -19,6 +20,7 @@ lake/
 # OS
 .DS_Store
 Thumbs.db
+*.trace
 
 # Build artifacts
 docbuild/

@@ -111,7 +111,6 @@ ClassNumber(K);
 
 **Building this project:**
 ```bash
-cd Lean
 lake exe cache get  # Download mathlib cache
 lake build          # Build the project
 ```

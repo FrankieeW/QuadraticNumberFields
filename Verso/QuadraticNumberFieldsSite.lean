@@ -13,7 +13,7 @@ open Verso.Code.External
 set_option pp.rawOnError true
 
 -- Source of code examples
-set_option verso.exampleProject "../Lean"
+set_option verso.exampleProject ".."
 
 -- Module for example code
 set_option verso.exampleModule "QuadraticNumberFields"
@@ -107,14 +107,14 @@ See `Examples/ZsqrtdNeg5/` for the Lean source.
 
 # Repository Structure
 
-: `Lean/QuadraticNumberFields/`
+: `QuadraticNumberFields/`
 
   Core definitions and proofs:
   - `Basic.lean`: Core definitions (`Qsqrtd`, trace, norm)
-  - `Param.lean`: `QuadFieldParam` class
-  - `Def.lean`: Main field definition
+  - `Parameters.lean`: parameter facts, rescaling, and uniqueness
+  - `Instances.lean`: field and number field instances
 
-: `Lean/QuadraticNumberFields/RingOfIntegers/`
+: `QuadraticNumberFields/RingOfIntegers/`
 
   Classification theorems:
   - `Classification.lean`: Main theorem
@@ -123,7 +123,7 @@ See `Examples/ZsqrtdNeg5/` for the Lean source.
   - `Zsqrtd.lean`: $`\mathbb{Z}[\sqrt{d}]` definitions
   - `ZOnePlusSqrtOverTwo.lean`: $`\mathbb{Z}[\omega]` definitions
 
-: `Lean/QuadraticNumberFields/Examples/ZsqrtdNeg5/`
+: `QuadraticNumberFields/Examples/ZsqrtdNeg5/`
 
   Concrete verified examples for $`\mathbb{Z}[\sqrt{-5}]`:
   - `Basic.lean`: `NoZeroDivisors`/`IsDomain` instances for negative $`d`
@@ -141,7 +141,6 @@ See `Examples/ZsqrtdNeg5/` for the Lean source.
 # Build Instructions
 
 ```bash
-cd Lean
 lake exe cache get
 lake build
 ```

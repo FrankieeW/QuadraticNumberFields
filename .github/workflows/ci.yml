@@ -18,7 +18,6 @@ jobs:
           echo "$HOME/.elan/bin" >> $GITHUB_PATH
 
       - name: Build Lean
-        working-directory: ./Lean
         run: |
           lake exe cache get
           lake build

@@ -44,16 +44,15 @@ The formal model also uses the equivalent generator $\frac{1 + \sqrt{-3}}{2} = 1
 
 | Directory | Description |
 |-----------|-------------|
-| `Lean/QuadraticNumberFields/` | Core definitions and proofs |
-| `Lean/QuadraticNumberFields/RingOfIntegers/` | Classification theorems |
-| `Lean/QuadraticNumberFields/Examples/ZsqrtdNeg5/` | Concrete examples for $\mathbb{Z}[\sqrt{-5}]$: ideal factorization, primality, ramification and inertia |
+| `QuadraticNumberFields/` | Core definitions and proofs |
+| `QuadraticNumberFields/RingOfIntegers/` | Classification theorems |
+| `QuadraticNumberFields/Examples/ZsqrtdNeg5/` | Concrete examples for $\mathbb{Z}[\sqrt{-5}]$: ideal factorization, primality, ramification and inertia |
 | `Verso/` | Documentation generation |
 | `site/` | Jekyll website |
 
 ## Build Instructions
 
 ```bash
-cd Lean
 lake exe cache get
 lake build
 ```
@@ -79,7 +78,7 @@ Start here:
 <div class="portal-links">
   <div class="portal-card">
     <h3>API Atlas</h3>
-    <p>Open <a href="api.html">API Atlas</a> for the source-driven declaration map of <code>Lean/QuadraticNumberFields</code>.</p>
+    <p>Open <a href="api.html">API Atlas</a> for the source-driven declaration map of <code>QuadraticNumberFields</code>.</p>
   </div>
   <div class="portal-card">
     <h3>Generated Lean Docs</h3>

@@ -11,7 +11,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-LEAN_ROOT = ROOT / "Lean" / "QuadraticNumberFields"
+LEAN_ROOT = ROOT / "QuadraticNumberFields"
 OUTPUT = ROOT / "site" / "_includes" / "generated" / "api-catalog.html"
 
 DECL_RE = re.compile(
@@ -44,7 +44,7 @@ class ModuleInfo:
 
 
 def module_name_from_path(path: Path) -> str:
-    rel = path.relative_to(ROOT / "Lean")
+    rel = path.relative_to(ROOT)
     return ".".join(rel.with_suffix("").parts)
 
 
@@ -362,7 +362,7 @@ def render(modules: list[ModuleInfo]) -> str:
 
   <h2>Declaration Atlas</h2>
   <p>
-    This section is generated from <code>Lean/QuadraticNumberFields</code>. Each module folds into a declaration table
+    This section is generated from <code>QuadraticNumberFields</code>. Each module folds into a declaration table
     with four views of the same item: the Lean name, the mathematical form it captures, the reason it exists in Lean,
     and the dependency context it lives in.
   </p>

@@ -11,11 +11,11 @@
 
 - **mathlib PR:** (pending)
 - **Project source files:**
-  - `Lean/QuadraticNumberFields/RingOfIntegers/ModFour.lean`
-  - `Lean/QuadraticNumberFields/RingOfIntegers/Zsqrtd.lean`
-  - `Lean/QuadraticNumberFields/RingOfIntegers/ZsqrtdMathlibInstances.lean`
-  - `Lean/QuadraticNumberFields/RingOfIntegers/HalfInt.lean`
-  - `Lean/QuadraticNumberFields/RingOfIntegers/ZOnePlusSqrtOverTwo.lean`
+  - `QuadraticNumberFields/RingOfIntegers/ModFour.lean`
+  - `QuadraticNumberFields/RingOfIntegers/Zsqrtd.lean`
+  - `QuadraticNumberFields/RingOfIntegers/ZsqrtdMathlibInstances.lean`
+  - `QuadraticNumberFields/RingOfIntegers/HalfInt.lean`
+  - `QuadraticNumberFields/RingOfIntegers/ZOnePlusSqrtOverTwo.lean`
 
 ---
 

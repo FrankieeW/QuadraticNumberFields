@@ -84,8 +84,8 @@ def get_module_stats(files: list[Path]) -> dict[str, LineCount]:
     for f in files:
         stats = count_lean_lines(f)
         
-        # Get relative path from Lean directory
-        rel_path = f.relative_to(Path('Lean'))
+        # Get relative path from repository root
+        rel_path = f.relative_to(Path('.'))
         parts = rel_path.parts
         
         if len(parts) >= 2 and parts[0] == 'QuadraticNumberFields':
@@ -137,7 +137,7 @@ def update_readme(readme_path: str = "README.md") -> None:
     """Update README.md with current code statistics"""
     exclude_dirs = ['.git', 'node_modules', '.lake']
     
-    files = walk_lean_files('Lean', exclude_dirs)
+    files = walk_lean_files('QuadraticNumberFields', exclude_dirs)
     
     if not files:
         print("No .lean files found")
@@ -184,7 +184,7 @@ def main():
     args = parser.parse_args()
     
     exclude_dirs = ['.git', 'node_modules', '.lake']
-    files = walk_lean_files('Lean', exclude_dirs)
+    files = walk_lean_files('QuadraticNumberFields', exclude_dirs)
     
     if not files:
         print("No .lean files found")

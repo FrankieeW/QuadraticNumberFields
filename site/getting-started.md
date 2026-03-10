@@ -51,9 +51,6 @@ This guide will help you get started with the QuadraticNumberFields formalizatio
 git clone https://github.com/FrankieeW/QuadraticNumberFields.git
 cd QuadraticNumberFields
 
-# Navigate to Lean directory
-cd Lean
-
 # Download mathlib cache (important!)
 lake exe cache get
 
@@ -74,20 +71,21 @@ Build completed successfully
 
 ## Project Structure
 
-```
+```text
 QuadraticNumberFields/
-├── Lean/                          # Main formalization
-│   ├── QuadraticNumberFields.lean # Entry point
-│   └── QuadraticNumberFields/
-│       ├── Basic.lean             # Core definitions
-│       ├── Def.lean               # Module imports / namespace setup
-│       ├── FieldInstance.lean     # Main type definition
-│       ├── RingOfIntegers/        # Classification theorem
-│       │   ├── Classification.lean
-│       │   ├── Zsqrtd.lean
-│       │   └── ...
-│       └── ...
-├── site/                          # Documentation website
+├── lakefile.toml
+├── lean-toolchain
+├── QuadraticNumberFields.lean      # Entry point
+├── QuadraticNumberFields/
+│   ├── Basic.lean                  # Core definitions
+│   ├── Parameters.lean             # Parameter facts and uniqueness
+│   ├── Instances.lean              # Number field instances
+│   ├── RingOfIntegers/             # Classification theorem
+│   │   ├── Classification.lean
+│   │   ├── Zsqrtd.lean
+│   │   └── ...
+│   └── ...
+├── site/                           # Documentation website
 └── README.md
 ```
 
@@ -103,11 +101,11 @@ code .
 ### Navigate to Key Files
 
 1. **Start with the main definition:**
-   - Open `Lean/QuadraticNumberFields/FieldInstance.lean`
-   - This defines `QuadraticNumberFields d`
+   - Open `QuadraticNumberFields/Basic.lean`
+   - This defines `Qsqrtd (d : ℚ)`
 
 2. **Explore the classification theorem:**
-   - Open `Lean/QuadraticNumberFields/RingOfIntegers/Classification.lean`
+   - Open `QuadraticNumberFields/RingOfIntegers/Classification.lean`
    - See the main result: `ringOfIntegers_classification`
 
 3. **Check out examples:**
@@ -124,17 +122,17 @@ Lean provides **interactive feedback** as you navigate:
 
 ### Example: Exploring a Definition
 
-Open `Lean/QuadraticNumberFields/FieldInstance.lean`:
+Open `QuadraticNumberFields/Basic.lean`:
 
 ```lean
-/-- The quadratic number field Q(√d) -/
-abbrev QuadraticNumberFields (d : ℤ) [QuadFieldParam d] : Type := Qsqrtd (d : ℚ)
+/-- The quadratic number field `ℚ(√d)` as a quadratic algebra. -/
+abbrev Qsqrtd (d : ℚ) := QuadraticAlgebra ℚ d 0
 ```
 
 **Try:**
-- Hover over `QuadraticNumberFields` to see its type
-- Ctrl+click (Cmd+click on Mac) on `Qsqrtd` to jump to its definition
-- See how it's defined in terms of `QuadraticAlgebra`
+- Hover over `Qsqrtd` to see its type
+- Ctrl+click (Cmd+click on Mac) on `QuadraticAlgebra` to inspect the underlying model
+- See how the project fixes a concrete quadratic-field carrier before building arithmetic on top
 
 ## Building Intuition
 
@@ -143,10 +141,11 @@ abbrev QuadraticNumberFields (d : ℤ) [QuadFieldParam d] : Type := Qsqrtd (d : 
 The main theorem states:
 
 ```lean
-theorem ringOfIntegers_classification (d : ℤ) [QuadFieldParam d] :
-    (d % 4 ≠ 1 ∧ Nonempty (𝓞 (QuadraticNumberFields d) ≃+* Zsqrtd d)) ∨
+theorem ringOfIntegers_classification
+    (d : ℤ) [Fact (Squarefree d)] [Fact (d ≠ 1)] :
+    (d % 4 ≠ 1 ∧ Nonempty (𝓞 (Qsqrtd (d : ℚ)) ≃+* Zsqrtd d)) ∨
     (∃ k : ℤ, d = 1 + 4 * k ∧
-      Nonempty (𝓞 (QuadraticNumberFields d) ≃+* ZOnePlusSqrtOverTwo k))
+      Nonempty (𝓞 (Qsqrtd (d : ℚ)) ≃+* ZOnePlusSqrtOverTwo k))
 ```
 
 **Reading this:**
@@ -163,7 +162,7 @@ theorem ringOfIntegers_classification (d : ℤ) [QuadFieldParam d] :
 ```lean
 -- d = -1, so -1 % 4 = 3 ≠ 1
 -- Therefore: 𝓞(ℚ(i)) ≃ ℤ[i]
-example : 𝓞 (QuadraticNumberFields (-1)) ≃+* Zsqrtd (-1) :=
+example : Nonempty (𝓞 (Qsqrtd ((-1 : ℤ) : ℚ)) ≃+* Zsqrtd (-1)) :=
   sorry  -- Proved in the formalization!
 ```
 
@@ -199,8 +198,8 @@ example : ∃ k, (-3) = 1 + 4 * k := ⟨-1, by norm_num⟩
 **In Lean files:**
 
 ```lean
-#check QuadraticNumberFields  -- See the type
-#print QuadraticNumberFields  -- See the definition
+#check Qsqrtd  -- See the type
+#print Qsqrtd  -- See the definition
 
 -- Evaluate norms
 #eval (3 : ℤ) ^ 2 - 2 * (2 : ℤ) ^ 2  -- Norm of 3 + 2√2
@@ -213,7 +212,7 @@ example : ∃ k, (-3) = 1 + 4 * k := ⟨-1, by norm_num⟩
 
 **Type classes for automatic instance resolution:**
 ```lean
-variable (d : ℤ) [QuadFieldParam d]
+variable (d : ℤ) [Fact (Squarefree d)] [Fact (d ≠ 1)]
 -- This automatically knows d is square-free and d ≠ 1
 ```
 
@@ -256,7 +255,7 @@ lake build
 **VS Code extension not working:**
 1. Ensure Lean 4 extension is installed
 2. Restart VS Code
-3. Check that a `lean-toolchain` file exists (for this project it is at `Lean/lean-toolchain`)
+3. Check that a `lean-toolchain` file exists (for this project it is at `lean-toolchain`)
 
 **Slow performance:**
 - Make sure you ran `lake exe cache get` to download precompiled mathlib

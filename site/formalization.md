@@ -18,19 +18,18 @@ This formalization follows several key design principles:
 
 ### Parameterization
 
-We define quadratic fields through the `QuadFieldParam` typeclass:
+We parameterize quadratic fields by an integer `d` together with explicit `Fact`
+instances:
 
 ```lean
-class QuadFieldParam (d : ℤ) : Prop where
-  squarefree : Squarefree d
-  ne_one : d ≠ 1
+variable (d : ℤ) [Fact (Squarefree d)] [Fact (d ≠ 1)]
 ```
 
 This ensures:
 - $d$ is square-free (no repeated prime factors)
 - $d \neq 1$ (to avoid the trivial case $\mathbb{Q}(\sqrt{1}) = \mathbb{Q}$)
 
-**Rationale:** Using a typeclass allows us to automatically infer these properties and write cleaner theorem statements.
+**Rationale:** Using explicit `Fact` instances keeps assumptions local, interoperates well with mathlib, and avoids a project-specific bundled class.
 
 ### Representation via QuadraticAlgebra
 
@@ -38,9 +37,6 @@ We represent $\mathbb{Q}(\sqrt{d})$ using mathlib's `QuadraticAlgebra`:
 
 ```lean
 abbrev Qsqrtd (d : ℚ) : Type := QuadraticAlgebra ℚ d 0
-
-abbrev QuadraticNumberFields (d : ℤ) [QuadFieldParam d] : Type :=
-  Qsqrtd (d : ℚ)
 ```
 
 **Rationale:** This leverages existing infrastructure for:
@@ -100,9 +96,10 @@ The proof heavily relies on analyzing congruences modulo 4:
 We establish the classification through explicit ring isomorphisms:
 
 ```lean
-def ringOfIntegers_equiv_zsqrtd (d : ℤ) [QuadFieldParam d]
+theorem ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one
+    (d : ℤ) [Fact (Squarefree d)] [Fact (d ≠ 1)]
     (hd4 : d % 4 ≠ 1) :
-    𝓞 (QuadraticNumberFields d) ≃+* Zsqrtd d
+    Nonempty (𝓞 (Qsqrtd (d : ℚ)) ≃+* Zsqrtd d)
 ```
 
 **Construction:** Define forward and inverse maps, then verify:

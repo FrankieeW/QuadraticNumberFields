@@ -11,10 +11,10 @@
 
 - **mathlib PR:** (pending)
 - **Project source files:**
-  - `Lean/QuadraticNumberFields/RingOfIntegers/Integrality.lean`
-  - `Lean/QuadraticNumberFields/RingOfIntegers/Classification.lean`
-  - `Lean/QuadraticNumberFields/RingOfIntegers/Norm.lean`
-  - `Lean/QuadraticNumberFields/RingOfIntegers/ZsqrtdIdeals.lean`
+  - `QuadraticNumberFields/RingOfIntegers/Integrality.lean`
+  - `QuadraticNumberFields/RingOfIntegers/Classification.lean`
+  - `QuadraticNumberFields/RingOfIntegers/Norm.lean`
+  - `QuadraticNumberFields/RingOfIntegers/ZsqrtdIdeals.lean`
 
 ---
 
