@@ -53,6 +53,8 @@ with respect to the basis `{1, i}`.
 PR#36347 this theorem will be in QuadraticAlgebra.Defs.lean -/
 theorem leftMulMatrix_eq (x : QuadraticAlgebra R a b) :
     Algebra.leftMulMatrix (basis a b) x = !![x.re, a * x.im; x.im, x.re + b * x.im] := by
+  -- In the basis `{1, i}`, multiplication by `x = x.re + x.im * i`
+  -- sends `1` and `i` to the two displayed columns.
   ext i j
   fin_cases i <;> fin_cases j
   all_goals
@@ -64,6 +66,8 @@ end CommSemiring
 /-- The trace in `Q(√d)` is `x.re + x̄.re`. -/
 @[simp] theorem trace_eq_re_add_re_star (x : Qsqrtd d) :
     Algebra.trace ℚ (Qsqrtd d) x = x.re + (star x).re := by
+  -- The trace is the matrix trace of left multiplication, so we just
+  -- read off the two diagonal entries from the explicit `2 × 2` matrix.
   rw [Algebra.trace_eq_matrix_trace (QuadraticAlgebra.basis d 0), leftMulMatrix_eq,
     Matrix.trace_fin_two_of]
   simp
@@ -71,6 +75,7 @@ end CommSemiring
 /-- In the model `Q(√d) = QuadraticAlgebra ℚ d 0`, the trace is `2 * re`. -/
 theorem trace_eq_two_re (x : Qsqrtd d) :
     Algebra.trace ℚ (Qsqrtd d) x = 2 * x.re := by
+  -- In `QuadraticAlgebra ℚ d 0`, conjugation fixes the real part.
   rw [trace_eq_re_add_re_star]
   simp
   ring
@@ -81,6 +86,8 @@ abbrev norm {d : ℚ} (x : Qsqrtd d) : ℚ := QuadraticAlgebra.norm x
 /-- `Q(√0)` is not reduced because `√0² = 0` but `√0 ≠ 0`. -/
 lemma zero_not_isReduced : ¬ IsReduced (Qsqrtd (0 : ℚ)) := by
   intro ⟨h⟩
+  -- When `d = 0`, the element `ε = ⟨0, 1⟩` satisfies `ε² = 0`,
+  -- so it is a nonzero nilpotent.
   have hnil : IsNilpotent (⟨0, 1⟩ : Qsqrtd 0) :=
     ⟨2, by ext <;> simp [pow_succ, pow_zero, QuadraticAlgebra.mk_mul_mk]⟩
   have hne : (⟨0, 1⟩ : Qsqrtd 0) ≠ 0 := by
@@ -98,6 +105,8 @@ lemma zero_not_isField : ¬ IsField (Qsqrtd (0 : ℚ)) := by
 lemma one_not_isField : ¬ IsField (Qsqrtd (1 : ℚ)) := by
   intro hF
   haveI := hF.isDomain
+  -- For `d = 1`, the standard factorization
+  -- `(1 + √1) (1 - √1) = 1 - (√1)^2 = 0` gives zero divisors.
   have hprod : (⟨1, 1⟩ : Qsqrtd 1) * ⟨1, -1⟩ = 0 := by
     ext <;> simp
   have hne : (⟨1, 1⟩ : Qsqrtd 1) ≠ 0 := by
@@ -112,6 +121,8 @@ lemma one_not_isField : ¬ IsField (Qsqrtd (1 : ℚ)) := by
 `QuadraticAlgebra.instField`. -/
 instance instFact_of_not_isSquare (d : ℚ) [Fact (¬ IsSquare d)] :
     Fact (∀ r : ℚ, r ^ 2 ≠ d + 0 * r) :=
+  -- For `b = 0`, the field criterion for `QuadraticAlgebra ℚ d b`
+  -- reduces to saying that `X^2 - d` has no rational root.
   ⟨by intro r hr; exact (Fact.out : ¬ IsSquare d) ⟨r, by nlinarith [hr]⟩⟩
 
 end Qsqrtd

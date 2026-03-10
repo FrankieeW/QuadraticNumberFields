@@ -50,6 +50,8 @@ def Qsqrtd.rescale (d : ℚ) (a : ℚ) (ha : a ≠ 0) :
   have h1d : (1 : Qsqrtd d) = ⟨1, 0⟩ := by ext <;> rfl
   have h1a : (1 : Qsqrtd (a ^ 2 * d)) = ⟨1, 0⟩ := by
     ext <;> rfl
+  -- This is the change of generator
+  -- `√d ↦ a⁻¹ * √(a² d)`, with the real part unchanged.
   exact AlgEquiv.ofLinearEquiv
     { toFun := fun x => ⟨x.re, x.im * a⁻¹⟩
       invFun := fun y => ⟨y.re, y.im * a⟩
@@ -71,6 +73,8 @@ theorem Qsqrtd_iso_int_param (d : ℚ) :
     exact ⟨d.num, d.den, Int.ofNat_ne_zero.mpr hd, (Rat.num_div_den d).symm⟩
   use m * n
   have ha : (n : ℚ) ≠ 0 := by exact_mod_cast hn0
+  -- Clearing the denominator replaces `d = m / n` by `n² d = mn`,
+  -- so after rescaling the parameter becomes an integer.
   have hrescale : Qsqrtd d ≃ₐ[ℚ] Qsqrtd (n ^ 2 * d) := Qsqrtd.rescale d n ha
   have heq : (n : ℚ) ^ 2 * d = m * n := by
     rw [hd]
@@ -92,6 +96,8 @@ theorem Qsqrtd_iso_squarefree_int_param {d : ℤ} (hd : d ≠ 0) :
   · rw [← Int.squarefree_natAbs]
     rwa [Int.natAbs_mul, Int.natAbs_sign_of_ne_zero hd, Int.natAbs_natCast, one_mul]
   · have hbQ : (b : ℚ) ≠ 0 := Nat.cast_ne_zero.mpr hb
+    -- Write `|d| = b² a` with `a` squarefree, then absorb the square factor `b²`
+    -- using the rescaling isomorphism.
     have hrescale := Qsqrtd.rescale (↑d) (↑b)⁻¹ (inv_ne_zero hbQ)
     have hd_int : d = d.sign * (↑b ^ 2 * ↑a) := by
       conv_lhs => rw [(Int.sign_mul_natAbs d).symm]
@@ -127,6 +133,9 @@ lemma nat_eq_one_of_squarefree_intcast_of_isSquare (m : ℕ)
 /-- If `d₁/d₂` is a rational square and `d₂` is squarefree, then `d₂ ∣ d₁`. -/
 lemma int_dvd_of_ratio_square (d₁ d₂ : ℤ) (hd₂ : d₂ ≠ 0)
     (hsq_d₂ : Squarefree d₂) (hr : IsSquare ((d₁ : ℚ) / (d₂ : ℚ))) : d₂ ∣ d₁ := by
+  -- A rational square has square numerator and denominator.
+  -- Since the denominator divides the squarefree integer `d₂`,
+  -- it must itself be `1`.
   have hsq_den_nat : IsSquare (((d₁ : ℚ) / (d₂ : ℚ)).den) := (Rat.isSquare_iff.mp hr).2
   have hsq_den_int : IsSquare ((((d₁ : ℚ) / (d₂ : ℚ)).den : ℤ)) := by
     rcases hsq_den_nat with ⟨n, hn⟩
@@ -171,6 +180,8 @@ lemma squarefree_eq_of_rat_sq_mul {d₁ d₂ : ℤ}
         field_simp [hs0]
   have hd21 : d₂ ∣ d₁ := int_dvd_of_ratio_square d₁ d₂ hd₂0 hd₂ hratio
   have hd12 : d₁ ∣ d₂ := int_dvd_of_ratio_square d₂ d₁ hd₁0 hd₁ hratio'
+  -- Mutual divisibility makes `d₁` and `d₂` associated, so over `ℤ`
+  -- they differ by at most a sign.
   have hassoc : Associated d₁ d₂ := associated_of_dvd_dvd hd12 hd21
   rcases (Int.associated_iff.mp hassoc) with hEq | hNeg
   · exact hEq
@@ -178,6 +189,8 @@ lemma squarefree_eq_of_rat_sq_mul {d₁ d₂ : ℤ}
       rw [hNeg]
       push_cast
       field_simp [hd₂Q]
+    -- The negative sign is impossible because it would force `-1`
+    -- to be a rational square.
     exfalso
     exact not_isSquare_neg_one_rat (by rwa [this] at hratio)
 
@@ -216,15 +229,20 @@ theorem Qsqrtd.param_unique (φ : Qsqrtd (d₁ : ℚ) ≃ₐ[ℚ] Qsqrtd (d₂ :
     have := congr_arg QuadraticAlgebra.im hφ_sq
     rw [hφ_eta, QuadraticAlgebra.mk_mul_mk] at this; simp at this; linarith
   have hb : b ≠ 0 := by
+    -- If `b = 0`, then the equation for the real part says `d₁ = a²`,
+    -- contradicting that the squarefree integer parameter `d₁` is non-square.
     intro hb0; simp [hb0] at hre
     have : IsSquare ((d₁ : ℤ) : ℚ) := ⟨a, by nlinarith⟩
     exact not_isSquare_int_of_squarefree_ne_one hsf₁ h1₁
       (Rat.isSquare_intCast_iff.mp this)
   have ha : a = 0 := by
+    -- Since `b ≠ 0`, the vanishing of the imaginary part forces `a = 0`.
     rcases mul_eq_zero.mp him with h | h
     · exact (mul_eq_zero.mp h).resolve_left (by norm_num)
     · exact absurd h hb
   have hr : (d₁ : ℚ) = d₂ * b ^ 2 := by nlinarith [hre, ha]
+  -- So the two parameters differ by a rational square factor, and squarefreeness
+  -- removes that ambiguity.
   exact squarefree_eq_of_rat_sq_mul hsf₁ hsf₂ hr
 
 end ParamLevel
