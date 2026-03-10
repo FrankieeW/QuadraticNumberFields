@@ -7,52 +7,54 @@ import QuadraticNumberFields.Basic
 import Mathlib.NumberTheory.NumberField.Basic
 
 /-!
-# Field and Number Field Instances for `Qsqrtd`
+# Field and Number Field Instances for Quadratic Algebras over ℚ
 
-This file equips `Qsqrtd d` (i.e., `QuadraticAlgebra ℚ d 0`) with `Field` and
-`NumberField` typeclass instances, gated by `[Fact (¬ IsSquare d)]`.
+This file provides `NumberField` instances for quadratic extensions of `ℚ`.
 
 ## Main Instances
 
-* `Field (Qsqrtd d)`: `Q(√d)` is a field when `d` is not a perfect square.
-* `NumberField (Qsqrtd d)`: `Q(√d)` is a number field.
-* `Algebra.IsQuadraticExtension ℚ (Qsqrtd d)`: `Q(√d)/ℚ` is a degree-2 extension.
+* `IsQuadraticField.instNumberField`: Any quadratic field is a number field.
+* `QuadraticAlgebra.instIsQuadraticExtension`: Any `QuadraticAlgebra ℚ a b` that is a field
+  is a quadratic extension of `ℚ`.
 
 ## Implementation Note
 
-`Field (QuadraticAlgebra R a b)` requires `Fact (∀ r, r^2 ≠ a + b*r)`.
-For `b = 0` this simplifies to `¬ IsSquare d`. We provide a bridge instance
-`Qsqrtd.instFact_of_not_isSquare` so that `[Fact (¬ IsSquare d)]` suffices.
+The `Module ℚ` instance from the `Field` algebra structure on `QuadraticAlgebra ℚ a b`
+coincides with the `QuadraticAlgebra` module structure. This resolves the diamond between
+the two `Algebra ℚ` instances (`DivisionRing.toRatAlgebra` vs `QuadraticAlgebra.instAlgebra`).
 -/
 
-namespace Qsqrtd
+/-! ## NumberField Instance -/
 
-/-- Bridge: `¬ IsSquare d` implies the technical `Fact` needed by
-`QuadraticAlgebra.instField`. -/
-instance instFact_of_not_isSquare (d : ℚ) [Fact (¬ IsSquare d)] :
-    Fact (∀ r : ℚ, r ^ 2 ≠ d + 0 * r) :=
-  ⟨by intro r hr; exact (Fact.out : ¬ IsSquare d) ⟨r, by nlinarith [hr]⟩⟩
+/-- A quadratic field is a number field: it has characteristic zero
+and is finite-dimensional over `ℚ`. -/
+instance IsQuadraticField.instNumberField (K : Type*) [Field K] [Algebra ℚ K]
+    [IsQuadraticField K] : NumberField K where
+  to_charZero := charZero_of_injective_algebraMap (algebraMap ℚ K).injective
+  to_finiteDimensional := by
+    haveI : CharZero K := charZero_of_injective_algebraMap (algebraMap ℚ K).injective
+    convert FiniteDimensional.of_finrank_pos (K := ℚ) (V := K) (by
+      rw [Algebra.IsQuadraticExtension.finrank_eq_two (R := ℚ) (S := K)]; omega) using 1
+    congr 1
+    exact Subsingleton.elim _ _
 
-/-- The `Module ℚ` instance from the `Field` algebra structure on `Qsqrtd d` coincides
-with the `QuadraticAlgebra` module structure. This resolves the diamond. -/
-private theorem module_eq (d : ℚ) [Fact (¬ IsSquare d)] :
-    (Algebra.toModule : Module ℚ (Qsqrtd d)) =
+/-! ## Quadratic Extension Instances -/
+
+/-- The `Module ℚ` instance from the `Field` algebra structure on `QuadraticAlgebra ℚ a b`
+coincides with the `QuadraticAlgebra` module structure. This resolves the diamond between
+the two `Algebra ℚ` instances (`DivisionRing.toRatAlgebra` vs `QuadraticAlgebra.instAlgebra`). -/
+private theorem QuadraticAlgebra.module_eq (a b : ℚ) [Fact (∀ r : ℚ, r ^ 2 ≠ a + b * r)] :
+    (Algebra.toModule : Module ℚ (QuadraticAlgebra ℚ a b)) =
       QuadraticAlgebra.instModule := by
   refine Module.ext' _ _ ?_
   intro r x
   simpa [Algebra.smul_def, QuadraticAlgebra.algebraMap_eq] using
-    (QuadraticAlgebra.C_mul_eq_smul (R := ℚ) (a := d) (b := (0 : ℚ)) r x)
+    (QuadraticAlgebra.C_mul_eq_smul (R := ℚ) (a := a) (b := b) r x)
 
-/-- `Q(√d)` is a number field: characteristic zero and finite-dimensional over ℚ. -/
-instance instNumberField (d : ℚ) [Fact (¬ IsSquare d)] : NumberField (Qsqrtd d) where
-  to_charZero := by infer_instance
-  to_finiteDimensional := by
-    letI : Module ℚ (Qsqrtd d) := QuadraticAlgebra.instModule
-    exact module_eq d ▸ (inferInstance : Module.Finite ℚ (Qsqrtd d))
-
-/-- `Q(√d)/ℚ` is a quadratic extension: free of rank 2 over `ℚ`. -/
-instance instIsQuadraticExtension (d : ℚ) [Fact (¬ IsSquare d)] :
-    Algebra.IsQuadraticExtension ℚ (Qsqrtd d) where
-  finrank_eq_two' := module_eq d ▸ QuadraticAlgebra.finrank_eq_two d 0
-
-end Qsqrtd
+/-- Any `QuadraticAlgebra ℚ a b` that is a field is automatically a quadratic extension
+of `ℚ`, i.e., a degree-2 extension. Combined with `IsQuadraticField.instNumberField`,
+this gives `NumberField (QuadraticAlgebra ℚ a b)` for free. -/
+instance QuadraticAlgebra.instIsQuadraticExtension (a b : ℚ)
+    [Fact (∀ r : ℚ, r ^ 2 ≠ a + b * r)] :
+    Algebra.IsQuadraticExtension ℚ (QuadraticAlgebra ℚ a b) where
+  finrank_eq_two' := QuadraticAlgebra.module_eq a b ▸ QuadraticAlgebra.finrank_eq_two a b

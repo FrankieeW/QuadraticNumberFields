@@ -118,9 +118,8 @@ lemma isIntegral_toQsqrtd (d : ℤ) (z : Zsqrtd d) :
 
 /-- Trace in `Q(√d)` is `2 * re`. -/
 private theorem trace_eq_two_re {d : ℤ} (x : Qsqrtd (d : ℚ)) :
-    Qsqrtd.trace x = 2 * x.re := by
-  simp [Qsqrtd.trace]
-  ring
+    Algebra.trace ℚ (Qsqrtd d) x = 2 * x.re :=
+  Qsqrtd.trace_eq_two_re x
 
 /-- Norm in `Q(√d)` is `re² - d * im²`. -/
 private theorem norm_eq_sqr_minus_d_sqr {d : ℤ} (x : Qsqrtd (d : ℚ)) :
@@ -155,18 +154,18 @@ lemma exists_halfInt_with_div_four_of_isIntegral
     exact (QuadraticAlgebra.C_inj (R := ℚ) (a := (d : ℚ)) (b := (0 : ℚ))).1 hrs
   have hstar : IsIntegral ℤ (star x) := map_isIntegral_int (starRingEnd (Qsqrtd (d : ℚ))) hx
   have htraceAlg :
-      IsIntegral ℤ (QuadraticAlgebra.C (a := (d : ℚ)) (b := (0 : ℚ)) (Qsqrtd.trace x)) := by
+      IsIntegral ℤ (QuadraticAlgebra.C (a := (d : ℚ)) (b := (0 : ℚ)) (Algebra.trace ℚ (Qsqrtd d) x)) := by
     have hsum : IsIntegral ℤ (x + star x) := hx.add hstar
     have hsum_eq :
-        x + star x = QuadraticAlgebra.C (a := (d : ℚ)) (b := (0 : ℚ)) (Qsqrtd.trace x) := by
+        x + star x = QuadraticAlgebra.C (a := (d : ℚ)) (b := (0 : ℚ)) (Algebra.trace ℚ (Qsqrtd d) x) := by
       ext
-      · simp [Qsqrtd.trace, star, QuadraticAlgebra.C]
+      · simp [Qsqrtd.trace_eq_re_add_re_star, star, QuadraticAlgebra.C]
       · simp [star, QuadraticAlgebra.C]
     simpa [hsum_eq] using hsum
-  have htraceRat : IsIntegral ℤ (Qsqrtd.trace x) :=
+  have htraceRat : IsIntegral ℤ (Algebra.trace ℚ (Qsqrtd d) x) :=
     (isIntegral_algHom_iff cHom.toIntAlgHom hc_inj).1 htraceAlg
   obtain ⟨a', ha'⟩ := (IsIntegrallyClosed.isIntegral_iff (R := ℤ) (K := ℚ)).1 htraceRat
-  have ha'trace : (a' : ℚ) = Qsqrtd.trace x := by simpa using ha'
+  have ha'trace : (a' : ℚ) = Algebra.trace ℚ (Qsqrtd d) x := by simpa using ha'
   have hnormAlg : IsIntegral ℤ (algebraMap ℚ (Qsqrtd (d : ℚ)) (Qsqrtd.norm x)) := by
     have hmul : algebraMap ℚ (Qsqrtd (d : ℚ)) (Qsqrtd.norm x) = x * star x := by
       simpa [Qsqrtd.norm, mul_comm] using
@@ -183,7 +182,7 @@ lemma exists_halfInt_with_div_four_of_isIntegral
   have hre : x.re = (a' : ℚ) / 2 := by
     have htr : 2 * x.re = (a' : ℚ) := by
       calc
-        2 * x.re = Qsqrtd.trace x := (trace_eq_two_re x).symm
+        2 * x.re = Algebra.trace ℚ (Qsqrtd d) x := (trace_eq_two_re x).symm
         _ = (a' : ℚ) := ha'trace.symm
     nlinarith
   have hqmul : (d : ℚ) * q ^ 2 = (m : ℚ) := by

@@ -48,8 +48,8 @@ abbrev omegaHalf (d : ℤ) : Qsqrtd (d : ℚ) := halfInt d 1 1
     (omegaHalf d).im = (1 : ℚ) / 2 := rfl
 
 /-- Trace of `halfInt` is `a'`. -/
-theorem trace_halfInt (d a' b' : ℤ) : Qsqrtd.trace (halfInt d a' b') = a' := by
-  simp [halfInt, Qsqrtd.trace]
+theorem trace_halfInt (d a' b' : ℤ) : Algebra.trace ℚ (Qsqrtd d) (halfInt d a' b') = a' := by
+  simp [halfInt]
 
 /-- Norm of `halfInt` is `(a'² - d*b'²)/4`. -/
 theorem norm_halfInt (d a' b' : ℤ) :

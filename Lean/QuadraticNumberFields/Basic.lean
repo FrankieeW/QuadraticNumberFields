@@ -8,22 +8,26 @@ import Mathlib.Algebra.Squarefree.Basic
 import Mathlib.LinearAlgebra.Dimension.Finrank
 import Mathlib.RingTheory.Int.Basic
 import Mathlib.RingTheory.Trace.Basic
-import Init.Data.Rat.Basic
+import Mathlib.NumberTheory.NumberField.Basic
 
 /-!
 # Basic Definitions for Quadratic Number Fields
 
-This file provides the fundamental type `Qsqrtd d` representing the quadratic
-field `ℚ(√d)` for a rational parameter `d`, along with basic operations:
-trace, norm, and the canonical embedding of ℚ.
+This file defines the concept of a quadratic number field as a degree-2 extension of `ℚ`,
+builds the concrete model `ℚ(√d)` as `QuadraticAlgebra ℚ d 0`, and proves basic properties
+including norm, trace, and field/number field instances.
 
 ## Main Definitions
 
-* `IsQuadraticField K`: A predicate asserting that `K` is a quadratic extension of ℚ.
+* `IsQuadraticField K`: A predicate asserting that `K` is a quadratic extension of `ℚ`.
+  This is defined as `Algebra.IsQuadraticExtension ℚ K`.
 * `Qsqrtd d`: The quadratic algebra `QuadraticAlgebra ℚ d 0`, representing `ℚ(√d)`.
-* `Qsqrtd.trace`: The trace `Tr(x)`, defined via mathlib's `Algebra.trace`.
 * `Qsqrtd.norm`: The norm `N(x) = x · x̄ = x.re² - d · x.im²`.
-* `Qsqrtd.embed`: The canonical embedding `ℚ → Q(√d)`.
+
+## Main Results
+
+* `IsQuadraticField.instNumberField`: Any quadratic field is a number field.
+* `Qsqrtd.instIsQuadraticExtension`: `ℚ(√d)/ℚ` is a degree-2 extension.
 * `not_isSquare_ratCast_of_squarefree_ne_one`: squarefree integer parameters
   with `d ≠ 1` give genuine quadratic fields.
 -/
@@ -38,13 +42,15 @@ notation "ℚ√" d => Qsqrtd d
 
 namespace Qsqrtd
 
-/-- The trace of an element `x : Q(√d)`, defined via `Algebra.trace`. -/
-noncomputable abbrev trace (x : Qsqrtd d) : ℚ := Algebra.trace ℚ (Qsqrtd d) x
+open QuadraticAlgebra
 
-/-- `Qsqrtd.trace` is definitionally mathlib's algebra trace. -/
-theorem trace_eq_algebra_trace (x : Qsqrtd d) :
-    Qsqrtd.trace x = Algebra.trace ℚ (Qsqrtd d) x := rfl
+variable {d : ℚ}
 
+/-- The canonical embedding of ℚ into `Q(√d)`, mapping `r ↦ r + 0·√d`. -/
+abbrev embed (r : ℚ) : Qsqrtd d := algebraMap ℚ (Qsqrtd d) r
+
+/-- The left multiplication matrix of an element in `Qsqrtd d` with respect to the basis `{1, √d}`.
+This is a local version until `QuadraticAlgebra.leftMulMatrix_eq` is merged into mathlib. -/
 private theorem leftMulMatrix_eq (x : Qsqrtd d) :
     Algebra.leftMulMatrix (QuadraticAlgebra.basis d 0) x = !![x.re, d * x.im; x.im, x.re] := by
   ext i j
@@ -53,17 +59,16 @@ private theorem leftMulMatrix_eq (x : Qsqrtd d) :
     rw [Algebra.leftMulMatrix_apply, LinearMap.toMatrix_apply]
     simp [QuadraticAlgebra.basis]
 
-/-- The trace in `Q(√d)` is `x + x̄`. -/
+/-- The trace in `Q(√d)` is `x.re + x̄.re`. -/
 @[simp] theorem trace_eq_re_add_re_star (x : Qsqrtd d) :
-    Qsqrtd.trace x = x.re + (star x).re := by
-  change Algebra.trace ℚ (Qsqrtd d) x = x.re + (star x).re
+    Algebra.trace ℚ (Qsqrtd d) x = x.re + (star x).re := by
   rw [Algebra.trace_eq_matrix_trace (QuadraticAlgebra.basis d 0), leftMulMatrix_eq,
     Matrix.trace_fin_two_of]
   simp
 
 /-- In the model `Q(√d) = QuadraticAlgebra ℚ d 0`, the trace is `2 * re`. -/
-@[simp] theorem trace_eq_two_re (x : Qsqrtd d) :
-    Qsqrtd.trace x = 2 * x.re := by
+theorem trace_eq_two_re (x : Qsqrtd d) :
+    Algebra.trace ℚ (Qsqrtd d) x = 2 * x.re := by
   rw [trace_eq_re_add_re_star]
   simp
   ring
@@ -71,15 +76,8 @@ private theorem leftMulMatrix_eq (x : Qsqrtd d) :
 /-- The norm of an element `x : Q(√d)`, defined as `N(x) = x · x̄ = x.re² - d · x.im²`. -/
 abbrev norm {d : ℚ} (x : Qsqrtd d) : ℚ := QuadraticAlgebra.norm x
 
-/-- The canonical embedding of ℚ into `Q(√d)`, mapping `r ↦ r + 0·√d`. -/
-abbrev embed (r : ℚ) : Qsqrtd d := algebraMap ℚ (Qsqrtd d) r
-
-end Qsqrtd
-
-/-! ## Parameter Lemmas -/
-
 /-- `Q(√0)` is not reduced because `√0² = 0` but `√0 ≠ 0`. -/
-lemma Qsqrtd.zero_not_isReduced : ¬ IsReduced (Qsqrtd (0 : ℚ)) := by
+lemma zero_not_isReduced : ¬ IsReduced (Qsqrtd (0 : ℚ)) := by
   intro ⟨h⟩
   have hnil : IsNilpotent (⟨0, 1⟩ : Qsqrtd 0) :=
     ⟨2, by ext <;> simp [pow_succ, pow_zero, QuadraticAlgebra.mk_mul_mk]⟩
@@ -89,13 +87,13 @@ lemma Qsqrtd.zero_not_isReduced : ¬ IsReduced (Qsqrtd (0 : ℚ)) := by
   exact hne (h _ hnil)
 
 /-- `Q(√0)` is not a field (it has nilpotents). -/
-lemma Qsqrtd.zero_not_isField : ¬ IsField (Qsqrtd (0 : ℚ)) := by
+lemma zero_not_isField : ¬ IsField (Qsqrtd (0 : ℚ)) := by
   intro hF
   haveI := hF.isDomain
-  exact Qsqrtd.zero_not_isReduced (inferInstance : IsReduced (Qsqrtd (0 : ℚ)))
+  exact zero_not_isReduced (inferInstance : IsReduced (Qsqrtd (0 : ℚ)))
 
 /-- `Q(√1) ≅ ℚ × ℚ` is not a field (it has zero divisors). -/
-lemma Qsqrtd.one_not_isField : ¬ IsField (Qsqrtd (1 : ℚ)) := by
+lemma one_not_isField : ¬ IsField (Qsqrtd (1 : ℚ)) := by
   intro hF
   haveI := hF.isDomain
   have hprod : (⟨1, 1⟩ : Qsqrtd 1) * ⟨1, -1⟩ = 0 := by
@@ -108,24 +106,33 @@ lemma Qsqrtd.one_not_isField : ¬ IsField (Qsqrtd (1 : ℚ)) := by
     exact one_ne_zero (congr_arg QuadraticAlgebra.re h)
   rcases mul_eq_zero.mp hprod with h | h <;> contradiction
 
-/-- A squarefree integer that is a perfect square must equal `1`. -/
-lemma eq_one_of_squarefree_isSquare {d : ℤ} (hd : Squarefree d) (hsq : IsSquare d) : d = 1 := by
-  rcases hsq with ⟨z, hz⟩
-  by_cases huz : IsUnit z
-  · rcases Int.isUnit_iff.mp huz with hz1 | hz1
-    · simpa [hz1] using hz
-    · simpa [hz1] using hz
-  · have hsqz2 : Squarefree (z ^ 2) := by
-      simpa [hz, pow_two] using hd
+/-- Bridge: `¬ IsSquare d` implies the technical `Fact` needed by
+`QuadraticAlgebra.instField`. -/
+instance instFact_of_not_isSquare (d : ℚ) [Fact (¬ IsSquare d)] :
+    Fact (∀ r : ℚ, r ^ 2 ≠ d + 0 * r) :=
+  ⟨by intro r hr; exact (Fact.out : ¬ IsSquare d) ⟨r, by nlinarith [hr]⟩⟩
+
+end Qsqrtd
+
+/-! ## Integer Parameter Lemmas -/
+
+/-- A squarefree integer that is a perfect square must equal `1` or `-1`.
+This is a local version until `Squarefree.isUnit_of_isSquare` is merged into mathlib. -/
+lemma eq_one_of_squarefree_isSquare {d : ℤ} (hd : Squarefree d) (hsq : IsSquare d) : d = 1 ∨ d = -1 := by
+  obtain ⟨z, rfl⟩ := hsq
+  have hsqz2 : Squarefree (z ^ 2) := by simpa [pow_two] using hd
+  have huz : IsUnit z := by
+    by_contra hne
     have h01 : (2 : ℕ) = 0 ∨ (2 : ℕ) = 1 :=
-      Squarefree.eq_zero_or_one_of_pow_of_not_isUnit (x := z) (n := 2) hsqz2 huz
+      Squarefree.eq_zero_or_one_of_pow_of_not_isUnit (x := z) (n := 2) hsqz2 hne
     norm_num at h01
+  rcases Int.isUnit_iff.mp huz with rfl | rfl <;> simp
 
 /-- For a squarefree integer `d ≠ 1`, `d` is not a perfect square in `ℤ`. -/
 lemma not_isSquare_int_of_squarefree_ne_one {d : ℤ}
     (hd : Squarefree d) (h1 : d ≠ 1) : ¬ IsSquare d := by
-  intro hdSq
-  exact h1 (eq_one_of_squarefree_isSquare hd hdSq)
+  intro hsq
+  rcases eq_one_of_squarefree_isSquare hd hsq with rfl | rfl <;> simp_all
 
 /-- For a squarefree integer `d ≠ 1`, `(d : ℚ)` is not a perfect square in `ℚ`. -/
 lemma not_isSquare_ratCast_of_squarefree_ne_one {d : ℤ}
