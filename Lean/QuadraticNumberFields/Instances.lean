@@ -33,6 +33,8 @@ instance IsQuadraticField.instNumberField (K : Type*) [Field K] [Algebra ℚ K]
   to_charZero := charZero_of_injective_algebraMap (algebraMap ℚ K).injective
   to_finiteDimensional := by
     haveI : CharZero K := charZero_of_injective_algebraMap (algebraMap ℚ K).injective
+    -- A quadratic extension has `ℚ`-dimension exactly `2`, hence in particular
+    -- positive finite dimension.
     convert FiniteDimensional.of_finrank_pos (K := ℚ) (V := K) (by
       rw [Algebra.IsQuadraticExtension.finrank_eq_two (R := ℚ) (S := K)]; omega) using 1
     congr 1
@@ -46,6 +48,8 @@ the two `Algebra ℚ` instances (`DivisionRing.toRatAlgebra` vs `QuadraticAlgebr
 private theorem QuadraticAlgebra.module_eq (a b : ℚ) [Fact (∀ r : ℚ, r ^ 2 ≠ a + b * r)] :
     (Algebra.toModule : Module ℚ (QuadraticAlgebra ℚ a b)) =
       QuadraticAlgebra.instModule := by
+  -- Both module structures act by scalar multiplication through the same copy
+  -- of `ℚ` inside the quadratic algebra.
   refine Module.ext' _ _ ?_
   intro r x
   simpa [Algebra.smul_def, QuadraticAlgebra.algebraMap_eq] using
@@ -57,4 +61,6 @@ this gives `NumberField (QuadraticAlgebra ℚ a b)` for free. -/
 instance QuadraticAlgebra.instIsQuadraticExtension (a b : ℚ)
     [Fact (∀ r : ℚ, r ^ 2 ≠ a + b * r)] :
     Algebra.IsQuadraticExtension ℚ (QuadraticAlgebra ℚ a b) where
+  -- After identifying the module structures, the standard quadratic-algebra basis
+  -- immediately gives dimension `2`.
   finrank_eq_two' := QuadraticAlgebra.module_eq a b ▸ QuadraticAlgebra.finrank_eq_two a b

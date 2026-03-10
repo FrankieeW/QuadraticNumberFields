@@ -49,11 +49,15 @@ abbrev omegaHalf (d : ℤ) : Qsqrtd (d : ℚ) := halfInt d 1 1
 
 /-- Trace of `halfInt` is `a'`. -/
 theorem trace_halfInt (d a' b' : ℤ) : Algebra.trace ℚ (Qsqrtd d) (halfInt d a' b') = a' := by
+  -- The trace on `Q(√d)` is twice the real part, so for `(a' + b'√d)/2`
+  -- the denominator cancels and leaves `a'`.
   simp [halfInt]
 
 /-- Norm of `halfInt` is `(a'² - d*b'²)/4`. -/
 theorem norm_halfInt (d a' b' : ℤ) :
     Qsqrtd.norm (halfInt d a' b') = (a' ^ 2 - (d : ℚ) * b' ^ 2) / 4 := by
+  -- Expand `re = a'/2` and `im = b'/2` in the formula
+  -- `N(r + s√d) = r² - d s²`.
   simp [halfInt, Qsqrtd.norm, QuadraticAlgebra.norm]
   ring
 
