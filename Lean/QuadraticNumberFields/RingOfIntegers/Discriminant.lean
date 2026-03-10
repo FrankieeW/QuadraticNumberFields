@@ -16,12 +16,6 @@ This file proves the explicit discriminant formula for `Qsqrtd (d : ℚ)`:
 * If `d % 4 = 1`, then `NumberField.discr (Qsqrtd (d : ℚ)) = d`.
 * If `d % 4 ≠ 1`, then `NumberField.discr (Qsqrtd (d : ℚ)) = 4 * d`.
 
-## Main Definitions
-
-* `discr_zsqrtd_basis`: The discriminant of the standard ℤ-basis of `ℤ[√d]` is `4 * d`.
-* `discr_zOnePlusSqrtOverTwo_basis`: The discriminant of the standard ℤ-basis of
-  `ℤ[(1+√d)/2]` is `1 + 4 * k` (i.e., `d` when `d = 1 + 4k`).
-
 ## Main Theorems
 
 * `discr_of_mod_four_ne_one`: `NumberField.discr (Qsqrtd (d : ℚ)) = 4 * d`
@@ -32,25 +26,16 @@ This file proves the explicit discriminant formula for `Qsqrtd (d : ℚ)`:
 -/
 
 open scoped NumberField
-open Matrix
 
 namespace QuadraticNumberFields
 namespace RingOfIntegers
 
-/-! ## Trace formula for QuadraticAlgebra over ℤ
+open Matrix
 
-The following results compute the algebraic trace, trace matrix, and discriminant
-for any `QuadraticAlgebra ℤ a b`. These are **general structural results** about
-the standard basis `{1, ω}` of any quadratic algebra, not specific to the
-quadratic-field setting.
-
-**mathlib target: `Mathlib.Algebra.QuadraticAlgebra.Basic`** — these would
-naturally live alongside the definition of `QuadraticAlgebra` and its basis. -/
+/-! ## Explicit Trace and Discriminant Computations -/
 
 /-- The left-multiplication matrix of `x : QuadraticAlgebra ℤ a b` with respect to
-the standard basis `{1, ω}` is `[[x.re, a * x.im], [x.im, x.re + b * x.im]]`.
-
-**mathlib target: `Mathlib.Algebra.QuadraticAlgebra.Basic`** -/
+the standard basis `{1, ω}` is `[[x.re, a * x.im], [x.im, x.re + b * x.im]]`. -/
 theorem leftMulMatrix_qa (a b : ℤ) (x : QuadraticAlgebra ℤ a b) :
     Algebra.leftMulMatrix (QuadraticAlgebra.basis a b) x =
       !![x.re, a * x.im; x.im, x.re + b * x.im] := by
@@ -62,8 +47,7 @@ theorem leftMulMatrix_qa (a b : ℤ) (x : QuadraticAlgebra ℤ a b) :
       Matrix.cons_val_zero, Matrix.cons_val_one,
       Matrix.of_apply]
 
-/-- The algebraic trace on `QuadraticAlgebra ℤ a b`:
-`Tr(x) = 2 * x.re + b * x.im`. -/
+/-- The algebraic trace on `QuadraticAlgebra ℤ a b` is `2 * x.re + b * x.im`. -/
 theorem trace_qa (a b : ℤ) (x : QuadraticAlgebra ℤ a b) :
     Algebra.trace ℤ (QuadraticAlgebra ℤ a b) x = 2 * x.re + b * x.im := by
   rw [Algebra.trace_eq_matrix_trace (QuadraticAlgebra.basis a b)]
@@ -71,64 +55,49 @@ theorem trace_qa (a b : ℤ) (x : QuadraticAlgebra ℤ a b) :
   simp [Matrix.trace, Fin.sum_univ_two]
   ring
 
-/-! ## Discriminant of the standard QuadraticAlgebra basis -/
-
 /-- The trace matrix of the standard basis of `QuadraticAlgebra ℤ a b` is
-`[[2, b], [b, 2*a + b²]]`. -/
+`[[2, b], [b, 2 * a + b²]]`. -/
 theorem traceMatrix_qa (a b : ℤ) :
     Algebra.traceMatrix ℤ (QuadraticAlgebra.basis a b) =
       !![2, b; b, 2 * a + b ^ 2] := by
   ext i j
   simp only [Algebra.traceMatrix_apply]
   fin_cases i <;> fin_cases j <;>
-    simp [trace_qa, QuadraticAlgebra.basis]; ring
+    simp [trace_qa, QuadraticAlgebra.basis, pow_two]
 
-/-- The discriminant of the standard basis of `QuadraticAlgebra ℤ a b` is `4a + b²`.
-
-For `b = 0` (the `ℤ[√a]` model) this gives `4a`; for `b = 1` (the `ℤ[ω]` model
-with `ω² = ω + a`) it gives `4a + 1 = 1 + 4a`.
-
-**mathlib target: `Mathlib.Algebra.QuadraticAlgebra.Basic`** -/
+/-- The discriminant of the standard basis of `QuadraticAlgebra ℤ a b` is `4a + b²`. -/
 theorem discr_qa_basis (a b : ℤ) :
     Algebra.discr ℤ (QuadraticAlgebra.basis a b) = 4 * a + b ^ 2 := by
   rw [Algebra.discr_def, traceMatrix_qa]
   simp [Matrix.det_fin_two]
   ring
 
-/-- The discriminant of `ℤ[√d]` is `4 * d`. -/
+/-- The discriminant of the standard basis of `ℤ[√d]` is `4 * d`. -/
 theorem discr_zsqrtd_basis (d : ℤ) :
     Algebra.discr ℤ (QuadraticAlgebra.basis d 0 :
       Module.Basis (Fin 2) ℤ (Zsqrtd d)) = 4 * d := by
   rw [discr_qa_basis]
   ring
 
-/-- The discriminant of `ℤ[(1+√(1+4k))/2]` is `1 + 4 * k`. -/
+/-- The discriminant of the standard basis of `ℤ[(1+√(1+4k))/2]` is `1 + 4 * k`. -/
 theorem discr_zOnePlusSqrtOverTwo_basis (k : ℤ) :
     Algebra.discr ℤ (QuadraticAlgebra.basis k 1 :
       Module.Basis (Fin 2) ℤ (ZOnePlusSqrtOverTwo k)) = 1 + 4 * k := by
   rw [discr_qa_basis]
   ring
 
-/-! ## Transport to NumberField.discr -/
-
-section ParamLevel
-
-variable (d : ℤ) [Fact (Squarefree d)] [Fact (d ≠ 1)]
-
-/-- Lift a `RingEquiv` to an `AlgEquiv ℤ` using the uniqueness of the
-ring homomorphism `ℤ → R` for any ring `R`.
-
-This is a **general categorical fact**: since `ℤ` is initial in the category of
-rings (there is exactly one `ℤ → R` for any ring `R`), any ring isomorphism
-automatically respects the `ℤ`-algebra structure.
-
-**mathlib target: `Mathlib.Algebra.Algebra.Basic` or
-`Mathlib.RingTheory.IntegralClosure.IsIntegralClosure`** -/
+/-- Any ring equivalence between `ℤ`-algebras is automatically an `AlgEquiv ℤ`. -/
 def ringEquivToIntAlgEquiv
     {R S : Type*} [CommRing R] [Algebra ℤ R] [CommRing S] [Algebra ℤ S]
     (e : R ≃+* S) : R ≃ₐ[ℤ] S :=
   AlgEquiv.ofRingEquiv (f := e) (fun n => by
     simp only [eq_intCast, map_intCast])
+
+/-! ## Transport to NumberField.discr -/
+
+section ParamLevel
+
+variable (d : ℤ) [Fact (Squarefree d)] [Fact (d ≠ 1)]
 
 /-- **Discriminant of `Q(√d)` when `d % 4 ≠ 1`.**
 

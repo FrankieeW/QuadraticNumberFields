@@ -4,7 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Frankie Wang
 -/
 import QuadraticNumberFields.RingOfIntegers.CommonInstances
-import QuadraticNumberFields.RingOfIntegers.Embedding
 import QuadraticNumberFields.RingOfIntegers.Integrality
 import QuadraticNumberFields.RingOfIntegers.ModFour
 import QuadraticNumberFields.RingOfIntegers.ZOnePlusSqrtOverTwo
@@ -36,6 +35,10 @@ then splits into the two branches above.
 
 ## Main Results
 
+* `ringOfIntegers_equiv_of_embedding`: General criterion identifying `𝓞 K` with any
+  ring that embeds injectively into `K` and has the correct integral image.
+  **mathlib target: `Mathlib.NumberTheory.NumberField.RingOfIntegers`**
+
 * `ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one`:
   `d % 4 ≠ 1 → 𝓞(ℚ(√d)) ≃+* ℤ[√d]`.
   **mathlib target: `Mathlib.NumberTheory.QuadraticField.RingOfIntegers`**
@@ -54,15 +57,51 @@ then splits into the two branches above.
 ## Design
 
 Integrality ingredients (`IsIntegralClosure` constructions, half-integer normal form,
-etc.) live in `Integrality.lean`, while the abstract embedding criterion lives in
-`Embedding.lean`. This file assembles the final `𝓞 ≃+* R` isomorphisms and the
-top-level classification.
+etc.) live in `Integrality.lean`. This file assembles the final `𝓞 ≃+* R`
+isomorphisms and the top-level classification.
 -/
 
 open scoped NumberField
 
 namespace QuadraticNumberFields
 namespace RingOfIntegers
+
+section FieldLevel
+
+/-! ## General Criterion for Ring of Integers Identification -/
+
+/-- **Generic fact**: the ring of integers `𝓞 K` is ring-isomorphic to any
+commutative ring `R` equipped with an `IsIntegralClosure R ℤ K` instance. -/
+theorem ringOfIntegers_equiv_of_integralClosure
+    (K : Type*) [Field K] [NumberField K]
+    (R : Type*) [CommRing R] [Algebra R K] [IsIntegralClosure R ℤ K] :
+    Nonempty (𝓞 K ≃+* R) :=
+  ⟨NumberField.RingOfIntegers.equiv (K := K) (R := R)⟩
+
+/-- **General criterion for identifying the ring of integers.** -/
+theorem ringOfIntegers_equiv_of_embedding
+    (K : Type*) [Field K] [NumberField K]
+    (R : Type*) [CommRing R]
+    (φ : R →+* K)
+    (h_inj : Function.Injective φ)
+    (h_exists : ∀ x : K, IsIntegral ℤ x → ∃ z : R, φ z = x)
+    (h_integral : ∀ z : R, IsIntegral ℤ (φ z)) :
+    Nonempty (𝓞 K ≃+* R) := by
+  letI : Algebra R K := φ.toAlgebra
+  letI : IsIntegralClosure R ℤ K :=
+    { algebraMap_injective := by
+        simpa [RingHom.toAlgebra] using h_inj
+      isIntegral_iff := by
+        intro x
+        constructor
+        · intro hx
+          rcases h_exists x hx with ⟨z, hz⟩
+          exact ⟨z, by simpa [RingHom.toAlgebra] using hz⟩
+        · rintro ⟨z, rfl⟩
+          simpa [RingHom.toAlgebra] using h_integral z }
+  exact ringOfIntegers_equiv_of_integralClosure K R
+
+end FieldLevel
 
 section ParamLevel
 

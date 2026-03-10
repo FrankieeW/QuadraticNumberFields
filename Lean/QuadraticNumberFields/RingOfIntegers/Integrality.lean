@@ -7,6 +7,7 @@ import QuadraticNumberFields.RingOfIntegers.HalfInt
 import QuadraticNumberFields.RingOfIntegers.ModFour
 import QuadraticNumberFields.RingOfIntegers.TraceNorm
 import QuadraticNumberFields.RingOfIntegers.ZOnePlusSqrtOverTwo
+import QuadraticNumberFields.Parameters
 
 /-!
 # Integrality Criteria for Quadratic Fields
@@ -36,6 +37,8 @@ membership in various carrier sets, used by `Classification.lean`.
 
 namespace QuadraticNumberFields
 namespace RingOfIntegers
+
+open scoped NumberField
 
 /-! ## Divisibility-Carrier Equivalences -/
 
@@ -96,6 +99,27 @@ theorem dvd_four_sub_sq_of_exists_zOnePlusSqrtOverTwo_image_of_one_mod_four
         QuadraticNumberFields.RingOfIntegers.halfInt (1 + 4 * k) a' b') :
     4 ∣ (a' ^ 2 - (1 + 4 * k) * b' ^ 2) :=
   (dvd_four_sub_sq_iff_exists_zOnePlusSqrtOverTwo_image_of_one_mod_four k a' b' hd).2 hz
+
+/-! ## Integrality Transport -/
+
+/-- Any image of an integral element under a ring hom remains integral over `ℤ`. -/
+private lemma isIntegral_of_intModel_image
+    (R S : Type*) [CommRing R] [CommRing S]
+    [Algebra.IsIntegral ℤ R] (φ : R →+* S) (z : R) :
+    IsIntegral ℤ (φ z) :=
+  map_isIntegral_int φ (Algebra.IsIntegral.isIntegral (R := ℤ) z)
+
+/-- Every element in the image of `Zsqrtd d → Q(√d)` is integral over `ℤ`. -/
+lemma isIntegral_toQsqrtd (d : ℤ) (z : Zsqrtd d) :
+    IsIntegral ℤ (Zsqrtd.toQsqrtdHom d z) :=
+  isIntegral_of_intModel_image (Zsqrtd d) (Qsqrtd (d : ℚ)) (Zsqrtd.toQsqrtdHom d) z
+
+/-- Every element in the image of `ZOnePlusSqrtOverTwo k → Q(√(1 + 4k))` is
+integral over `ℤ`. -/
+lemma isIntegral_toQsqrtd_of_zOnePlusSqrtOverTwo (k : ℤ) (z : ZOnePlusSqrtOverTwo k) :
+    IsIntegral ℤ (_root_.ZOnePlusSqrtOverTwo.toQsqrtdHom k z) :=
+  isIntegral_of_intModel_image (ZOnePlusSqrtOverTwo k) (Qsqrtd ((1 + 4 * k : ℤ) : ℚ))
+    (_root_.ZOnePlusSqrtOverTwo.toQsqrtdHom k) z
 
 /-! ## Half-Integer Normal Form -/
 
@@ -172,7 +196,6 @@ lemma exists_zsqrtd_of_isIntegral_of_ne_one_mod_four
     (fun a' b' hdiv =>
       exists_zsqrtd_image_of_dvd_four_sub_sq_of_ne_one_mod_four d a' b' hd_sf hd4 hdiv)
     hx
-
 /-- Integrality classification in the `1 mod 4` branch model (`d = 1 + 4k`):
 integral elements of `Q(√(1 + 4k))` lie in the image of `ZOnePlusSqrtOverTwo k`. -/
 lemma exists_zOnePlusSqrtOverTwo_of_isIntegral_of_one_mod_four
