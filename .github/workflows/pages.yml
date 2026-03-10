@@ -25,14 +25,6 @@ jobs:
         id: pages
         uses: actions/configure-pages@v5
 
-      - name: Setup Python
-        uses: astral-sh/setup-uv@v4
-        with:
-          python-version: '3.12'
-
-      - name: Install Graphviz
-        run: sudo apt-get update && sudo apt-get install -y graphviz libgraphviz-dev pkg-config
-
       - name: Install Elan
         run: |
           curl https://elan.lean-lang.org/elan-init.sh -sSf | sh -s -- -y
@@ -59,22 +51,6 @@ jobs:
         working-directory: site
         env:
           JEKYLL_ENV: production
-
-      - name: Build blueprint
-        run: bash scripts/build_blueprint.sh
-
-      - name: Stage blueprint into Pages artifact
-        run: |
-          mkdir -p _site/blueprint
-          if [ -d blueprint/web ] && [ "$(find blueprint/web -type f | wc -l)" -gt 0 ]; then
-            cp -R blueprint/web/. _site/blueprint/
-          elif [ -d blueprint/src/web ] && [ "$(find blueprint/src/web -type f | wc -l)" -gt 0 ]; then
-            cp -R blueprint/src/web/. _site/blueprint/
-          else
-            echo "No non-empty blueprint site directory found."
-            find blueprint -maxdepth 4 -type f | sed -n '1,200p'
-            exit 1
-          fi
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4

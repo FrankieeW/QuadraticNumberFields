@@ -64,7 +64,6 @@ lake build
 - [Getting Started Guide](getting-started.html) - Installation and first steps
 
 ### Theory and Examples
-- [Blueprint](blueprint/) - Standalone blueprint site in the QuadraticIntegers style
 - [Mathematical Background](math.html) - Detailed mathematical theory and proofs
 - [Examples and Applications](examples.html) - Gaussian integers, Eisenstein integers, and more
 
@@ -75,13 +74,9 @@ lake build
 
 ## Documentation Portal
 
-If you want the site entry point used in projects like `QuadraticIntegers`, start here:
+Start here:
 
 <div class="portal-links">
-  <div class="portal-card">
-    <h3>Blueprint</h3>
-    <p>Open <a href="blueprint/">Blueprint</a> for the standalone proof site, with human-oriented and formalisation-oriented chapters in the QuadraticIntegers style.</p>
-  </div>
   <div class="portal-card">
     <h3>API Atlas</h3>
     <p>Open <a href="api.html">API Atlas</a> for the source-driven declaration map of <code>Lean/QuadraticNumberFields</code>.</p>
@@ -103,7 +98,7 @@ If you want the site entry point used in projects like `QuadraticIntegers`, star
   </div>
   <div class="portal-card">
     <h3>Formalization Rationale</h3>
-    <p>Open <a href="formalization.html">Formalization Details</a> for the design choices behind the Lean architecture outside the blueprint subsite.</p>
+    <p>Open <a href="formalization.html">Formalization Details</a> for the design choices behind the Lean architecture.</p>
   </div>
 </div>
 
