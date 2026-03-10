@@ -1,8 +1,7 @@
 # QuadraticNumberFields
 
-A Lean 4 formalization of quadratic number fields `Q(√d)` and the classification
-of their ring of integers, centered on the Lean objects `Qsqrtd`,
-`QuadraticNumberFields`, and `QuadFieldParam`.
+A Lean 4 formalization of quadratic number fields `ℚ(√d)` and the classification
+of their ring of integers, built on mathlib's `QuadraticAlgebra`.
 
 **[Documentation site](https://frankieew.github.io/QuadraticNumberFields)**
 
@@ -14,7 +13,7 @@ of their ring of integers, centered on the Lean objects `Qsqrtd`,
 
 For squarefree `d ≠ 1`, the ring of integers `𝓞 (ℚ(√d))` is classified as:
 
-- If `d % 4 ≠ 1`, then `𝓞 (ℚ(√d)) ≃+* ℤ√d`.
+- If `d % 4 ≠ 1`, then `𝓞 (ℚ(√d)) ≃+* ℤ[√d]`.
 - If `d % 4 = 1`, writing `d = 1 + 4k`, then `𝓞 (ℚ(√d)) ≃+* ℤ[(1+√d)/2]`.
 
 Key declarations: `ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one`,
@@ -48,27 +47,26 @@ precisely when it equals the full ring of integers `𝓞 (ℚ(√d))`.
 
 ## Core Lean Objects
 
-- `Qsqrtd (d : ℚ) := QuadraticAlgebra ℚ d 0`
-  (`Lean/QuadraticNumberFields/Basic.lean`)
-- `QuadFieldParam (d : ℤ)` with fields `squarefree : Squarefree d` and `ne_one : d ≠ 1`
-  (`Lean/QuadraticNumberFields/Param.lean`)
-- `QuadraticNumberFields (d : ℤ) [QuadFieldParam d] := Qsqrtd (d : ℚ)`
-  (`Lean/QuadraticNumberFields/Instances.lean`)
-- `Zsqrtd d` and `ZOnePlusSqrtOverTwo k` as the two candidate integral models
-  (`Lean/QuadraticNumberFields/RingOfIntegers/`)
+- `Qsqrtd (d : ℚ) := QuadraticAlgebra ℚ d 0` — the quadratic field `ℚ(√d)`
+  (`Basic.lean`)
+- Parameters: `[Fact (Squarefree d)] [Fact (d ≠ 1)]` — explicit `Fact` instances
+  (`Parameters.lean`, `RingOfIntegers/CommonInstances.lean`)
+- `Zsqrtd d` and `ZOnePlusSqrtOverTwo k` — the two candidate integral models
+  (`RingOfIntegers/Zsqrtd.lean`, `RingOfIntegers/ZOnePlusSqrtOverTwo.lean`)
 
 ## Mathematical Content
 
 This project formalizes:
-- Quadratic number fields through `Qsqrtd` / `QuadraticNumberFields`
-- `QuadFieldParam`: typeclass for squarefree `d ≠ 1` parameters
-- Parametrization and uniqueness of the quadratic field structure
+- Quadratic number fields as `Qsqrtd d := QuadraticAlgebra ℚ d 0`
+- Parametrization via squarefree integers and uniqueness of the parameter
 - Ring of integers classification (`ringOfIntegers_classification`)
 - Discriminant formula (`discr_formula`)
 - Dedekind domain characterization (`isDedekindDomain_iff_mod_four_ne_one`)
+- Totally real / totally complex / CM field classification
 - Integrality criteria via trace and norm
-- Ideal theory in `ℤ√d`: quotient by prime ideals, ramification
-- Concrete verified examples for `ℤ[√-5]`: ideal factorization, primality, ramification/inertia
+- Norm multiplicativity and unit criterion (`N(z) = ±1`)
+- Ideal theory in `ℤ[√d]`: quotient by prime ideals, ramification
+- Concrete verified examples for `ℤ[√(-5)]`: ideal factorization, primality, ramification/inertia
 
 ## Project Structure
 
@@ -77,33 +75,33 @@ QuadraticNumberFields/
 ├── Lean/                  # Lean formal proofs
 │   ├── lakefile.toml
 │   ├── lean-toolchain
-│   ├── QuadraticNumberFields.lean    # Root module
+│   ├── QuadraticNumberFields.lean    # Root import module
 │   └── QuadraticNumberFields/
-│       ├── Basic.lean               # Qsqrtd type, norm and trace
-│       ├── Instances.lean           # QuadraticNumberFields alias + field/number field instances
-│       ├── Param.lean               # QuadFieldParam typeclass and instances
-│       ├── ParamUniqueness.lean     # Uniqueness of the quadratic structure
-│       ├── Rescale.lean             # Rescaling between Q(√d) forms
-│       ├── TotallyRealComplex.lean  # Totally real / complex place behavior
+│       ├── Basic.lean               # Qsqrtd type, norm, trace, field instances
+│       ├── Instances.lean           # NumberField instance for quadratic extensions
+│       ├── Parameters.lean          # Rescaling, squarefree normalization, uniqueness
+│       ├── FieldClassification.lean # Quadratic field ↔ squarefree parameter
+│       ├── TotallyRealComplex.lean  # Totally real / complex / CM classification
 │       ├── RingEquiv.lean           # Dedekind domain transfer via ring equivalences
 │       ├── Euclidean/
-│       │   └── Basic.lean           # Euclidean domain classification framework
+│       │   └── Basic.lean           # Norm-Euclidean classification framework
 │       ├── Examples/
 │       │   └── ZsqrtdNeg5/
-│       │       ├── Ideals.lean          # Ideal factorization and primality in ℤ[√-5]
+│       │       ├── Ideals.lean          # Ideal factorization and primality in ℤ[√(-5)]
 │       │       └── RamificationInertia.lean  # Ramification indices and inertia degrees
 │       └── RingOfIntegers/
-│           ├── Classification.lean  # Main classification theorem
-│           ├── Discriminant.lean    # Discriminant formula for quadratic fields
-│           ├── HalfInt.lean         # Half-integer normal form
-│           ├── Integrality.lean     # Integrality criteria
-│           ├── ModFour.lean         # Modulo-4 arithmetic lemmas
-│           ├── Norm.lean            # Norm computations and unit criteria
-│           ├── ZOnePlusSqrtOverTwo.lean  # ℤ[(1+√d)/2] ring
-│           ├── Zsqrtd.lean          # ℤ√d ring as QuadraticAlgebra
-│           ├── ZsqrtdIdeals.lean    # Ideal theory: quotients by prime ideals
-│           └── ZsqrtdMathlibInstances.lean  # Dedekind domain characterization
-├── Verso/                 # Documentation generation
+│           ├── Classification.lean      # Main classification theorem
+│           ├── CommonInstances.lean     # Fact instances for d = -1, -3, -5
+│           ├── Discriminant.lean        # Discriminant formula
+│           ├── HalfInt.lean             # Half-integer normal form (a'+b'√d)/2
+│           ├── Integrality.lean         # Integrality criteria via trace/norm
+│           ├── ModFour.lean             # Modulo-4 arithmetic lemmas
+│           ├── Norm.lean                # Norm formulas and unit criteria
+│           ├── ZOnePlusSqrtOverTwo.lean # ℤ[(1+√d)/2] ring model
+│           ├── Zsqrtd.lean             # ℤ[√d] ring model and mathlib bridge
+│           ├── ZsqrtdIdeals.lean       # Ideal theory: membership, primality, quotients
+│           └── ZsqrtdMathlibInstances.lean  # Dedekind domain for mathlib's ℤ√d
+├── Verso/                 # Documentation generation (Verso/Subverso)
 └── site/                  # Jekyll website (GitHub Pages)
 ```
 
@@ -118,14 +116,6 @@ QuadraticNumberFields/
 | `QuadraticNumberFields/Euclidean` | 52 | 25 | 93 |
 | `Root` | 19 | 18 | 43 |
 | **Total** | **2106** | **1025** | **3131** |
-=======
-| `QuadraticNumberFields/RingOfIntegers` | 1205 | 618 | 2193 |
-| `QuadraticNumberFields` | 556 | 258 | 934 |
-| `QuadraticNumberFields/Examples` | 274 | 106 | 449 |
-| `QuadraticNumberFields/Euclidean` | 52 | 25 | 93 |
-| `Root` | 19 | 18 | 43 |
-| **Total** | **2106** | **1025** | **3131** |
->>>>>>> 03862d6 (docs: README.md updated)
 
 ## Prerequisites
 
