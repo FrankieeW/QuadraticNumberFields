@@ -1,3 +1,8 @@
 #!/bin/bash
-# Build documentation script placeholder
-echo "Documentation build script - to be implemented"
+
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+cd "$REPO_ROOT"
+python3 scripts/generate_api_catalog.py

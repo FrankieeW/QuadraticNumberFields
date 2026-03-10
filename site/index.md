@@ -64,13 +64,48 @@ lake build
 - [Getting Started Guide](getting-started.html) - Installation and first steps
 
 ### Theory and Examples
+- [Blueprint](blueprint.html) - The theorem pipeline and module-stage roadmap for the whole formalization
 - [Mathematical Background](math.html) - Detailed mathematical theory and proofs
 - [Examples and Applications](examples.html) - Gaussian integers, Eisenstein integers, and more
 
 ### Technical Documentation
-- [API Documentation](api.html) - Lean formalization reference
+- [API Atlas](api.html) - Every named declaration with mathematical form, Lean motivation, and dependency context
 - [Formalization Details](formalization.html) - Design decisions and proof techniques
 - [Resources](resources.html) - Learning materials, tools, and references
+
+## Documentation Portal
+
+If you want the site entry point used in projects like `QuadraticIntegers`, start here:
+
+<div class="portal-links">
+  <div class="portal-card">
+    <h3>Blueprint</h3>
+    <p>Open <a href="blueprint.html">Blueprint</a> for the theorem roadmap, staged dependency layers, and reader paths through the project.</p>
+  </div>
+  <div class="portal-card">
+    <h3>API Atlas</h3>
+    <p>Open <a href="api.html">API Atlas</a> for the source-driven declaration map of <code>Lean/QuadraticNumberFields</code>.</p>
+  </div>
+  <div class="portal-card">
+    <h3>Generated Lean Docs</h3>
+    <p>Open <a href="docs/">docs</a> when you want searchable symbol pages and doc-comment lookup.</p>
+  </div>
+</div>
+
+<div class="portal-links">
+  <div class="portal-card">
+    <h3>Dependency Map</h3>
+    <p>Jump directly to <a href="api.html#module-dependency-map">module dependencies</a> to see how the proof layers stack.</p>
+  </div>
+  <div class="portal-card">
+    <h3>Declaration Atlas</h3>
+    <p>Jump directly to <a href="api.html#declaration-atlas">declaration tables</a> to inspect every named top-level declaration.</p>
+  </div>
+  <div class="portal-card">
+    <h3>Formalization Rationale</h3>
+    <p>Open <a href="formalization.html">Formalization Details</a> for the design choices behind the Lean architecture.</p>
+  </div>
+</div>
 
 ## Quick Links
 

@@ -32,6 +32,9 @@ jobs:
           bundler-cache: true
           working-directory: site
 
+      - name: Generate source-driven API atlas
+        run: bash scripts/build_docs.sh
+
       - name: Build Jekyll
         run: bundle exec jekyll build --destination ../_site --baseurl "${{ steps.pages.outputs.base_path }}"
         working-directory: site
