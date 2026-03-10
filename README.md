@@ -54,6 +54,21 @@ precisely when it equals the full ring of integers `𝓞 (ℚ(√d))`.
 - `Zsqrtd d` and `ZOnePlusSqrtOverTwo k` — the two candidate integral models
   (`RingOfIntegers/Zsqrtd.lean`, `RingOfIntegers/ZOnePlusSqrtOverTwo.lean`)
 
+## Module Organization
+
+The project is organized around a small number of medium-sized files. In the
+ring-of-integers development, closely related material is usually grouped into a
+single file and separated with `section`s, rather than split into many tiny
+modules.
+
+In particular:
+- `Integrality.lean` develops the main integrality transport and half-integer
+  normal form arguments.
+- `TraceNorm.lean` isolates the trace/norm preliminaries used by the
+  classification proofs.
+- `Classification.lean`, `Norm.lean`, and `Discriminant.lean` each collect one
+  main narrative, with internal `section`s for subresults.
+
 ## Mathematical Content
 
 This project formalizes:
@@ -94,12 +109,13 @@ QuadraticNumberFields/
 │           ├── CommonInstances.lean     # Fact instances for d = -1, -3, -5
 │           ├── Discriminant.lean        # Discriminant formula
 │           ├── HalfInt.lean             # Half-integer normal form (a'+b'√d)/2
-│           ├── Integrality.lean         # Integrality criteria via trace/norm
+│           ├── Integrality.lean         # Integrality transport and normal forms
 │           ├── ModFour.lean             # Modulo-4 arithmetic lemmas
 │           ├── Norm.lean                # Norm formulas and unit criteria
+│           ├── TraceNorm.lean           # Trace/norm integrality preliminaries
 │           ├── ZOnePlusSqrtOverTwo.lean # ℤ[(1+√d)/2] ring model
-│           ├── Zsqrtd.lean             # ℤ[√d] ring model and mathlib bridge
-│           ├── ZsqrtdIdeals.lean       # Ideal theory: membership, primality, quotients
+│           ├── Zsqrtd.lean              # ℤ[√d] ring model and mathlib bridge
+│           ├── ZsqrtdIdeals.lean        # Ideal theory: membership, primality, quotients
 │           └── ZsqrtdMathlibInstances.lean  # Dedekind domain for mathlib's ℤ√d
 ├── Verso/                 # Documentation generation (Verso/Subverso)
 └── site/                  # Jekyll website (GitHub Pages)
@@ -110,7 +126,7 @@ QuadraticNumberFields/
 
 | Module | Code Lines | Comment Lines | Total Lines |
 |--------|------------|---------------|-------------|
-| `QuadraticNumberFields/RingOfIntegers` | 1280 | 564 | 2209 |
+| `QuadraticNumberFields/RingOfIntegers` | 1280 | 564 | 2210 |
 | `QuadraticNumberFields` | 556 | 258 | 934 |
 | `QuadraticNumberFields/Examples` | 274 | 106 | 449 |
 | `QuadraticNumberFields/Euclidean` | 52 | 25 | 93 |

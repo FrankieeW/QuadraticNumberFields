@@ -75,6 +75,7 @@ theorem dvd_four_sub_sq_iff_exists_zOnePlusSqrtOverTwo_image_of_one_mod_four
       ∃ z : ZOnePlusSqrtOverTwo k,
         ZOnePlusSqrtOverTwo.toQsqrtdFun k z =
           halfInt (1 + 4 * k) a' b' := by
+          
   -- In the `1 mod 4` case, integrality is controlled by parity agreement
   -- of the two numerator coordinates, matching the carrier of `ℤ[(1 + √d)/2]`.
   have hd4 : (1 + 4 * k) % 4 = 1 :=
