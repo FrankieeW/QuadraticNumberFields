@@ -99,7 +99,14 @@ theorem dvd_four_sub_sq_of_exists_zOnePlusSqrtOverTwo_image_of_one_mod_four
     4 ∣ (a' ^ 2 - (1 + 4 * k) * b' ^ 2) :=
   (dvd_four_sub_sq_iff_exists_zOnePlusSqrtOverTwo_image_of_one_mod_four k a' b' hd).2 hz
 
-/-- Generic fact: the ring of integers is ring-isomorphic to any integral closure model. -/
+/-- **Generic fact**: the ring of integers `𝓞 K` is ring-isomorphic to any
+commutative ring `R` equipped with an `IsIntegralClosure R ℤ K` instance.
+
+This is the universal property of the integral closure, packaged as a `RingEquiv`.
+It is **not specific to quadratic fields**.
+
+**mathlib target: already in mathlib as `NumberField.RingOfIntegers.equiv`,
+but this wrapper with explicit algebra argument is more ergonomic.** -/
 theorem ringOfIntegers_equiv_of_integralClosure
     (K : Type*) [Field K] [NumberField K]
     (R : Type*) [CommRing R] [Algebra R K] [IsIntegralClosure R ℤ K] :
@@ -107,7 +114,13 @@ theorem ringOfIntegers_equiv_of_integralClosure
   -- The ring of integers is characterized by the integral-closure universal property.
   ⟨NumberField.RingOfIntegers.equiv (K := K) (R := R)⟩
 
-/-- Any image of an integral element under a ring hom remains integral over `ℤ`. -/
+/-- Any image of an integral element under a ring hom remains integral over `ℤ`.
+
+This is a **general integrality-transport lemma**: if `R` is an integral `ℤ`-algebra
+(i.e., every element of `R` is integral over `ℤ`), then ring homomorphisms preserve
+integrality. The proof uses `map_isIntegral_int`.
+
+**mathlib target: `Mathlib.RingTheory.IntegralClosure.IsIntegral`** -/
 private lemma isIntegral_of_intModel_image
     (R S : Type*) [CommRing R] [CommRing S]
     [Algebra.IsIntegral ℤ R] (φ : R →+* S) (z : R) :

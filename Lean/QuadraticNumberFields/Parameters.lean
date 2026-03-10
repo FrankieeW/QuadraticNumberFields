@@ -130,7 +130,14 @@ lemma nat_eq_one_of_squarefree_intcast_of_isSquare (m : ℕ)
   | inl h => exact_mod_cast h
   | inr h => simp only at h; omega
 
-/-- If `d₁/d₂` is a rational square and `d₂` is squarefree, then `d₂ ∣ d₁`. -/
+/-- If `d₁/d₂` is a rational square and `d₂` is squarefree, then `d₂ ∣ d₁`.
+
+This is a **general number-theoretic fact** about squarefree integers: if a
+squarefree integer divides the denominator of a reduced fraction that is a perfect
+square, then the denominator must be `1` (since its square part is constrained
+by squarefreeness).
+
+**mathlib target: `Mathlib.Data.Int.Squarefree` or `Mathlib.Data.Rat.Squarefree`** -/
 lemma int_dvd_of_ratio_square (d₁ d₂ : ℤ) (hd₂ : d₂ ≠ 0)
     (hsq_d₂ : Squarefree d₂) (hr : IsSquare ((d₁ : ℚ) / (d₂ : ℚ))) : d₂ ∣ d₁ := by
   -- A rational square has square numerator and denominator.
@@ -149,7 +156,14 @@ lemma int_dvd_of_ratio_square (d₁ d₂ : ℤ) (hd₂ : d₂ ≠ 0)
   exact (Rat.den_div_intCast_eq_one_iff d₁ d₂ hd₂).1 hden1_nat
 
 /-- If two squarefree integers are related by `d₁ = d₂ · r²` for rational `r`,
-then `d₁ = d₂`. -/
+then `d₁ = d₂`.
+
+This is a **key rigidity result for squarefree integers**: two squarefree integers
+that differ by a rational square factor must be equal. The proof reduces to mutual
+divisibility via `int_dvd_of_ratio_square`, yielding `d₁ ∣ d₂` and `d₂ ∣ d₁`.
+The sign ambiguity is resolved by the fact that `-1` is not a rational square.
+
+**mathlib target: `Mathlib.Data.Int.Squarefree`** -/
 lemma squarefree_eq_of_rat_sq_mul {d₁ d₂ : ℤ}
     (hd₁ : Squarefree d₁) (hd₂ : Squarefree d₂)
     {r : ℚ} (hr : (d₁ : ℚ) = d₂ * r ^ 2) : d₁ = d₂ := by

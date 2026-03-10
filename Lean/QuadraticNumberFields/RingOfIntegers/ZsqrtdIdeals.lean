@@ -60,14 +60,24 @@ variable (d : ℤ)
 -- Utility lemmas
 -- ============================================================================
 
-/-- If `a` divides every element of `S`, then `span S ≤ span {a}`. -/
+/-- If `a` divides every element of `S`, then `Ideal.span S ≤ Ideal.span {a}`.
+
+This is a **general ideal-lattice lemma** for any commutative semiring —
+it has nothing to do with `ℤ[√d]` and would be useful throughout ring theory.
+
+**mathlib target: `Mathlib.RingTheory.Ideal.Operations`** -/
 theorem span_le_span_singleton_of_forall_dvd
     {α : Type*} [CommSemiring α] {a : α} {S : Set α}
     (h : ∀ x ∈ S, a ∣ x) :
     Ideal.span S ≤ Ideal.span {a} :=
   Ideal.span_le.2 fun x hx => Ideal.mem_span_singleton.mpr (h x hx)
 
-/-- An ideal whose absolute norm is a prime number is a prime ideal. -/
+/-- An ideal whose absolute norm is a prime number is a prime ideal.
+
+This is a **general fact for Dedekind domains** — an ideal with prime norm
+is irreducible in the ideal monoid, hence prime by unique factorization of ideals.
+
+**mathlib target: `Mathlib.RingTheory.DedekindDomain.Ideal`** -/
 theorem ideal_of_prime_norm_is_prime {R : Type*} [CommRing R] [IsDedekindDomain R]
     [Module.Free ℤ R] (I : Ideal R) (hI : I.absNorm.Prime) : I.IsPrime :=
   Ideal.isPrime_of_irreducible_absNorm hI
@@ -83,7 +93,14 @@ lemma map_span_int_singleton (n : ℤ) :
 -- ============================================================================
 
 /-- The fundamental identity for `re + im` of a product in `ℤ[√d]`:
-`(a*b).re + (a*b).im = (a.re + a.im) * (b.re + b.im) + (d - 1) * a.im * b.im`. -/
+`(a*b).re + (a*b).im = (a.re + a.im) * (b.re + b.im) + (d - 1) * a.im * b.im`.
+
+This identity is purely algebraic in the multiplication law of `QuadraticAlgebra ℤ d 0`.
+It shows that the "augmentation" map `z ↦ z.re + z.im` is *almost* multiplicative,
+with a correction term proportional to `d - 1`. When `p ∣ (d - 1)`, the correction
+vanishes mod `p`, making the augmentation a ring hom `ℤ[√d] → ℤ/pℤ`.
+
+**mathlib target: `Mathlib.NumberTheory.Zsqrtd.Basic`** -/
 lemma mul_re_add_im_eq (a b : Zsqrtd d) :
     (a * b).re + (a * b).im =
       (a.re + a.im) * (b.re + b.im) + (d - 1) * a.im * b.im := by

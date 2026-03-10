@@ -148,7 +148,19 @@ end ParamLevel
 
 /-! ## Unit Criterion -/
 
-private theorem isUnit_iff_norm_eq_one_or_neg_one
+/-- **Unit criterion for quadratic algebras over `ℤ`.**
+
+An element `z` of `QuadraticAlgebra ℤ a b` is a unit if and only if `N(z) = ±1`.
+This is a general fact: in any quadratic algebra over a PID, the norm is multiplicative,
+so `z · z⁻¹ = 1` implies `N(z) · N(z⁻¹) = 1`, forcing `N(z)` to be a unit of `ℤ`,
+i.e., `±1`. The converse uses the explicit formula `z · z̄ = N(z)`.
+
+This works for *any* `QuadraticAlgebra ℤ a b`, not just the two quadratic orders
+`ℤ[√d]` and `ℤ[(1+√d)/2]`.
+
+**mathlib target: `Mathlib.Algebra.QuadraticAlgebra.Basic` or
+`Mathlib.NumberTheory.NumberField.Units`** -/
+theorem isUnit_iff_norm_eq_one_or_neg_one
     {a b : ℤ} (z : QuadraticAlgebra ℤ a b) :
     IsUnit z ↔ QuadraticAlgebra.norm z = 1 ∨ QuadraticAlgebra.norm z = -1 := by
   constructor
@@ -163,17 +175,20 @@ private theorem isUnit_iff_norm_eq_one_or_neg_one
     · exact QuadraticAlgebra.isUnit_iff_norm_isUnit.mpr (h1 ▸ isUnit_one)
     · exact QuadraticAlgebra.isUnit_iff_norm_isUnit.mpr (hneg1 ▸ isUnit_neg_one)
 
-/-- An element of `Zsqrtd d` is a unit iff its norm is `±1`.
+/-- An element of `ℤ[√d]` is a unit iff its norm is `±1`.
 
-**Proof sketch:**
-* (⟹) If `z` is a unit with inverse `w`, then `1 = N(1) = N(z·w) = N(z)·N(w)`.
-  Thus `N(z)` divides `1` in `ℤ`, so `N(z) = ±1`.
-* (⟸) If `N(z) = ±1`, then `z · conj(z) = N(z) = ±1`, so `z` is a unit. -/
+Special case of `isUnit_iff_norm_eq_one_or_neg_one` for `b = 0`.
+
+**mathlib target: `Mathlib.NumberTheory.Zsqrtd.Basic`** -/
 theorem isUnit_zsqrtd_iff_norm_eq_one_or_neg_one (d : ℤ) (z : Zsqrtd d) :
     IsUnit z ↔ Zsqrtd.norm z = 1 ∨ Zsqrtd.norm z = -1 :=
   by simpa using isUnit_iff_norm_eq_one_or_neg_one z
 
-/-- An element of `ZOnePlusSqrtOverTwo k` is a unit iff its norm is `±1`. -/
+/-- An element of `ℤ[(1+√(1+4k))/2]` is a unit iff its norm is `±1`.
+
+Special case of `isUnit_iff_norm_eq_one_or_neg_one` for `b = 1`.
+
+**mathlib target: `Mathlib.NumberTheory.QuadraticField.RingOfIntegers`** -/
 theorem isUnit_zOnePlusSqrtOverTwo_iff_norm_eq_one_or_neg_one
     (k : ℤ) (z : ZOnePlusSqrtOverTwo k) :
     IsUnit z ↔ QuadraticAlgebra.norm z = 1 ∨ QuadraticAlgebra.norm z = -1 :=

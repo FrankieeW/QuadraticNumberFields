@@ -37,10 +37,20 @@ open Matrix
 namespace QuadraticNumberFields
 namespace RingOfIntegers
 
-/-! ## Trace formula for QuadraticAlgebra over ℤ -/
+/-! ## Trace formula for QuadraticAlgebra over ℤ
+
+The following results compute the algebraic trace, trace matrix, and discriminant
+for any `QuadraticAlgebra ℤ a b`. These are **general structural results** about
+the standard basis `{1, ω}` of any quadratic algebra, not specific to the
+quadratic-field setting.
+
+**mathlib target: `Mathlib.Algebra.QuadraticAlgebra.Basic`** — these would
+naturally live alongside the definition of `QuadraticAlgebra` and its basis. -/
 
 /-- The left-multiplication matrix of `x : QuadraticAlgebra ℤ a b` with respect to
-the standard basis `{1, ω}` is `[[x.re, a * x.im], [x.im, x.re + b * x.im]]`. -/
+the standard basis `{1, ω}` is `[[x.re, a * x.im], [x.im, x.re + b * x.im]]`.
+
+**mathlib target: `Mathlib.Algebra.QuadraticAlgebra.Basic`** -/
 theorem leftMulMatrix_qa (a b : ℤ) (x : QuadraticAlgebra ℤ a b) :
     Algebra.leftMulMatrix (QuadraticAlgebra.basis a b) x =
       !![x.re, a * x.im; x.im, x.re + b * x.im] := by
@@ -73,7 +83,12 @@ theorem traceMatrix_qa (a b : ℤ) :
   fin_cases i <;> fin_cases j <;>
     simp [trace_qa, QuadraticAlgebra.basis]; ring
 
-/-- The discriminant of the standard basis of `QuadraticAlgebra ℤ a b` is `4a + b²`. -/
+/-- The discriminant of the standard basis of `QuadraticAlgebra ℤ a b` is `4a + b²`.
+
+For `b = 0` (the `ℤ[√a]` model) this gives `4a`; for `b = 1` (the `ℤ[ω]` model
+with `ω² = ω + a`) it gives `4a + 1 = 1 + 4a`.
+
+**mathlib target: `Mathlib.Algebra.QuadraticAlgebra.Basic`** -/
 theorem discr_qa_basis (a b : ℤ) :
     Algebra.discr ℤ (QuadraticAlgebra.basis a b) = 4 * a + b ^ 2 := by
   rw [Algebra.discr_def, traceMatrix_qa]
@@ -101,7 +116,14 @@ section ParamLevel
 variable (d : ℤ) [Fact (Squarefree d)] [Fact (d ≠ 1)]
 
 /-- Lift a `RingEquiv` to an `AlgEquiv ℤ` using the uniqueness of the
-ring homomorphism `ℤ → R` for any ring `R`. -/
+ring homomorphism `ℤ → R` for any ring `R`.
+
+This is a **general categorical fact**: since `ℤ` is initial in the category of
+rings (there is exactly one `ℤ → R` for any ring `R`), any ring isomorphism
+automatically respects the `ℤ`-algebra structure.
+
+**mathlib target: `Mathlib.Algebra.Algebra.Basic` or
+`Mathlib.RingTheory.IntegralClosure.IsIntegralClosure`** -/
 def ringEquivToIntAlgEquiv
     {R S : Type*} [CommRing R] [Algebra ℤ R] [CommRing S] [Algebra ℤ S]
     (e : R ≃+* S) : R ≃ₐ[ℤ] S :=

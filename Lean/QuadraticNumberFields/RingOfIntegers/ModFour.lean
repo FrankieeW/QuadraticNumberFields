@@ -40,7 +40,9 @@ which determines whether `𝓞(Q(√d))` is `ℤ[√d]` or `ℤ[(1+√d)/2]`.
 namespace QuadraticNumberFields
 namespace RingOfIntegers
 
-/-- A squarefree integer is not divisible by `4`. -/
+/-- A squarefree integer is not divisible by `4`.
+
+**mathlib target: `Mathlib.Algebra.Squarefree.Basic`** -/
 lemma squarefree_int_not_dvd_four (d : ℤ) (hd : Squarefree d) : ¬ (4 : ℤ) ∣ d := by
   intro h
   have h22 : (2 : ℤ) * 2 ∣ d := by
@@ -55,13 +57,21 @@ lemma squarefree_int_emod_four (d : ℤ) (hd : Squarefree d) :
   have hnd : ¬ (4 : ℤ) ∣ d := squarefree_int_not_dvd_four d hd
   omega
 
-/-- The square of an even integer is `0 mod 4`. -/
+/-- The square of an even integer is `0 mod 4`.
+
+This is a pure modular-arithmetic fact: `(2k)² = 4k² ≡ 0 (mod 4)`.
+
+**mathlib target: `Mathlib.Data.Int.ModCast` or `Mathlib.Data.ZMod.Basic`** -/
 lemma Int.sq_emod_four_of_even (n : ℤ) (h : 2 ∣ n) : n ^ 2 % 4 = 0 := by
   obtain ⟨k, rfl⟩ := h
   ring_nf
   omega
 
-/-- The square of an odd integer is `1 mod 4`. -/
+/-- The square of an odd integer is `1 mod 4`.
+
+This is a pure modular-arithmetic fact: `(2k+1)² = 4k²+4k+1 ≡ 1 (mod 4)`.
+
+**mathlib target: `Mathlib.Data.Int.ModCast` or `Mathlib.Data.ZMod.Basic`** -/
 lemma Int.sq_emod_four_of_odd (n : ℤ) (h : ¬ 2 ∣ n) : n ^ 2 % 4 = 1 := by
   set k := n / 2
   have hk : n = 2 * k + 1 := by omega
@@ -119,7 +129,14 @@ private lemma mod_four_eq_one_of_odd_odd_of_mod_eq_zero
   ring_nf at hmod'
   omega
 
-/-- Main mod-4 criterion for `4 ∣ a'² - d*b'²`. -/
+/-- **Main mod-4 criterion for the binary quadratic form `a'² − d·b'²`.**
+
+`4 ∣ (a'² − d·b'²)` if and only if either both `a', b'` are even, or both are odd
+and `d ≡ 1 (mod 4)`. This is the key arithmetic fact driving the classification of
+rings of integers: it determines whether the half-integer `(a' + b'√d)/2` can be
+integral.
+
+**mathlib target: `Mathlib.NumberTheory.QuadraticField.RingOfIntegers`** -/
 theorem dvd_four_sub_sq_iff_even_even_or_odd_odd_mod_four_one (d a' b' : ℤ) (hd : Squarefree d) :
     4 ∣ (a' ^ 2 - d * b' ^ 2) ↔
       (2 ∣ a' ∧ 2 ∣ b') ∨ (¬ 2 ∣ a' ∧ ¬ 2 ∣ b' ∧ d % 4 = 1) := by
