@@ -4,7 +4,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LEAN_ROOT="$REPO_ROOT/Lean"
-BLUEPRINT_ROOT="$LEAN_ROOT/blueprint"
+BLUEPRINT_ROOT="$REPO_ROOT/blueprint"
 BUILD_ROOT="$(mktemp -d)"
 
 cleanup() {
@@ -18,7 +18,11 @@ if ! command -v uv >/dev/null 2>&1; then
   exit 1
 fi
 
-if [ ! -d "$BLUEPRINT_ROOT/.venv" ]; then
+EXPECTED_VENV="VIRTUAL_ENV='$BLUEPRINT_ROOT/.venv'"
+if [ ! -x "$BLUEPRINT_ROOT/.venv/bin/python3" ] || \
+   [ ! -f "$BLUEPRINT_ROOT/.venv/bin/activate" ] || \
+   ! grep -Fq "$EXPECTED_VENV" "$BLUEPRINT_ROOT/.venv/bin/activate"; then
+  rm -rf "$BLUEPRINT_ROOT/.venv"
   uv venv "$BLUEPRINT_ROOT/.venv" --python 3.12
 fi
 
@@ -48,13 +52,13 @@ git -C "$BUILD_ROOT" init >/dev/null 2>&1
 cd "$BUILD_ROOT"
 leanblueprint web
 
-rm -rf "$BLUEPRINT_ROOT/web"
+rm -rf "$BLUEPRINT_ROOT/web" "$BLUEPRINT_ROOT/src/web"
+
 if [ -d "$BUILD_ROOT/blueprint/web" ]; then
   cp -R "$BUILD_ROOT/blueprint/web" "$BLUEPRINT_ROOT/"
 elif [ -d "$BUILD_ROOT/blueprint/src/web" ]; then
-  mkdir -p "$BLUEPRINT_ROOT/src"
-  rm -rf "$BLUEPRINT_ROOT/src/web"
-  cp -R "$BUILD_ROOT/blueprint/src/web" "$BLUEPRINT_ROOT/src/"
+  rm -rf "$BLUEPRINT_ROOT/web"
+  cp -R "$BUILD_ROOT/blueprint/src/web" "$BLUEPRINT_ROOT/web"
 else
   echo "Blueprint build succeeded but no web output directory was found." >&2
   exit 1

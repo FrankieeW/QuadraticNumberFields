@@ -66,13 +66,13 @@ jobs:
       - name: Stage blueprint into Pages artifact
         run: |
           mkdir -p _site/blueprint
-          if [ -d Lean/blueprint/web ] && [ "$(find Lean/blueprint/web -type f | wc -l)" -gt 0 ]; then
-            cp -R Lean/blueprint/web/. _site/blueprint/
-          elif [ -d Lean/blueprint/src/web ] && [ "$(find Lean/blueprint/src/web -type f | wc -l)" -gt 0 ]; then
-            cp -R Lean/blueprint/src/web/. _site/blueprint/
+          if [ -d blueprint/web ] && [ "$(find blueprint/web -type f | wc -l)" -gt 0 ]; then
+            cp -R blueprint/web/. _site/blueprint/
+          elif [ -d blueprint/src/web ] && [ "$(find blueprint/src/web -type f | wc -l)" -gt 0 ]; then
+            cp -R blueprint/src/web/. _site/blueprint/
           else
             echo "No non-empty blueprint site directory found."
-            find Lean/blueprint -maxdepth 4 -type f | sed -n '1,200p'
+            find blueprint -maxdepth 4 -type f | sed -n '1,200p'
             exit 1
           fi
 
