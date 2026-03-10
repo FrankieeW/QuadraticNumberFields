@@ -158,3 +158,7 @@ Before syncing, verify:
 
 - **Preserve** `-- ANCHOR: name --` and `-- ANCHOR_END:` comments — they mark sections extracted for website documentation
 - Do not remove or modify these anchor comments
+
+## Lean 4 & mathlib Style
+
+Use the `lean4` and `mathlib-style` skills.
