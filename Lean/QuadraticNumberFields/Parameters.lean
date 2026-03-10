@@ -191,6 +191,8 @@ variable (d₁ d₂ : ℤ)
     `ℚ(√d₁) ≃ₐ[ℚ] ℚ(√d₂)` with both squarefree and `≠ 1` implies `d₁ = d₂`. -/
 theorem Qsqrtd.param_unique (φ : Qsqrtd (d₁ : ℚ) ≃ₐ[ℚ] Qsqrtd (d₂ : ℚ))
     (hsf₁ : Squarefree d₁) (h1₁ : d₁ ≠ 1) (hsf₂ : Squarefree d₂) : d₁ = d₂ := by
+  -- The idea is to write `φ ⟨0, 1⟩ = ⟨a, b⟩`
+  -- ⟨0, 1⟩² = ⟨d₁, 0⟩ implies `a² + d₂ b² = d₁` and `2ab = 0`.
   set a := (φ ⟨0, 1⟩).re
   set b := (φ ⟨0, 1⟩).im
   have hε_sq : (⟨0, 1⟩ : Qsqrtd (d₁ : ℚ)) * ⟨0, 1⟩ = ⟨(d₁ : ℚ), 0⟩ := by
