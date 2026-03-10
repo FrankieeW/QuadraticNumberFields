@@ -48,6 +48,8 @@ private theorem ringOfIntegers_equiv_of_embedding
     (h_exists : ∀ x : K, IsIntegral ℤ x → ∃ z : R, φ z = x)
     (h_integral : ∀ z : R, IsIntegral ℤ (φ z)) :
     Nonempty (𝓞 K ≃+* R) := by
+  -- The hypotheses say precisely that the image of `R` inside `K`
+  -- is the full integral closure of `ℤ` in `K`.
   letI : Algebra R K := φ.toAlgebra
   letI : IsIntegralClosure R ℤ K :=
     { algebraMap_injective := by
@@ -73,6 +75,8 @@ theorem ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one (hd4 : d % 4 ≠ 1) :
     Nonempty (𝓞 (Qsqrtd (d : ℚ)) ≃+* Zsqrtd d) := by
   have hd_sf : Squarefree d := Fact.out
   have hd_ne : d ≠ 1 := Fact.out
+  -- In this branch every integral element lifts to `ℤ[√d]`, and every element
+  -- of `ℤ[√d]` is integral, so `ℤ[√d]` is the integral closure.
   exact ringOfIntegers_equiv_of_embedding (Qsqrtd (d : ℚ)) (Zsqrtd d)
     (Zsqrtd.toQsqrtdHom d)
     (Zsqrtd.toQsqrtdHom_injective d)
@@ -129,11 +133,15 @@ theorem not_isDedekindDomain_zsqrtd_of_mod_four_eq_one
   intro hDed
   letI : IsDedekindDomain (Zsqrtd d) := hDed
   letI : Module (Zsqrtd d) (Zsqrtd d) := Semiring.toModule
+  -- A Dedekind domain is integrally closed in its fraction field, so to get
+  -- a contradiction it suffices to exhibit an integral element missing from `ℤ[√d]`.
   have hIC : IsIntegrallyClosed (Zsqrtd d) := IsDedekindRing.toIsIntegralClosure
   letI : IsIntegrallyClosed (Zsqrtd d) := hIC
   rcases exists_k_of_mod_four_eq_one (d := d) hd4 with ⟨k, hk⟩
   subst hk
   let x : Qsqrtd (((1 + 4 * k : ℤ) : ℚ)) := halfInt (1 + 4 * k) 1 1
+  -- The witness is `x = (1 + √d)/2`, which is integral because it lies in
+  -- the larger order `ℤ[(1 + √d)/2]`.
   have hx_def :
       x = _root_.ZOnePlusSqrtOverTwo.toQsqrtdFun k (⟨0, 1⟩ : _root_.ZOnePlusSqrtOverTwo k) := by
     ext <;> simp [x, halfInt, _root_.ZOnePlusSqrtOverTwo.toQsqrtdFun]
@@ -144,6 +152,8 @@ theorem not_isDedekindDomain_zsqrtd_of_mod_four_eq_one
   have hx_integral : IsIntegral (Zsqrtd (1 + 4 * k)) x := hx_integral_Z.tower_top
   rcases (isIntegrallyClosed_iff (Qsqrtd (((1 + 4 * k : ℤ) : ℚ)))).mp hIC hx_integral with
     ⟨z, hz⟩
+  -- If `x` were in `ℤ[√d]`, the half-integer criterion would force both
+  -- numerators `1, 1` to be even, impossible.
   have h_even : 2 ∣ (1 : ℤ) ∧ 2 ∣ (1 : ℤ) :=
     (Zsqrtd.halfInt_mem_range_toQsqrtdHom_iff_even_even (1 + 4 * k) 1 1).mp
       ⟨z, by
@@ -172,6 +182,8 @@ theorem ringOfIntegers_equiv_zOnePlusSqrtOverTwo_of_mod_four_eq_one
   refine ⟨k, hk, ?_⟩
   subst hk
   have hd_ne' : (1 + 4 * k) ≠ 1 := hd_ne
+  -- In the `1 mod 4` branch the previous integrality criterion identifies
+  -- the full integral closure with `ℤ[(1 + √d)/2]`.
   exact ringOfIntegers_equiv_of_embedding
     (Qsqrtd (((1 + 4 * k : ℤ) : ℚ))) (ZOnePlusSqrtOverTwo k)
     (_root_.ZOnePlusSqrtOverTwo.toQsqrtdHom k)
@@ -195,6 +207,8 @@ theorem ringOfIntegers_classification
       Nonempty (𝓞 (Qsqrtd (d : ℚ)) ≃+* Zsqrtd d)) ∨
     (∃ k : ℤ, d = 1 + 4 * k ∧
       Nonempty (𝓞 (Qsqrtd (d : ℚ)) ≃+* ZOnePlusSqrtOverTwo k)) := by
+  -- The congruence class of `d mod 4` gives the two mutually exclusive shapes
+  -- of the quadratic order.
   by_cases hd4 : d % 4 = 1
   · exact Or.inr <| ringOfIntegers_equiv_zOnePlusSqrtOverTwo_of_mod_four_eq_one d hd4
   · exact Or.inl ⟨hd4, ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one d hd4⟩

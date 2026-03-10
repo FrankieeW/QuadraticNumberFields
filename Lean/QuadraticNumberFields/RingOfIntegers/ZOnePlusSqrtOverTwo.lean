@@ -57,6 +57,8 @@ abbrev qParam (d : ℤ) : ℚ := Qsqrtd.d_of_k d
 
 /-- Coordinate-level embedding candidate into `Q(√(1 + 4d))`. -/
 def toQsqrtdFun (d : ℤ) : ZOnePlusSqrtOverTwo d → Qsqrtd (qParam d) :=
+  -- Send `r + sω` to `r + s * (1 + √(1 + 4d)) / 2`,
+  -- so the real coordinate is `r + s/2` and the `√d`-coordinate is `s/2`.
   fun x => ⟨(x.re : ℚ) + (x.im : ℚ) / 2, (x.im : ℚ) / 2⟩
 
 /-- Coordinate-level embedding as a ring hom into `Q(√(1 + 4d))`. -/
@@ -65,6 +67,8 @@ def toQsqrtdHom (d : ℤ) : ZOnePlusSqrtOverTwo d →+* Qsqrtd (qParam d) where
   map_one' := by
     ext <;> simp [toQsqrtdFun, QuadraticAlgebra.re_one, QuadraticAlgebra.im_one]
   map_mul' := by
+    -- The multiplication formulas agree because `ω² = ω + d`,
+    -- which is exactly the relation defining `QuadraticAlgebra ℤ d 1`.
     intro x y
     ext <;>
       simp [toQsqrtdFun, qParam, Qsqrtd.d_of_k,
@@ -82,6 +86,8 @@ def toQsqrtdHom (d : ℤ) : ZOnePlusSqrtOverTwo d →+* Qsqrtd (qParam d) where
 /-- The canonical map `toQsqrtdHom` is injective. -/
 theorem toQsqrtdHom_injective (d : ℤ) : Function.Injective (toQsqrtdHom d) := by
   intro x y hxy
+  -- Equality of images first identifies the `ω`-coefficients from the imaginary parts,
+  -- then the constant terms from the real parts.
   have himHalf : (x.im : ℚ) / 2 = (y.im : ℚ) / 2 := by
     simpa [toQsqrtdHom, toQsqrtdFun] using congrArg QuadraticAlgebra.im hxy
   have himQ : (x.im : ℚ) = (y.im : ℚ) := by
@@ -105,6 +111,8 @@ theorem halfInt_mem_carrierSet_iff_same_parity (k a' b' : ℤ) :
       a' % 2 = b' % 2 := by
   constructor
   · rintro ⟨z, hz⟩
+    -- If `(a' + b'√d)/2 = r + sω`, then necessarily `s = b'`
+    -- and `a' = 2r + b'`, so `a'` and `b'` have the same parity.
     have him : z.im / 2 = (b' : ℚ) / 2 := by
       simpa [toQsqrtdFun, QuadraticNumberFields.RingOfIntegers.halfInt] using
         congrArg QuadraticAlgebra.im hz
@@ -120,6 +128,8 @@ theorem halfInt_mem_carrierSet_iff_same_parity (k a' b' : ℤ) :
     have ha' : 2 * z.re + b' = a' := by simpa [hb] using ha
     omega
   · intro hpar
+    -- Conversely, same parity means `a' - b' = 2t`, so
+    -- `(a' + b'√d)/2 = t + b' * ω`.
     have hmod : (a' - b') % 2 = 0 := by
       omega
     have hdiv : (2 : ℤ) ∣ (a' - b') := Int.dvd_iff_emod_eq_zero.mpr hmod
