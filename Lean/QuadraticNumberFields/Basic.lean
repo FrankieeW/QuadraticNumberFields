@@ -46,18 +46,20 @@ open QuadraticAlgebra
 
 variable {d : ℚ}
 
-/-- The canonical embedding of ℚ into `Q(√d)`, mapping `r ↦ r + 0·√d`. -/
-abbrev embed (r : ℚ) : Qsqrtd d := algebraMap ℚ (Qsqrtd d) r
-
-/-- The left multiplication matrix of an element in `Qsqrtd d` with respect to the basis `{1, √d}`.
-This is a local version until `QuadraticAlgebra.leftMulMatrix_eq` is merged into mathlib. -/
-private theorem leftMulMatrix_eq (x : Qsqrtd d) :
-    Algebra.leftMulMatrix (QuadraticAlgebra.basis d 0) x = !![x.re, d * x.im; x.im, x.re] := by
+section CommSemiring
+variable [CommSemiring R]
+/-- The left multiplication matrix of an element in `QuadraticAlgebra R a b`
+with respect to the basis `{1, i}`.
+PR#36347 this theorem will be in QuadraticAlgebra.Defs.lean -/
+theorem leftMulMatrix_eq (x : QuadraticAlgebra R a b) :
+    Algebra.leftMulMatrix (basis a b) x = !![x.re, a * x.im; x.im, x.re + b * x.im] := by
   ext i j
   fin_cases i <;> fin_cases j
   all_goals
     rw [Algebra.leftMulMatrix_apply, LinearMap.toMatrix_apply]
     simp [QuadraticAlgebra.basis]
+
+end CommSemiring
 
 /-- The trace in `Q(√d)` is `x.re + x̄.re`. -/
 @[simp] theorem trace_eq_re_add_re_star (x : Qsqrtd d) :
