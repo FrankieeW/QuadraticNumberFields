@@ -24,6 +24,17 @@ Thumbs.db
 docbuild/
 _site/
 
+# Blueprint build artifacts
+Lean/blueprint/web/
+Lean/blueprint/print/
+Lean/blueprint/lean_decls/
+Lean/blueprint/.venv/
+Lean/blueprint/src/web.paux
+Lean/blueprint/src/web.bbl
+Lean/blueprint/src/print.pdf
+Lean/blueprint/src/blueprint.sty
+Lean/blueprint/src/extra_styles.css
+
 # Ruby/Bundler
 site/Gemfile.lock
 site/vendor/
