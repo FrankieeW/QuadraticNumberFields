@@ -120,7 +120,8 @@ end Qsqrtd
 
 /-- A squarefree integer that is a perfect square must equal `1` or `-1`.
 This is a local version until `Squarefree.isUnit_of_isSquare` is merged into mathlib. -/
-lemma eq_one_of_squarefree_isSquare {d : ℤ} (hd : Squarefree d) (hsq : IsSquare d) : d = 1 ∨ d = -1 := by
+lemma eq_one_of_squarefree_isSquare {d : ℤ} (hd : Squarefree d) (hsq : IsSquare d) :
+    d = 1 ∨ d = -1 := by
   obtain ⟨z, rfl⟩ := hsq
   have hsqz2 : Squarefree (z ^ 2) := by simpa [pow_two] using hd
   have huz : IsUnit z := by

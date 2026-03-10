@@ -122,7 +122,7 @@ lemma nat_eq_one_of_squarefree_intcast_of_isSquare (m : ℕ)
     eq_one_of_squarefree_isSquare hsm hsq
   cases hmz with
   | inl h => exact_mod_cast h
-  | inr h => simp only [Int.cast_neg] at h; omega
+  | inr h => simp only at h; omega
 
 /-- If `d₁/d₂` is a rational square and `d₂` is squarefree, then `d₂ ∣ d₁`. -/
 lemma int_dvd_of_ratio_square (d₁ d₂ : ℤ) (hd₂ : d₂ ≠ 0)
@@ -185,16 +185,12 @@ lemma squarefree_eq_of_rat_sq_mul {d₁ d₂ : ℤ}
 
 section ParamLevel
 
-variable (d₁ d₂ : ℤ) [Fact (Squarefree d₁)] [Fact (d₁ ≠ 1)]
-  [Fact (Squarefree d₂)] [Fact (d₂ ≠ 1)]
+variable (d₁ d₂ : ℤ)
 
 /-- The squarefree integer parameter of a quadratic field is unique:
     `ℚ(√d₁) ≃ₐ[ℚ] ℚ(√d₂)` with both squarefree and `≠ 1` implies `d₁ = d₂`. -/
-theorem Qsqrtd.param_unique (φ : Qsqrtd (d₁ : ℚ) ≃ₐ[ℚ] Qsqrtd (d₂ : ℚ)) : d₁ = d₂ := by
-  have hsf₁ : Squarefree d₁ := Fact.out
-  have h1₁ : d₁ ≠ 1 := Fact.out
-  have hsf₂ : Squarefree d₂ := Fact.out
-  have _h1₂ : d₂ ≠ 1 := Fact.out
+theorem Qsqrtd.param_unique (φ : Qsqrtd (d₁ : ℚ) ≃ₐ[ℚ] Qsqrtd (d₂ : ℚ))
+    (hsf₁ : Squarefree d₁) (h1₁ : d₁ ≠ 1) (hsf₂ : Squarefree d₂) : d₁ = d₂ := by
   set a := (φ ⟨0, 1⟩).re
   set b := (φ ⟨0, 1⟩).im
   have hε_sq : (⟨0, 1⟩ : Qsqrtd (d₁ : ℚ)) * ⟨0, 1⟩ = ⟨(d₁ : ℚ), 0⟩ := by
