@@ -72,16 +72,14 @@ section FieldLevel
 
 /-- **Generic fact**: the ring of integers `𝓞 K` is ring-isomorphic to any
 commutative ring `R` equipped with an `IsIntegralClosure R ℤ K` instance. -/
-@[nolint unusedArguments]
 theorem ringOfIntegers_equiv_of_integralClosure
-    (K : Type*) [Field K] [NumberField K]
-    (R : Type*) [CommRing R] [Algebra R K] [IsIntegralClosure R ℤ K] :
+    (K : Type*) [Field K] (R : Type*) [CommRing R] [Algebra R K] [IsIntegralClosure R ℤ K] :
     Nonempty (𝓞 K ≃+* R) :=
   ⟨NumberField.RingOfIntegers.equiv (K := K) (R := R)⟩
 
 /-- **General criterion for identifying the ring of integers.** -/
 theorem ringOfIntegers_equiv_of_embedding
-    (K : Type*) [Field K] [NumberField K]
+    (K : Type*) [Field K]
     (R : Type*) [CommRing R]
     (φ : R →+* K)
     (h_inj : Function.Injective φ)
@@ -153,7 +151,8 @@ isomorphism.
 theorem isDedekindDomain_zsqrtd_of_mod_four_ne_one (hd4 : d % 4 ≠ 1) :
     IsDedekindDomain (Zsqrtd d) := by
   rcases ringOfIntegers_equiv_zsqrtd_of_mod_four_ne_one d hd4 with ⟨e⟩
-  letI : IsDedekindDomain (𝓞 (Qsqrtd (d : ℚ))) := inferInstance
+  -- letI : IsDedekindDomain (𝓞 (Qsqrtd (d : ℚ))) := inferInstance
+  -- Instance : `IsDedekindDomain (𝓞 (Qsqrtd (d : ℚ)))`
   exact RingEquiv.isDedekindDomain e
 
 /-- If `d % 4 = 1`, then `ℤ[√d]` is **not** a Dedekind domain.
@@ -191,26 +190,26 @@ theorem not_isDedekindDomain_zsqrtd_of_mod_four_eq_one
     · norm_num
     · ext
       · simp only [Nat.cast_mul, map_mul, map_natCast, QuadraticAlgebra.re_mul,
-          QuadraticAlgebra.re_natCast, QuadraticAlgebra.im_natCast, mul_zero, add_zero,
+           QuadraticAlgebra.im_natCast, mul_zero, add_zero,
           QuadraticAlgebra.im_mul, zero_mul]
         calc
           z.re * (↑z.re.den * ↑z.im.den) = z.re * (z.re.den : ℚ) * z.im.den := by ring
           _ = ((z.re.num : ℤ) : ℚ) * z.im.den := by rw [Rat.mul_den_eq_num]
           _ = (((z.re.num : ℤ) * z.im.den : ℤ) : ℚ) := by norm_num
       · simp only [Nat.cast_mul, map_mul, map_natCast, QuadraticAlgebra.im_mul,
-          QuadraticAlgebra.re_natCast, QuadraticAlgebra.im_natCast, mul_zero, zero_mul,
+           QuadraticAlgebra.im_natCast, mul_zero, zero_mul,
           add_zero, QuadraticAlgebra.re_mul, zero_add]
         calc
           z.im * (↑z.re.den * ↑z.im.den) = z.im * (z.im.den : ℚ) * z.re.den := by ring
           _ = ((z.im.num : ℤ) : ℚ) * z.re.den := by rw [Rat.mul_den_eq_num]
           _ = (((z.im.num : ℤ) * z.re.den : ℤ) : ℚ) := by norm_num
-  letI : IsFractionRing (Zsqrtd d) (Qsqrtd (d : ℚ)) := hFrac
-  intro hDed
-  letI : IsDedekindDomain (Zsqrtd d) := hDed
-  letI : Module (Zsqrtd d) (Zsqrtd d) := Semiring.toModule
+  -- Instances (auto-derived):
+  --   letI : IsFractionRing (Zsqrtd d) (Qsqrtd (d : ℚ)) := hFrac
+  --   letI : IsDedekindDomain (Zsqrtd d) := hDed
+  --   letI : Module (Zsqrtd d) (Zsqrtd d) := Semiring.toModule
+  --   letI : IsIntegrallyClosed (Zsqrtd d) := IsDedekindRing.toIsIntegralClosure
+  intro _
   -- A Dedekind domain is integrally closed in its fraction field.
-  have hIC : IsIntegrallyClosed (Zsqrtd d) := IsDedekindRing.toIsIntegralClosure
-  letI : IsIntegrallyClosed (Zsqrtd d) := hIC
   -- Write `d = 1 + 4k` and consider `ω = (1 + √d)/2`.
   rcases exists_k_of_mod_four_eq_one (d := d) hd4 with ⟨k, hk⟩
   subst hk
@@ -224,7 +223,8 @@ theorem not_isDedekindDomain_zsqrtd_of_mod_four_eq_one
     exact isIntegral_toQsqrtd_of_zOnePlusSqrtOverTwo k
       (z := (⟨0, 1⟩ : _root_.ZOnePlusSqrtOverTwo k))
   have hx_integral : IsIntegral (Zsqrtd (1 + 4 * k)) x := hx_integral_Z.tower_top
-  rcases (isIntegrallyClosed_iff (Qsqrtd (((1 + 4 * k : ℤ) : ℚ)))).mp hIC hx_integral with
+  rcases (isIntegrallyClosed_iff (Qsqrtd (((1 + 4 * k : ℤ) : ℚ)))).mp
+      IsDedekindRing.toIsIntegralClosure hx_integral with
     ⟨z, hz⟩
   -- If `ω ∈ ℤ[√d]`, the half-integer criterion would force the numerators
   -- `(1, 1)` to both be even — a contradiction.

@@ -88,8 +88,8 @@ theorem Qsqrtd_iso_squarefree_int_param {d : ℤ} (hd : d ≠ 0) :
     ∃ z : ℤ, Squarefree z ∧ Nonempty (Qsqrtd (d : ℚ) ≃ₐ[ℚ] Qsqrtd (z : ℚ)) := by
   obtain ⟨a, b, heq, ha⟩ := Nat.sq_mul_squarefree d.natAbs
   have hb : b ≠ 0 := by
-    intro hb
-    subst hb
+    intro h
+    subst h
     simp at heq
     exact hd (Int.natAbs_eq_zero.mp heq.symm)
   refine ⟨d.sign * ↑a, ?_, ?_⟩
@@ -236,9 +236,11 @@ theorem Qsqrtd.param_unique (φ : Qsqrtd (d₁ : ℚ) ≃ₐ[ℚ] Qsqrtd (d₂ :
     rw [hleft, hright]
     exact φ.commutes (d₁ : ℚ)
   have hφ_eta : φ ⟨0, 1⟩ = ⟨a, b⟩ := by ext <;> rfl
+  --`a² + d₂ b² = d₁`
   have hre : a ^ 2 + (d₂ : ℚ) * b ^ 2 = d₁ := by
     have := congr_arg QuadraticAlgebra.re hφ_sq
     rw [hφ_eta, QuadraticAlgebra.mk_mul_mk] at this; simp at this; nlinarith
+  -- `2ab = 0`
   have him : 2 * a * b = 0 := by
     have := congr_arg QuadraticAlgebra.im hφ_sq
     rw [hφ_eta, QuadraticAlgebra.mk_mul_mk] at this; simp at this; linarith

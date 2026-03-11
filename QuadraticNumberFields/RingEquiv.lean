@@ -45,16 +45,14 @@ the source ring, then pushes forward via `Ideal.map`.
 theorem dimensionLEOne (e : R ≃+* S) [Ring.DimensionLEOne R] :
     Ring.DimensionLEOne S := by
   refine ⟨?_⟩
-  intro p hp0 hp
-  have hcomapPrime : (Ideal.comap e p).IsPrime := Ideal.comap_isPrime e p
+  intro p hp0 _
   have hcomapNeBot : Ideal.comap e p ≠ ⊥ := by
     intro hbot
     have hmap := Ideal.map_comap_eq_self_of_equiv e p
     rw [hbot, Ideal.map_bot] at hmap
     exact hp0 hmap.symm
   have hcomapMax : (Ideal.comap e p).IsMaximal :=
-    Ring.DimensionLEOne.maximalOfPrime hcomapNeBot hcomapPrime
-  letI : (Ideal.comap e p).IsMaximal := hcomapMax
+    Ring.DimensionLEOne.maximalOfPrime hcomapNeBot (Ideal.comap_isPrime e p)
   have hmapMax : (Ideal.map e (Ideal.comap e p)).IsMaximal :=
     Ideal.map_isMaximal_of_equiv e
   simpa [Ideal.map_comap_eq_self_of_equiv] using hmapMax
@@ -68,14 +66,14 @@ invariant under ring isomorphism, so the conjunction is as well.
 **mathlib target: `Mathlib.RingTheory.DedekindDomain.Basic`** -/
 theorem isDedekindDomain (e : R ≃+* S) [IsDedekindDomain R] :
     IsDedekindDomain S := by
-  letI : Module R R := Semiring.toModule
+  -- letI : Module R R := Semiring.toModule
   letI : IsNoetherianRing R :=
     show IsNoetherian R R from IsDedekindRing.toIsNoetherian
   letI : IsDomain S := e.toMulEquiv.isDomain_iff.mp inferInstance
   letI : IsNoetherianRing S := isNoetherianRing_of_ringEquiv R e
   letI : IsIntegrallyClosed S := IsIntegrallyClosed.of_equiv e
   letI : Ring.DimensionLEOne S := dimensionLEOne e
-  letI : Module S S := Semiring.toModule
+  -- letI : Module S S := Semiring.toModule
   letI : IsDedekindRing S :=
     { toIsNoetherian := show IsNoetherian S S from inferInstance
       toDimensionLEOne := inferInstance
@@ -89,11 +87,11 @@ theorem isDedekindDomain (e : R ≃+* S) [IsDedekindDomain R] :
 theorem isDedekindDomain_iff (e : R ≃+* S) :
     IsDedekindDomain R ↔ IsDedekindDomain S := by
   constructor
-  · intro h
-    letI : IsDedekindDomain R := h
+  · intro _
+    -- letI : IsDedekindDomain R := h
     exact isDedekindDomain e
-  · intro h
-    letI : IsDedekindDomain S := h
+  · intro _
+    -- letI : IsDedekindDomain S := h
     exact isDedekindDomain e.symm
 
 end CommRing
