@@ -215,6 +215,7 @@ lemma liftModPNeg_apply (p : ℕ) [Fact p.Prime] (hd : (p : ℤ) ∣ (d - 1)) (z
 
 /-- An element of `ℤ[√d]` belongs to `(p, 1-√d)` iff `p ∣ (re + im)`,
 provided `p ∣ (d - 1)` for a prime `p`. -/
+@[nolint unusedArguments]
 lemma mem_span_p_one_minus_sqrtd_iff (p : ℕ) [Fact p.Prime]
     (hd : (p : ℤ) ∣ (d - 1)) (z : Zsqrtd d) :
     z ∈ (Ideal.span ({(p : Zsqrtd d), 1 - sqrtd} : Set (Zsqrtd d)) : Ideal (Zsqrtd d)) ↔
@@ -243,6 +244,7 @@ lemma mem_span_p_one_minus_sqrtd_iff (p : ℕ) [Fact p.Prime]
 
 /-- An element of `ℤ[√d]` belongs to `(p, 1+√d)` iff `p ∣ (re - im)`,
 provided `p ∣ (d - 1)` for a prime `p`. -/
+@[nolint unusedArguments]
 lemma mem_span_p_one_plus_sqrtd_iff (p : ℕ) [Fact p.Prime]
     (hd : (p : ℤ) ∣ (d - 1)) (z : Zsqrtd d) :
     z ∈ (Ideal.span ({(p : Zsqrtd d), 1 + sqrtd} : Set (Zsqrtd d)) : Ideal (Zsqrtd d)) ↔

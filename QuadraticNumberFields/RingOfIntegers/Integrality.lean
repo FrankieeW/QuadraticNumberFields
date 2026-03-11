@@ -155,6 +155,7 @@ private lemma dvd_four_sub_sq_of_int_norm_halfInt
 
 /-- Any element of `Q(√d)` integral over `ℤ` has half-integer coordinates with
 `4 ∣ (a'^2 - d * b'^2)`. -/
+@[nolint unusedArguments]
 lemma exists_halfInt_with_div_four_of_isIntegral
     (d : ℤ) (hd_sf : Squarefree d) (_hd_ne : d ≠ 1)
     {x : Qsqrtd (d : ℚ)} (hx : IsIntegral ℤ x) :

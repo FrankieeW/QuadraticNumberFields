@@ -38,6 +38,8 @@ abbrev IsQuadraticField (K : Type*) [Field K] [Algebra ℚ K] : Prop :=
 
 /-- The quadratic field `ℚ(√d)` as a type alias for `QuadraticAlgebra ℚ d 0`. -/
 abbrev Qsqrtd (d : ℚ) : Type := QuadraticAlgebra ℚ d 0
+
+/-- Notation for the quadratic field `Qsqrtd d = ℚ(√d)`. -/
 notation "ℚ√" d => Qsqrtd d
 
 namespace Qsqrtd

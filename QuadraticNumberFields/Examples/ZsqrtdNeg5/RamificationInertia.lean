@@ -157,12 +157,15 @@ lemma comap_P3₁ : Ideal.comap (algebraMap ℤ R) P3₁ = (span ({(3 : ℤ)} : 
 lemma comap_P3₂ : Ideal.comap (algebraMap ℤ R) P3₂ = (span ({(3 : ℤ)} : Set ℤ) : Ideal ℤ) :=
   Zsqrtd.Ideal.comap_span_p_one_minus_sqrtd 3 neg5_dvd_three
 
+/-- The quotient by `P2` is canonically isomorphic to `ZMod 2`. -/
 noncomputable def quotEquivP2 : (R ⧸ P2) ≃+* ZMod 2 :=
   Zsqrtd.Ideal.quotEquivZModPNeg 2 neg5_dvd_two
 
+/-- The quotient by `P3₁` is canonically isomorphic to `ZMod 3`. -/
 noncomputable def quotEquivP3₁ : (R ⧸ P3₁) ≃+* ZMod 3 :=
   Zsqrtd.Ideal.quotEquivZModPNeg 3 neg5_dvd_three
 
+/-- The quotient by `P3₂` is canonically isomorphic to `ZMod 3`. -/
 noncomputable def quotEquivP3₂ : (R ⧸ P3₂) ≃+* ZMod 3 :=
   Zsqrtd.Ideal.quotEquivZModP 3 neg5_dvd_three
 
