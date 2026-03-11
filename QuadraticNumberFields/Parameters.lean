@@ -161,9 +161,7 @@ then `d₁ = d₂`.
 This is a **key rigidity result for squarefree integers**: two squarefree integers
 that differ by a rational square factor must be equal. The proof reduces to mutual
 divisibility via `int_dvd_of_ratio_square`, yielding `d₁ ∣ d₂` and `d₂ ∣ d₁`.
-The sign ambiguity is resolved by the fact that `-1` is not a rational square.
-
-**mathlib target: `Mathlib.Data.Int.Squarefree`** -/
+The sign ambiguity is resolved by the fact that `-1` is not a rational square. -/
 lemma squarefree_eq_of_rat_sq_mul {d₁ d₂ : ℤ}
     (hd₁ : Squarefree d₁) (hd₂ : Squarefree d₂)
     {r : ℚ} (hr : (d₁ : ℚ) = d₂ * r ^ 2) : d₁ = d₂ := by

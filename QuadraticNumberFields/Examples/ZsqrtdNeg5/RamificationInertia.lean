@@ -260,3 +260,10 @@ theorem inertiaDeg_P3₂ :
   exact_mod_cast hfin.trans (by simp [Module.finrank_self])
 
 end QuadraticNumberFields.Examples.ZsqrtdNeg5
+
+--TODO : using Discriminant, show that 2 is the only ramified prime in ℤ[√-5],
+-- and that all other primes are either inert or split.
+
+-- Discriminant of ℤ[√d] is 4d if d ≡ 2,3 mod 4, and d if d ≡ 1 mod 4. For d = -5,
+-- we have 4d = -20, which is divisible by 2 but not by any other prime,
+-- so 2 is the only ramified prime.

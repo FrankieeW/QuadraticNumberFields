@@ -22,6 +22,7 @@ It does not introduce new trace or norm definitions: trace is always
 * `TraceNorm.exists_int_double_im`: an integral element has doubled imaginary part in `ℤ`.
 -/
 
+
 namespace QuadraticNumberFields
 namespace RingOfIntegers
 namespace TraceNorm
