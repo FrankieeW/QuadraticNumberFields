@@ -2,6 +2,7 @@ name = "QuadraticNumberFields"
 version = "0.1.0"
 keywords = ["math", "number-theory", "quadratic-fields"]
 defaultTargets = ["QuadraticNumberFields"]
+lintDriver = "runLinter"
 
 [leanOptions]
 pp.unicode.fun = true
@@ -21,3 +22,8 @@ rev = "v4.29.0-rc2"
 
 [[lean_lib]]
 name = "QuadraticNumberFields"
+
+[[lean_exe]]
+name = "runLinter"
+srcDir = "scripts"
+supportInterpreter = true
