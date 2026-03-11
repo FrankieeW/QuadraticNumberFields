@@ -27,8 +27,7 @@ docbuild/
 _site/
 
 # Ruby/Bundler
-site/Gemfile.lock
-site/vendor/
+home_page/vendor/
 
 # Git worktrees
 .worktrees/

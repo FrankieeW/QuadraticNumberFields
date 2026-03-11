@@ -116,20 +116,9 @@ QuadraticNumberFields/
 │       ├── Zsqrtd.lean               # ℤ[√d] ring model and mathlib bridge
 │       ├── ZsqrtdIdeals.lean         # Ideal theory: membership, primality, quotients
 │       └── ZsqrtdMathlibInstances.lean  # Dedekind domain for mathlib's ℤ√d
-├── Verso/                            # Documentation generation (Verso/Subverso)
-└── site/                             # Jekyll website (GitHub Pages)
+├── blueprint/                        # leanblueprint source files
+└── home_page/                        # Homepage content for docgen-action / GitHub Pages
 ```
-
-
-## Code Statistics
-
-| Module | Code Lines | Comment Lines | Total Lines |
-|--------|------------|---------------|-------------|
-| `QuadraticNumberFields/RingOfIntegers` | 1280 | 564 | 2210 |
-| `QuadraticNumberFields` | 556 | 258 | 934 |
-| `QuadraticNumberFields/Examples` | 274 | 106 | 449 |
-| `QuadraticNumberFields/Euclidean` | 52 | 25 | 93 |
-| **Total** | **2162** | **953** | **3115** |
 
 ## Prerequisites
 
@@ -142,11 +131,6 @@ QuadraticNumberFields/
 ```bash
 lake exe cache get  # Download mathlib cache (required, speeds up build significantly)
 lake build
-```
-
-## Worktree
-```bash
-git worktree add .worktrees/<prefix>/<feature> main -b <prefix>/<feature>
 ```
 
 ## History

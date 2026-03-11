@@ -54,8 +54,8 @@ The Lean source lives under `QuadraticNumberFields/`. The base type is
 
 ### Other Components
 
-- **`Verso/`** — Documentation generation using Verso/Subverso (separate Lake project: `cd Verso && lake build docs`)
-- **`site/`** — Jekyll website for GitHub Pages
+- **`blueprint/`** — leanblueprint source files for the blueprint site
+- **`home_page/`** — Homepage content used by `docgen-action` for GitHub Pages
 
 ## Dependencies
 
