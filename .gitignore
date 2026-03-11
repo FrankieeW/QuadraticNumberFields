@@ -16,6 +16,7 @@ build/
 .idea/
 *.swp
 *~
+.venv-leanblueprint/
 
 # OS
 .DS_Store
