@@ -136,14 +136,32 @@ theorem isSplit_or_isInert_or_isRamified
   -- Apply the sum formula: ∑ e_i * f_i = [L:K] = 2
   have h_sum := Ideal.sum_ramification_inertia S K L hp
   rw [h_deg] at h_sum
-
   -- Since p.IsMaximal Ideal.inertiaDeg_ne_zero
   have hf_ge_one:
     ∀ P ∈ p.primesOver S, 1 ≤ f(P) := f_ge_one p S
   have he_ge_one:
     ∀ P ∈ p.primesOver S, 1 ≤ e(P) := e_ge_one p S hp
   have hg_ge_one : 1 ≤ g := one_le_primesOver_ncard p S
-  have hg_le_two : g ≤ 2 := sorry
+
+  have hmul_ge_one : ∀ P ∈ primesOverFinset p S, 1 ≤ e(P) * f(P) := by
+    intro P hP
+    have hP' : P ∈ p.primesOver S :=
+        (mem_primesOverFinset_iff (p := p) (B := S) hp).mp hP
+    exact Right.one_le_mul (he_ge_one P hP') (hf_ge_one P hP')
+
+  have hcard_le_sum :
+    (primesOverFinset p S).card ≤
+      ∑ P ∈ primesOverFinset p S, e(P) * f(P) := by
+    rw [Finset.card_eq_sum_ones]
+    exact Finset.sum_le_sum (fun P hP => hmul_ge_one P hP)
+
+  have hfin_le_two : (primesOverFinset p S).card ≤ 2 := by
+    simpa [h_sum] using hcard_le_sum
+
+  have hg_le_two : g ≤ 2 := by
+    rw [← coe_primesOverFinset (p := p) hp S, Set.ncard_coe_finset]
+    exact hfin_le_two
+
   -- Case analysis on g
   by_cases hg : g = 2
   · -- Case g = 2: split
