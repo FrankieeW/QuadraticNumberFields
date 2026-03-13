@@ -124,30 +124,26 @@ variable (K L : Type*) [Field K] [Field L]
     [Algebra K L] [Algebra R L]
     [IsScalarTower R S L] [IsScalarTower R K L]
     [Module.Finite R S] [Module.IsTorsionFree R S]
+    -- [DecidableEq (Ideal S)]
 
 
 
--- TODO: prove exhaustivity for degree-2 extensions
--- `sum_ramification_inertia` + Galois uniformity
+-- `sum_ramification_inertia`
 theorem isSplit_or_isInert_or_isRamified
     [p.IsMaximal] (hp : p ≠ ⊥)
     (h_deg : Module.finrank K L = 2) :
   p.IsSplitIn S ∨ p.IsInertIn S ∨ p.IsRamifiedIn S := by
   -- Apply the sum formula: ∑ e_i * f_i = [L:K] = 2
+  classical
   have h_sum := Ideal.sum_ramification_inertia S K L hp
   rw [h_deg] at h_sum
-  -- Since p.IsMaximal Ideal.inertiaDeg_ne_zero
-  have hf_ge_one:
-    ∀ P ∈ p.primesOver S, 1 ≤ f(P) := f_ge_one p S
-  have he_ge_one:
-    ∀ P ∈ p.primesOver S, 1 ≤ e(P) := e_ge_one p S hp
   have hg_ge_one : 1 ≤ g := one_le_primesOver_ncard p S
 
   have hmul_ge_one : ∀ P ∈ primesOverFinset p S, 1 ≤ e(P) * f(P) := by
     intro P hP
     have hP' : P ∈ p.primesOver S :=
         (mem_primesOverFinset_iff (p := p) (B := S) hp).mp hP
-    exact Right.one_le_mul (he_ge_one P hP') (hf_ge_one P hP')
+    exact Right.one_le_mul (e_ge_one _ _ hp P hP') (f_ge_one p S P hP')
 
   have hcard_le_sum :
     (primesOverFinset p S).card ≤
@@ -169,17 +165,54 @@ theorem isSplit_or_isInert_or_isRamified
     -- So e(P₁) = e(P₂) = 1 (and f(P₁) = f(P₂) = 1)
     left
     refine ⟨hg.ge, ?_⟩
-    rintro P hP
     -- suppose e(P) ≠ 1, then e(P) ≥ 2, so e(P)f(P) ≥ 2, contradicting the sum
     by_contra h
-    sorry
+    push_neg at h
+    obtain ⟨P, hP, heP⟩ := h
+    have htwoP : 2 ≤ e(P) := by
+      have h1 : 1 ≤ e(P) := e_ge_one p S hp P hP
+      omega
+
+    have hP_fin : P ∈ primesOverFinset p S :=
+      (mem_primesOverFinset_iff (p := p) (B := S) hp).2 hP
+    -- ∃ P, e(P)f(P) ≥ 2 and ∀ P, e(P)f(P) ≥ 1, so sum ≥ 3
+    have hdecomp :
+      ∑ Q ∈ primesOverFinset p S, e(Q) * f(Q)
+        = e(P) * f(P) + ∑ Q ∈ (primesOverFinset p S).erase P, e(Q) * f(Q) := by
+        exact (Finset.add_sum_erase
+        (s := primesOverFinset p S)
+        (a := P)
+        (f := fun Q => e(Q) * f(Q))
+        hP_fin).symm
+    have hrest_ge_one : 1 ≤ ∑ Q ∈ (primesOverFinset p S).erase P, e(Q) * f(Q) := by
+      sorry
+    have hsum_ge_three : 3 ≤ ∑ P ∈ primesOverFinset p S, e(P) * f(P) := by
+      --hmul_ge_one  + htwoP
+      rw [hdecomp]
+      have : 1 ≤ f(P) := f_ge_one p S P hP
+      have : 2 ≤ e(P) * f(P) := by
+        calc
+          2 ≤ e(P) * 1 := by omega
+          _ ≤ e(P) * f(P) := by exact Nat.mul_le_mul_left _ this
+      omega
+    --h_sum and hsum_ge_three contradiction
+    omega
   · -- g ≠ 2, so g = 1
     have hg1 : g = 1 := by
       -- ¬g=2 and 1≥g
-      sorry
-    sorry
-
-
+      omega
+    right
+    by_cases hi : ∀ P ∈ p.primesOver S, e(P) = 1
+    · -- Case g = 1 and e(P) = 1: inert
+      left
+      exact ⟨hg1, hi⟩
+    · -- Case g = 1 and ∃ P, e(P) ≠ 1: ramified
+      right
+      push_neg at hi
+      obtain ⟨P, hP, heP⟩ := hi
+      refine ⟨P, hP, ?_⟩
+      have h1 : 1 ≤ e(P) := e_ge_one p S hp P hP
+      omega
 
 
 
