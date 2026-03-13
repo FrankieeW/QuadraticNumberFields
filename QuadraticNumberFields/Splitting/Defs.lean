@@ -30,11 +30,9 @@ open Ideal
 
 namespace Ideal
 
-variable {R : Type*} [CommRing R] [IsDomain R] [IsDedekindDomain R]
-
+variable {R : Type*} [CommRing R]
+variable (p : Ideal R) (S : Type*) [CommRing S] [Algebra R S]
 section GeneralDefs
-variable (p : Ideal R) (S : Type*) [CommRing S] [IsDedekindDomain S] [Algebra R S]
-
 
 /-- A prime `p` **splits** in `S` if at least two primes of `S` lie over `p`,
 each with ramification index 1. -/
@@ -57,6 +55,7 @@ end GeneralDefs
 
 section Trichotomy
 
+
 /-! ## Trichotomy for degree-2 extensions
 
 For `[L : K] = 2`, `∑ eᵢfᵢ = 2` forces exactly three possibilities:
@@ -64,18 +63,15 @@ For `[L : K] = 2`, `∑ eᵢfᵢ = 2` forces exactly three possibilities:
 * `(e, f, g) = (1, 2, 1)` — inert
 * `(e, f, g) = (2, 1, 1)` — ramified
 -/
-variable {R : Type*} [CommRing R]
-variable (p : Ideal R) (S : Type*) [CommRing S] [Algebra R S]
 
--- variable {R : Type*} [CommRing R]
 theorem IsSplitIn.not_isInert :
      p.IsSplitIn S → ¬ p.IsInertIn S :=
     fun hs hi => Nat.lt_irrefl 1 (hi.1 ▸ hs.1)
 
-  private theorem not_isRamifiedIn_of_forall_eq_one
+private theorem not_isRamifiedIn_of_forall_eq_one
       (h : ∀ P ∈ p.primesOver S, ramificationIdx (algebraMap R S) p P = 1) :
       ¬ p.IsRamifiedIn S :=
-  fun ⟨P, hP, hlt⟩ => by simp [h P hP] at hlt
+    fun ⟨P, hP, hlt⟩ => by simp [h P hP] at hlt
 
 theorem IsSplitIn.not_isRamified :
      p.IsSplitIn S → ¬ p.IsRamifiedIn S :=
@@ -87,24 +83,20 @@ theorem IsSplitIn.not_isRamified :
 
 theorem IsInertIn.not_isRamified :
      p.IsInertIn S → ¬ p.IsRamifiedIn S :=
-    -- rintro ⟨_, h_ram⟩ ⟨P, hP, h_ram'⟩
-    -- specialize h_ram P hP
-    -- rw [← Eq.symm h_ram] at h_ram'
-    -- exact Nat.lt_irrefl 1 h_ram'
     fun hi => not_isRamifiedIn_of_forall_eq_one p S hi.2
 
-
+variable (K L : Type*) [Field K] [Field L]
+    [Algebra R K] [IsFractionRing R K]
+    [Algebra S L] [IsFractionRing S L]
+    [Algebra K L] [Algebra R L]
+    [IsScalarTower R S L] [IsScalarTower R K L]
+    [Module.Finite R S]
 -- TODO: prove exhaustivity for degree-2 extensions
-  theorem isSplit_or_isInert_or_isRamified
-      (K L : Type*) [Field K] [Field L]
-      [Algebra R K] [IsFractionRing R K]
-      [Algebra S L] [IsFractionRing S L]
-      [Algebra K L] [Algebra R L]
-      [IsScalarTower R S L] [IsScalarTower R K L]
-      [Module.Finite R S]
-      [p.IsMaximal] (hp : p ≠ ⊥)
-      (h_deg : Module.finrank K L = 2) :
-      p.IsSplitIn S ∨ p.IsInertIn S ∨ p.IsRamifiedIn S := by
+theorem isSplit_or_isInert_or_isRamified
+    [p.IsMaximal] (hp : p ≠ ⊥)
+    (h_deg : Module.finrank K L = 2) :
+  p.IsSplitIn S ∨ p.IsInertIn S ∨ p.IsRamifiedIn S := by
+
     sorry
 
 end Trichotomy
