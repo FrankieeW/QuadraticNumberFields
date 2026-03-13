@@ -32,28 +32,33 @@ namespace Ideal
 
 variable {R : Type*} [CommRing R]
 variable (p : Ideal R) (S : Type*) [CommRing S] [Algebra R S]
+-- Local notation for ramification index, inertia degree, and number of primes
+local notation3 "e(" P ")" => ramificationIdx (algebraMap R S) p P
+local notation3 "f(" P ")" => p.inertiaDeg P
+local notation3 "g" => (p.primesOver S).ncard
 section GeneralDefs
 
 /-- A prime `p` **splits** in `S` if at least two primes of `S` lie over `p`,
 each with ramification index 1. -/
 def IsSplitIn : Prop :=
-  1 < (p.primesOver S).ncard ∧
-    ∀ P ∈ p.primesOver S, ramificationIdx (algebraMap R S) p P = 1
+  1 < g ∧
+    ∀ P ∈ p.primesOver S, e(P)  = 1
 
 /-- A prime `p` is **inert** in `S` if exactly one prime of `S` lies over `p`,
 with ramification index 1. -/
 def IsInertIn : Prop :=
-  (p.primesOver S).ncard = 1 ∧
-    ∀ P ∈ p.primesOver S, ramificationIdx (algebraMap R S) p P = 1
+  g = 1 ∧
+    ∀ P ∈ p.primesOver S, e(P) = 1
 
 /-- A prime `p` **ramifies** in `S` if some prime of `S` lying over `p`
 has ramification index > 1. -/
 def IsRamifiedIn : Prop :=
-  ∃ P ∈ p.primesOver S, 1 < ramificationIdx (algebraMap R S) p P
+  ∃ P ∈ p.primesOver S, 1 < e(P)
 
 end GeneralDefs
 
 section Trichotomy
+
 
 
 /-! ## Trichotomy for degree-2 extensions
@@ -69,7 +74,7 @@ theorem IsSplitIn.not_isInert :
     fun hs hi => Nat.lt_irrefl 1 (hi.1 ▸ hs.1)
 
 private theorem not_isRamifiedIn_of_forall_eq_one
-      (h : ∀ P ∈ p.primesOver S, ramificationIdx (algebraMap R S) p P = 1) :
+      (h : ∀ P ∈ p.primesOver S, e(P) = 1) :
       ¬ p.IsRamifiedIn S :=
     fun ⟨P, hP, hlt⟩ => by simp [h P hP] at hlt
 
@@ -85,19 +90,53 @@ theorem IsInertIn.not_isRamified :
      p.IsInertIn S → ¬ p.IsRamifiedIn S :=
     fun hi => not_isRamifiedIn_of_forall_eq_one p S hi.2
 
+/-! ## Helper lemmas for trichotomy
+
+Three mutually exclusive cases from `∑ eᵢfᵢ = [L:K] = 2`:
+- `(e, f, g) = (1, 1, 2)` — split
+- `(e, f, g) = (1, 2, 1)` — inert
+- `(e, f, g) = (2, 1, 1)` — ramified
+-/
+
+variable [IsDedekindDomain R] [IsDedekindDomain S] [Module.Finite R S]
+
 variable (K L : Type*) [Field K] [Field L]
     [Algebra R K] [IsFractionRing R K]
-    [Algebra S L] [IsFractionRing S L]
+    [Algebra S L] [IsFractionRing S L] [IsDedekindDomain S]
     [Algebra K L] [Algebra R L]
     [IsScalarTower R S L] [IsScalarTower R K L]
-    [Module.Finite R S]
+
+
 -- TODO: prove exhaustivity for degree-2 extensions
+-- `sum_ramification_inertia` + Galois uniformity
 theorem isSplit_or_isInert_or_isRamified
     [p.IsMaximal] (hp : p ≠ ⊥)
     (h_deg : Module.finrank K L = 2) :
   p.IsSplitIn S ∨ p.IsInertIn S ∨ p.IsRamifiedIn S := by
+  -- Apply the sum formula: ∑ e_i * f_i = [L:K] = 2
+  have h_sum := Ideal.sum_ramification_inertia S K L hp
+  rw [h_deg] at h_sum
+  -- Case analysis on g
+  by_cases hg : g = 2
+  · -- Case g = 2: split
+    -- We have e(P₁)f(P₁) + e(P₂)f(P₂) = 2 with each term ≥ 1
+    -- So e(P₁) = e(P₂) = 1 (and f(P₁) = f(P₂) = 1)
+    left
+    refine ⟨hg.ge, ?_⟩
+    rintro P hP
+    -- suppose e(P) ≠ 1, then e(P) ≥ 2, so e(P)f(P) ≥ 2, contradicting the sum
+    by_contra h
 
+    simp at h
     sorry
+
+  · -- g ≠ 2, so g = 1 (cannot be 0 or ≥ 3 given total = 2)
+    sorry
+
+
+
+
+
 
 end Trichotomy
 
