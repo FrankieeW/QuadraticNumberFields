@@ -98,13 +98,33 @@ Three mutually exclusive cases from `∑ eᵢfᵢ = [L:K] = 2`:
 - `(e, f, g) = (2, 1, 1)` — ramified
 -/
 
-variable [IsDedekindDomain R] [IsDedekindDomain S] [Module.Finite R S]
+lemma f_ge_one [p.IsMaximal] [Module.Finite R S] :
+  ∀ P ∈ p.primesOver S, 1 ≤ f(P) := by
+    intro P hP
+    refine Nat.one_le_iff_ne_zero.mpr ?_
+    have : P.LiesOver p := hP.2 --see RingTheory/Ideal/Over.lean 369
+    apply Ideal.inertiaDeg_ne_zero
+
+
+variable [IsDedekindDomain R] [IsDedekindDomain S]
+
+lemma e_ge_one [Module.IsTorsionFree R S] (hp : p ≠ ⊥) :
+    ∀ P ∈ p.primesOver S, 1 ≤ e(P) := by
+  intro P hP
+  letI : P.IsPrime := hP.1
+  letI : P.LiesOver p := hP.2
+  exact Nat.one_le_iff_ne_zero.mpr
+    (Ideal.IsDedekindDomain.ramificationIdx_ne_zero_of_liesOver P hp)
+
+
 
 variable (K L : Type*) [Field K] [Field L]
     [Algebra R K] [IsFractionRing R K]
-    [Algebra S L] [IsFractionRing S L] [IsDedekindDomain S]
+    [Algebra S L] [IsFractionRing S L]
     [Algebra K L] [Algebra R L]
     [IsScalarTower R S L] [IsScalarTower R K L]
+    [Module.Finite R S] [Module.IsTorsionFree R S]
+
 
 
 -- TODO: prove exhaustivity for degree-2 extensions
@@ -116,6 +136,14 @@ theorem isSplit_or_isInert_or_isRamified
   -- Apply the sum formula: ∑ e_i * f_i = [L:K] = 2
   have h_sum := Ideal.sum_ramification_inertia S K L hp
   rw [h_deg] at h_sum
+
+  -- Since p.IsMaximal Ideal.inertiaDeg_ne_zero
+  have hf_ge_one:
+    ∀ P ∈ p.primesOver S, 1 ≤ f(P) := f_ge_one p S
+  have he_ge_one:
+    ∀ P ∈ p.primesOver S, 1 ≤ e(P) := e_ge_one p S hp
+  have hg_ge_one : 1 ≤ g := one_le_primesOver_ncard p S
+  have hg_le_two : g ≤ 2 := sorry
   -- Case analysis on g
   by_cases hg : g = 2
   · -- Case g = 2: split
@@ -126,13 +154,12 @@ theorem isSplit_or_isInert_or_isRamified
     rintro P hP
     -- suppose e(P) ≠ 1, then e(P) ≥ 2, so e(P)f(P) ≥ 2, contradicting the sum
     by_contra h
-
-    simp at h
     sorry
-
-  · -- g ≠ 2, so g = 1 (cannot be 0 or ≥ 3 given total = 2)
+  · -- g ≠ 2, so g = 1
+    have hg1 : g = 1 := by
+      -- ¬g=2 and 1≥g
+      sorry
     sorry
-
 
 
 
