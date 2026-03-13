@@ -72,19 +72,26 @@ theorem IsSplitIn.not_isInert :
      p.IsSplitIn S → ¬ p.IsInertIn S :=
     fun hs hi => Nat.lt_irrefl 1 (hi.1 ▸ hs.1)
 
+  private theorem not_isRamifiedIn_of_forall_eq_one
+      (h : ∀ P ∈ p.primesOver S, ramificationIdx (algebraMap R S) p P = 1) :
+      ¬ p.IsRamifiedIn S :=
+  fun ⟨P, hP, hlt⟩ => by simp [h P hP] at hlt
+
 theorem IsSplitIn.not_isRamified :
-     p.IsSplitIn S → ¬ p.IsRamifiedIn S := by
-    rintro ⟨_, h_ram⟩ ⟨P, hP, h_ram'⟩
-    specialize h_ram P hP
-    rw [← Eq.symm h_ram] at h_ram'
-    exact Nat.lt_irrefl 1 h_ram'
+     p.IsSplitIn S → ¬ p.IsRamifiedIn S :=
+    -- rintro ⟨_, h_ram⟩ ⟨P, hP, h_ram'⟩
+    -- specialize h_ram P hP
+    -- rw [← Eq.symm h_ram] at h_ram'
+    -- exact Nat.lt_irrefl 1 h_ram'
+    fun hs => not_isRamifiedIn_of_forall_eq_one p S hs.2
 
 theorem IsInertIn.not_isRamified :
-     p.IsInertIn S → ¬ p.IsRamifiedIn S := by
-    rintro ⟨_, h_ram⟩ ⟨P, hP, h_ram'⟩
-    specialize h_ram P hP
-    rw [← Eq.symm h_ram] at h_ram'
-    exact Nat.lt_irrefl 1 h_ram'
+     p.IsInertIn S → ¬ p.IsRamifiedIn S :=
+    -- rintro ⟨_, h_ram⟩ ⟨P, hP, h_ram'⟩
+    -- specialize h_ram P hP
+    -- rw [← Eq.symm h_ram] at h_ram'
+    -- exact Nat.lt_irrefl 1 h_ram'
+    fun hi => not_isRamifiedIn_of_forall_eq_one p S hi.2
 
 
 -- TODO: prove exhaustivity for degree-2 extensions
