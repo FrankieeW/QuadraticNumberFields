@@ -6,6 +6,7 @@
 # Lake build directory
 lake/
 .lake/
+build/
 
 # Mathlib cache
 ~/.lean/cache/
@@ -15,18 +16,19 @@ lake/
 .idea/
 *.swp
 *~
+.venv-leanblueprint/
 
 # OS
 .DS_Store
 Thumbs.db
+*.trace
 
 # Build artifacts
 docbuild/
 _site/
 
 # Ruby/Bundler
-site/Gemfile.lock
-site/vendor/
+home_page/vendor/
 
 # Git worktrees
 .worktrees/
