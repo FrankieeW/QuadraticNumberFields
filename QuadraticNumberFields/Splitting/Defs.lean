@@ -218,7 +218,7 @@ theorem isSplit_or_isInert_or_isRamified
     · -- Case g = 1 and ∃ P, e(P) ≠ 1: ramified
       right
       push_neg at hi
-      obtain ⟨P, hP, heP⟩ := hi
+      obtain ⟨P, hP, _⟩ := hi
       refine ⟨P, hP, ?_⟩
       have h1 : 1 ≤ e(P) := e_ge_one p S hp P hP
       omega
