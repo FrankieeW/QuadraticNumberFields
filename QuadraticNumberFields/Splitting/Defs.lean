@@ -137,6 +137,9 @@ theorem isSplit_or_isInert_or_isRamified
   classical
   have h_sum := Ideal.sum_ramification_inertia S K L hp
   rw [h_deg] at h_sum
+  have g_to_card : g = (primesOverFinset p S).card := by
+    rw [← coe_primesOverFinset (p := p) hp S, Set.ncard_coe_finset]
+
   have hg_ge_one : 1 ≤ g := one_le_primesOver_ncard p S
 
   have hmul_ge_one : ∀ P ∈ primesOverFinset p S, 1 ≤ e(P) * f(P) := by
@@ -155,7 +158,7 @@ theorem isSplit_or_isInert_or_isRamified
     simpa [h_sum] using hcard_le_sum
 
   have hg_le_two : g ≤ 2 := by
-    rw [← coe_primesOverFinset (p := p) hp S, Set.ncard_coe_finset]
+    rw [g_to_card]
     exact hfin_le_two
 
   -- Case analysis on g
@@ -172,7 +175,6 @@ theorem isSplit_or_isInert_or_isRamified
     have htwoP : 2 ≤ e(P) := by
       have h1 : 1 ≤ e(P) := e_ge_one p S hp P hP
       omega
-
     have hP_fin : P ∈ primesOverFinset p S :=
       (mem_primesOverFinset_iff (p := p) (B := S) hp).2 hP
     -- ∃ P, e(P)f(P) ≥ 2 and ∀ P, e(P)f(P) ≥ 1, so sum ≥ 3
@@ -185,7 +187,20 @@ theorem isSplit_or_isInert_or_isRamified
         (f := fun Q => e(Q) * f(Q))
         hP_fin).symm
     have hrest_ge_one : 1 ≤ ∑ Q ∈ (primesOverFinset p S).erase P, e(Q) * f(Q) := by
-      sorry
+      have hterm :
+          ∀ Q ∈ (primesOverFinset p S).erase P, 1 ≤ e(Q) * f(Q) := by
+          intro Q hQ
+          refine hmul_ge_one Q (Finset.mem_of_mem_erase hQ)
+      have : 1 = ((primesOverFinset p S).erase P).card := by
+        -- the set has 2 elements, after erasing one we have 1 element left
+        rw [Finset.card_erase_of_mem hP_fin]
+        have : g - 1 = 1 := by rw [hg]
+        rw [g_to_card] at this
+        omega
+      rw [this]
+      rw [Finset.card_eq_sum_ones]
+      exact Finset.sum_le_sum (fun P hP => hterm P hP)
+      -- exact Finset.sum_pos
     have hsum_ge_three : 3 ≤ ∑ P ∈ primesOverFinset p S, e(P) * f(P) := by
       --hmul_ge_one  + htwoP
       rw [hdecomp]
