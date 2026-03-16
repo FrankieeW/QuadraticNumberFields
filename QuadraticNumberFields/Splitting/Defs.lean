@@ -36,8 +36,8 @@ variable (p : Ideal R) (S : Type*) [CommRing S] [IsDedekindDomain S] [Algebra R 
 local notation3 "e(" P ")" => ramificationIdx (algebraMap R S) p P
 local notation3 "f(" P ")" => p.inertiaDeg P
 local notation3 "g" => (primesOverFinset p S).card
--- primesOverFinset p S
--- local notation "TODO" => primesOverFinset p S
+-- local notation3 "π(" p ", " S ")" => primesOverFinset p S
+
 
 section GeneralDefs
 
@@ -160,11 +160,7 @@ theorem isSplit_or_isInert_or_isRamified
     have htwoP : 2 ≤ e(P) := by
       have := e_ge_one p S hp P hP
       omega
-    have hdecomp :
-      ∑ Q ∈ primesOverFinset p S, e(Q) * f(Q)
-        = e(P) * f(P) + ∑ Q ∈ (primesOverFinset p S).erase P, e(Q) * f(Q) :=
-        (Finset.add_sum_erase _ _ hP).symm
-    have hrest_ge_one : 1 ≤ ∑ Q ∈ (primesOverFinset p S).erase P, e(Q) * f(Q) := by
+    have : 1 ≤ ∑ Q ∈ (primesOverFinset p S).erase P, e(Q) * f(Q) := by
       have hterm :
           ∀ Q ∈ (primesOverFinset p S).erase P, 1 ≤ e(Q) * f(Q) :=
           fun Q hQ => hmul_ge_one Q (Finset.mem_of_mem_erase hQ)
@@ -174,7 +170,7 @@ theorem isSplit_or_isInert_or_isRamified
       rw [this, Finset.card_eq_sum_ones]
       exact Finset.sum_le_sum (fun P hP => hterm P hP)
     have hsum_ge_three : 3 ≤ ∑ P ∈ primesOverFinset p S, e(P) * f(P) := by
-      rw [hdecomp]
+      rw [(Finset.add_sum_erase _ _ hP).symm]
       have : 1 ≤ f(P) := f_ge_one p S hp P hP
       have : 2 ≤ e(P) * f(P) := by
         calc
