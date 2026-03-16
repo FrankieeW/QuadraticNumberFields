@@ -8,7 +8,7 @@
    "rev": "f2133b3eb4930a01acee87897b1b152076fea89a",
    "name": "LeanPrism",
    "manifestFile": "lake-manifest.json",
-   "inputRev": null,
+   "inputRev": "main",
    "inherited": false,
    "configFile": "lakefile.lean"},
   {"url": "https://github.com/PatrickMassot/checkdecls.git",

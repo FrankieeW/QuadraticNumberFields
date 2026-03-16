@@ -186,7 +186,12 @@ theorem isSplit_or_isInert_or_isRamified
         (f := fun Q => e(Q) * f(Q))
         hP_fin).symm
     have hrest_ge_one : 1 ≤ ∑ Q ∈ (primesOverFinset p S).erase P, e(Q) * f(Q) := by
+      have hterm :
+          ∀ Q ∈ (primesOverFinset p S).erase P, 1 ≤ e(Q) * f(Q) := by
+          intro Q hQ
+          refine hmul_ge_one Q (Finset.mem_of_mem_erase hQ)
       sorry
+  
     have hsum_ge_three : 3 ≤ ∑ P ∈ primesOverFinset p S, e(P) * f(P) := by
       --hmul_ge_one  + htwoP
       rw [hdecomp]

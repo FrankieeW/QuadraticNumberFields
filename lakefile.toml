@@ -27,6 +27,7 @@ git = "https://github.com/PatrickMassot/checkdecls.git"
 [[require]]
 name = "LeanPrism"
 git = "https://codeberg.org/wvhulle/lean-prism.git"
+rev = "main"
 
 [[lean_lib]]
 name = "QuadraticNumberFields"
