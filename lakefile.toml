@@ -24,6 +24,10 @@ rev = "v4.29.0-rc2"
 name = "checkdecls"
 git = "https://github.com/PatrickMassot/checkdecls.git"
 
+[[require]]
+name = "LeanPrism"
+git = "https://codeberg.org/wvhulle/lean-prism.git"
+
 [[lean_lib]]
 name = "QuadraticNumberFields"
 

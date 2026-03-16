@@ -6,6 +6,7 @@ Authors: Frankie Wang
 import Mathlib.NumberTheory.RamificationInertia.Basic
 import Mathlib.NumberTheory.RamificationInertia.Galois
 import Mathlib.RingTheory.Ideal.Over
+import LeanPrism
 
 /-!
 # Splitting Definitions and Trichotomy
