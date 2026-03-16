@@ -37,7 +37,7 @@ local notation3 "e(" P ")" => ramificationIdx (algebraMap R S) p P
 local notation3 "f(" P ")" => p.inertiaDeg P
 local notation3 "g" => (primesOverFinset p S).card
 -- primesOverFinset p S
--- local notation "PS" => primesOverFinset p S
+-- local notation "TODO" => primesOverFinset p S
 
 section GeneralDefs
 
