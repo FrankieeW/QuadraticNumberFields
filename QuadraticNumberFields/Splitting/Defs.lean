@@ -187,17 +187,51 @@ theorem isSplit_or_isInert_or_isRamified
       have h1 : 1 ≤ e(P) := e_ge_one p S hp P hP
       omega
 
---TODO: improve isSplit_or_isInert_or_isRamified as (e, f, g)
-theorem noname
+/-- In a degree-2 extension, the triple `(g, e(P), f(P))` is one of
+`(2, 1, 1)` (split), `(1, 1, 2)` (inert), or `(1, 2, 1)` (ramified). -/
+theorem efg_trichotomy
     (hp : p ≠ ⊥)
     (h_deg : Module.finrank K L = 2)
     (hP : P ∈ primesOverFinset p S) :
   (g = 2 ∧ e(P) = 1 ∧ f(P) = 1)  ∨
   (g = 1 ∧ e(P) = 1 ∧ f(P) = 2)  ∨
   (g = 1 ∧ e(P) = 2 ∧ f(P) = 1) := by
+  classical
   have h_sum := Ideal.sum_ramification_inertia S K L hp
   rw [h_deg] at h_sum
-  sorry
+  have heP := e_ge_one p S hp P hP
+  have hfP := f_ge_one p S hp P hP
+  have hmul_ge_one : ∀ Q ∈ primesOverFinset p S, 1 ≤ e(Q) * f(Q) :=
+    fun Q hQ => Right.one_le_mul (e_ge_one p S hp Q hQ) (f_ge_one p S hp Q hQ)
+  -- Split the sum: e(P)*f(P) + rest = 2
+  have hsplit := h_sum
+  rw [(Finset.add_sum_erase _ _ hP).symm] at hsplit
+  -- hsplit : e(P)*f(P) + ∑ Q ∈ erase P, e(Q)*f(Q) = 2
+  set rest := ∑ Q ∈ (primesOverFinset p S).erase P, e(Q) * f(Q) with hrest_def
+  have hefP_le : e(P) * f(P) ≤ 2 := by omega
+  have hg_ge := g_ge_one p S hp
+  have hg_le : g ≤ 2 := by
+    have : g ≤ ∑ Q ∈ primesOverFinset p S, e(Q) * f(Q) := by
+      rw [Finset.card_eq_sum_ones]
+      exact Finset.sum_le_sum fun Q hQ => hmul_ge_one Q hQ
+    omega
+  have hg_rest : g - 1 ≤ rest := by
+    rw [hrest_def, ← Finset.card_erase_of_mem hP, Finset.card_eq_sum_ones]
+    exact Finset.sum_le_sum fun Q hQ => hmul_ge_one Q (Finset.mem_of_mem_erase hQ)
+  have hg1_rest0 : g = 1 → rest = 0 := by
+    intro hg1
+    obtain ⟨a, ha⟩ := Finset.card_eq_one.mp hg1
+    have hPa : P = a := Finset.mem_singleton.mp (ha ▸ hP)
+    subst hPa; simp [hrest_def, ha]
+  have heP_le : e(P) ≤ 2 := le_trans (Nat.le_mul_of_pos_right _ (by omega)) hefP_le
+  have hfP_le : f(P) ≤ 2 := le_trans (Nat.le_mul_of_pos_left _ (by omega)) hefP_le
+  interval_cases g
+  · -- g = 1: rest = 0, so e(P)*f(P) = 2
+    have := hg1_rest0 rfl
+    interval_cases (e(P)) <;> interval_cases (f(P)) <;> omega
+  · -- g = 2
+    interval_cases (e(P)) <;> interval_cases (f(P)) <;> omega
+ 
 
 
 
