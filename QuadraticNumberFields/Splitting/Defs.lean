@@ -87,13 +87,7 @@ theorem IsInertIn.not_isRamified :
      p.IsInertIn S → ¬ p.IsRamifiedIn S :=
     fun hi => not_isRamifiedIn_of_forall_eq_one p S hi.2
 
-/-! ## Helper lemmas for trichotomy
-
-Three mutually exclusive cases from `∑ eᵢfᵢ = [L:K] = 2`:
-- `(e, f, g) = (1, 1, 2)` — split
-- `(e, f, g) = (1, 2, 1)` — inert
-- `(e, f, g) = (2, 1, 1)` — ramified
--/
+/-! ## Helper lemmas for trichotomy-/
 
 
 
@@ -143,15 +137,14 @@ theorem isSplit_or_isInert_or_isRamified
   have h_sum := Ideal.sum_ramification_inertia S K L hp
   rw [h_deg] at h_sum
   have hmul_ge_one : ∀ P ∈ primesOverFinset p S, 1 ≤ e(P) * f(P) :=
-    fun P hP => Right.one_le_mul (e_ge_one _ _ hp P hP) (f_ge_one p S hp P hP)
+    fun P hP => Right.one_le_mul (e_ge_one p S hp P hP) (f_ge_one p S hp P hP)
   have hcard_le_sum :
     g ≤ ∑ P ∈ primesOverFinset p S, e(P) * f(P) := by
     rw [Finset.card_eq_sum_ones]
     exact Finset.sum_le_sum (fun P hP => hmul_ge_one P hP)
-  have hg_le_two : g ≤ 2 := by omega
-  -- Case analysis on g
+  -- Case analysis on g  
   by_cases hg : g = 2
-  · -- Case g = 2: split
+  · -- Case g = 2: split (e, f, g) = (1, 1, 2)
     left
     refine ⟨by omega, ?_⟩
     by_contra h
@@ -171,11 +164,10 @@ theorem isSplit_or_isInert_or_isRamified
       exact Finset.sum_le_sum (fun P hP => hterm P hP)
     have hsum_ge_three : 3 ≤ ∑ P ∈ primesOverFinset p S, e(P) * f(P) := by
       rw [(Finset.add_sum_erase _ _ hP).symm]
-      have : 1 ≤ f(P) := f_ge_one p S hp P hP
       have : 2 ≤ e(P) * f(P) := by
         calc
           2 ≤ e(P) * 1 := by omega
-          _ ≤ e(P) * f(P) := Nat.mul_le_mul_left _ this
+          _ ≤ e(P) * f(P) := Nat.mul_le_mul_left _ (f_ge_one p S hp P hP)
       omega
     omega
   · -- g ≠ 2, so g = 1
@@ -184,10 +176,10 @@ theorem isSplit_or_isInert_or_isRamified
       omega
     right
     by_cases hi : ∀ P ∈ primesOverFinset p S, e(P) = 1
-    · -- Case g = 1 and e(P) = 1: inert
+    · -- Case g = 1 and e(P) = 1: inert (e, f, g) = (1, 2, 1)
       left
       exact ⟨hg1, hi⟩
-    · -- Case g = 1 and ∃ P, e(P) ≠ 1: ramified
+    · -- Case g = 1 and ∃ P, e(P) ≠ 1: (e, f, g) = (2, 1, 1) ramified
       right
       push_neg at hi
       obtain ⟨P, hP, _⟩ := hi
