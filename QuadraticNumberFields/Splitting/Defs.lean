@@ -142,7 +142,7 @@ theorem isSplit_or_isInert_or_isRamified
     g ≤ ∑ P ∈ primesOverFinset p S, e(P) * f(P) := by
     rw [Finset.card_eq_sum_ones]
     exact Finset.sum_le_sum (fun P hP => hmul_ge_one P hP)
-  -- Case analysis on g  
+  -- Case analysis on g
   by_cases hg : g = 2
   · -- Case g = 2: split (e, f, g) = (1, 1, 2)
     left
@@ -186,6 +186,18 @@ theorem isSplit_or_isInert_or_isRamified
       refine ⟨P, hP, ?_⟩
       have h1 : 1 ≤ e(P) := e_ge_one p S hp P hP
       omega
+
+--TODO: improve isSplit_or_isInert_or_isRamified as (e, f, g)
+theorem noname
+    (hp : p ≠ ⊥)
+    (h_deg : Module.finrank K L = 2)
+    (hP : P ∈ primesOverFinset p S) :
+  (g = 2 ∧ e(P) = 1 ∧ f(P) = 1)  ∨
+  (g = 1 ∧ e(P) = 1 ∧ f(P) = 2)  ∨
+  (g = 1 ∧ e(P) = 2 ∧ f(P) = 1) := by
+  have h_sum := Ideal.sum_ramification_inertia S K L hp
+  rw [h_deg] at h_sum
+  sorry
 
 
 
