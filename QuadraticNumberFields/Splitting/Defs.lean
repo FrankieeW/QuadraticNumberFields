@@ -195,6 +195,17 @@ theorem isSplit_or_isInert_or_isRamified
       have h1 : 1 ≤ e(P) := e_ge_one p S hp P hP
       omega
 
+--TODO: improve isSplit_or_isInert_or_isRamified as (e, f, g)
+theorem noname{P : Ideal S}
+    (hp : p ≠ ⊥)
+    (h_deg : Module.finrank K L = 2)
+    (hP : P ∈ primesOverFinset p S) :
+  (g = 2 ∧ e(P) = 1 ∧ f(P) = 1)  ∨
+  (g = 1 ∧ e(P) = 1 ∧ f(P) = 2)  ∨
+  (g = 1 ∧ e(P) = 2 ∧ f(P) = 1) := by
+  have h_sum := Ideal.sum_ramification_inertia S K L hp
+  rw [h_deg] at h_sum
+  sorry
 
 
 end Trichotomy
