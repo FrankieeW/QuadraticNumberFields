@@ -6,6 +6,7 @@ Authors: Frankie Wang
 import Mathlib.NumberTheory.RamificationInertia.Basic
 import Mathlib.NumberTheory.RamificationInertia.Galois
 import Mathlib.RingTheory.Ideal.Over
+import Mathlib.Data.Fintype.EquivFin
 import Mathlib.NumberTheory.NumberField.Basic
 import Mathlib.RingTheory.NormalClosure
 /-!
@@ -17,15 +18,12 @@ in Dedekind extensions, and proves the trichotomy theorem for degree-2 extension
 
 ## Main Definitions
 
-* `Ideal.IsSplitIn`: A prime splits if there are ≥ 2 primes above it, each with e = 1 and f = 1.
-* `Ideal.IsInertIn`: A prime is inert if there is exactly 1 prime above it, with e = 1.
-* `Ideal.IsRamifiedIn`: A prime ramifies if some prime above it has e > 1.
-
-
-## iff
-* `Ideal.IsSplitIn_iff`: τ = (1, 1, 2)
-* `Ideal.IsInertIn_iff`: τ = (1, 2, 1)
-* `Ideal.IsRamifiedIn_iff`: τ = (2, 1, 1)
+* `Ideal.IsCompletelySplitIn`: General completely split behavior for a prime ideal.
+* `Ideal.IsInertInGeneral`: General inert behavior for a prime ideal.
+* `Ideal.IsRamifiedInGeneral`: General ramified behavior for a prime ideal.
+* `Ideal.IsSplitIn`: Galois-global split behavior used in the quadratic trichotomy.
+* `Ideal.IsInertIn`: Galois-global inert behavior used in the quadratic trichotomy.
+* `Ideal.IsRamifiedIn`: Galois-global ramified behavior used in the quadratic trichotomy.
 
 ## Main Theorems
 
@@ -38,43 +36,154 @@ open Ideal
 namespace Ideal
 
 variable {R : Type*} [CommRing R]
-variable (p : Ideal R) (S : Type*) [CommRing S] [IsDedekindDomain S] [Algebra R S]
-local notation3 "e(" p "," P ")" => ramificationIdx (algebraMap R S) p P
-local notation3 "f(" p "," P ")" => Ideal.inertiaDeg p P
+variable (p : Ideal R) (S : Type*) [CommRing S] [Algebra R S]
+
 local notation3 "g(" p ")" => (primesOver p S).ncard
-local notation3 "τ(" p "," P ")" => (e(p, P), f(p, P), g(p))
 
 section GeneralDefs
 
+local notation3 "e(" p "," P ")" => ramificationIdx (algebraMap R S) p P
+local notation3 "f(" p "," P ")" => Ideal.inertiaDeg p P
+local notation3 "τ(" p "," P ")" => (e(p, P), f(p, P), g(p))
 
-/-- A prime `p` **splits** in `S` if at least two primes of `S` lie over `p`,
-each with ramification index 1. -/
-def IsSplitIn : Prop :=
-   e(p) = 1 ∧ f(p) = 1
+/-- General completely split behavior: there is at least one prime above `p`, and every
+prime above `p` has ramification index and inertia degree equal to `1`. -/
+def IsCompletelySplitIn : Prop :=
+  0 < g(p) ∧ ∀ P ∈ primesOver p S, e(p, P) = 1 ∧ f(p, P) = 1
 
-/-- A prime `p` is **inert** in `S` if exactly one prime of `S` lies over `p`,
-with ramification index 1. -/
-def IsInertIn : Prop :=
-  g(p) = 1 ∧ e(p) = 1
+/-- General inert behavior: there is a unique prime above `p`, and it is unramified. -/
+def IsInertInGeneral : Prop :=
+  g(p) = 1 ∧ ∀ P ∈ primesOver p S, e(p, P) = 1
 
-/-- A prime `p` **ramifies** in `S` if some prime of `S` lying over `p`
-has ramification index > 1. -/
-def IsRamifiedIn : Prop :=
-  e(p) > 1
+/-- General ramified behavior: some prime above `p` has ramification index greater than `1`. -/
+def IsRamifiedInGeneral : Prop :=
+  ∃ P ∈ primesOver p S, 1 < e(p, P)
 
 end GeneralDefs
+
+
+section GalDefs
 
 local notation3 "e(" p ")" => ramificationIdxIn p S
 local notation3 "f(" p ")" => Ideal.inertiaDegIn p S
 local notation3 "τ(" p ")" => (e(p), f(p), g(p))
-section GalDefs
--- Gal
+
+/-- Galois-global split behavior used in the quadratic trichotomy. -/
+def IsSplitIn : Prop :=
+  e(p) = 1 ∧ f(p) = 1
+
+/-- Galois-global inert behavior used in the quadratic trichotomy. -/
+def IsInertIn : Prop :=
+  g(p) = 1 ∧ e(p) = 1
+
+/-- Galois-global ramified behavior used in the quadratic trichotomy. -/
+def IsRamifiedIn : Prop :=
+  1 < e(p)
+
+lemma ramificationIdxIn_eq_of_mem (G : Type*) [Group G] [Finite G] [MulSemiringAction G S]
+    [IsGaloisGroup G R S] {P : Ideal S} (hP : P ∈ primesOver p S) :
+    e(p) = ramificationIdx (algebraMap R S) p P := by
+  letI : P.IsPrime := hP.1
+  letI : P.LiesOver p := hP.2
+  simpa using (Ideal.ramificationIdxIn_eq_ramificationIdx p P G)
+
+lemma inertiaDegIn_eq_of_mem (G : Type*) [Group G] [Finite G] [MulSemiringAction G S]
+    [IsGaloisGroup G R S] {P : Ideal S} (hP : P ∈ primesOver p S) :
+    f(p) = Ideal.inertiaDeg p P := by
+  letI : P.IsPrime := hP.1
+  letI : P.LiesOver p := hP.2
+  simpa using (Ideal.inertiaDegIn_eq_inertiaDeg p P G)
+
+lemma finite_primesOver_of_nonempty (G : Type*) [Group G] [Finite G] [MulSemiringAction G S]
+    [IsGaloisGroup G R S] (hne : ∃ P : Ideal S, P.IsPrime ∧ P.LiesOver p) :
+    Finite (primesOver p S) := by
+  let P0 : primesOver p S := ⟨hne.choose, hne.choose_spec⟩
+  let fG : G → primesOver p S := fun σ => σ • P0
+  refine Finite.of_surjective fG ?_
+  intro Q
+  let : (P0 : Ideal S).IsPrime := P0.2.1
+  let : (P0 : Ideal S).LiesOver p := P0.2.2
+  let : (Q : Ideal S).IsPrime := Q.2.1
+  let : (Q : Ideal S).LiesOver p := Q.2.2
+  obtain ⟨σ, hσ⟩ := Ideal.exists_smul_eq_of_isGaloisGroup
+    (p := p) (P := (P0 : Ideal S)) (Q := (Q : Ideal S)) (G := G)
+  refine ⟨σ, Subtype.ext hσ⟩
+
+lemma isRamifiedIn_iff_isRamifiedInGeneral (G : Type*) [Group G] [Finite G]
+    [MulSemiringAction G S] [IsGaloisGroup G R S] :
+    IsRamifiedIn p S ↔ IsRamifiedInGeneral p S := by
+  constructor
+  · intro hpRam
+    by_cases hne : ∃ P : Ideal S, P.IsPrime ∧ P.LiesOver p
+    · refine ⟨hne.choose, hne.choose_spec, ?_⟩
+      have hP : hne.choose ∈ primesOver p S := hne.choose_spec
+      rw [← ramificationIdxIn_eq_of_mem (p := p) (S := S) G hP]
+      exact hpRam
+    · simp [IsRamifiedIn, ramificationIdxIn, hne] at hpRam
+  · rintro ⟨P, hP, hPgt⟩
+    change 1 < e(p)
+    rw [ramificationIdxIn_eq_of_mem (p := p) (S := S) G hP]
+    exact hPgt
+
+lemma isInertIn_iff_isInertInGeneral (G : Type*) [Group G] [Finite G]
+    [MulSemiringAction G S] [IsGaloisGroup G R S] :
+    IsInertIn p S ↔ IsInertInGeneral p S := by
+  constructor
+  · rintro ⟨hg, he⟩
+    refine ⟨hg, ?_⟩
+    intro P hP
+    rw [← ramificationIdxIn_eq_of_mem (p := p) (S := S) G hP]
+    exact he
+  · rintro ⟨hg, hgen⟩
+    have hcard : (primesOver p S).ncard = 1 := by
+      simpa using hg
+    obtain ⟨P, hPset⟩ := Set.ncard_eq_one.mp hcard
+    have hP : P ∈ primesOver p S := by simp [hPset]
+    refine ⟨hg, ?_⟩
+    rw [ramificationIdxIn_eq_of_mem (p := p) (S := S) G hP]
+    exact hgen P hP
+
+lemma isSplitIn_iff_isCompletelySplitIn (G : Type*) [Group G] [Finite G]
+    [MulSemiringAction G S] [IsGaloisGroup G R S] :
+    IsSplitIn p S ↔ IsCompletelySplitIn p S := by
+  constructor
+  · rintro ⟨he, hf⟩
+    have hne : ∃ P : Ideal S, P.IsPrime ∧ P.LiesOver p := by
+      by_contra h
+      simp [ramificationIdxIn, h] at he
+    let : Finite (primesOver p S) := finite_primesOver_of_nonempty (p := p) (S := S) G hne
+    have hs : (primesOver p S).Finite := Set.toFinite _
+    have hpos : 0 < (primesOver p S).ncard := by
+      rw [Set.ncard_pos (hs := hs)]
+      exact ⟨hne.choose, hne.choose_spec⟩
+    refine ⟨hpos, ?_⟩
+    intro P hP
+    constructor
+    · rw [← ramificationIdxIn_eq_of_mem (p := p) (S := S) G hP]
+      exact he
+    · rw [← inertiaDegIn_eq_of_mem (p := p) (S := S) G hP]
+      exact hf
+  · rintro ⟨hpos, hgen⟩
+    have hs : (primesOver p S).Finite := Set.finite_of_ncard_pos hpos
+    rw [Set.ncard_pos (hs := hs)] at hpos
+    obtain ⟨P, hP⟩ := hpos
+    refine ⟨?_, ?_⟩
+    · rw [ramificationIdxIn_eq_of_mem (p := p) (S := S) G hP]
+      exact (hgen P hP).1
+    · rw [inertiaDegIn_eq_of_mem (p := p) (S := S) G hP]
+      exact (hgen P hP).2
 
 
 end GalDefs
 
 
 section Trichotomy
+
+variable [IsDedekindDomain S]
+
+local notation3 "e(" p ")" => ramificationIdxIn p S
+local notation3 "f(" p ")" => Ideal.inertiaDegIn p S
+local notation3 "τ(" p ")" => (e(p), f(p), g(p))
 
 /-! ## Trichotomy for degree-2 extensions
 
@@ -104,7 +213,7 @@ theorem foo (a b c : ℕ) (h : a * b * c = 2) :
     <;> rcases H c (by simp) with (rfl | rfl)
     <;> simp_all
 
-theorem efg_trichotomy''' [Nontrivial R] [Algebra.IsQuadraticExtension R S] [IsDedekindDomain R]
+theorem efg_trichotomy [Nontrivial R] [Algebra.IsQuadraticExtension R S] [IsDedekindDomain R]
     -- [Algebra.IsSeparable R S]
     -- [Algebra.IsQuadraticExtension K L]
     (hp : p ≠ ⊥) [p.IsMaximal] :
