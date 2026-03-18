@@ -6,7 +6,8 @@ Authors: Frankie Wang
 import Mathlib.NumberTheory.RamificationInertia.Basic
 import Mathlib.NumberTheory.RamificationInertia.Galois
 import Mathlib.RingTheory.Ideal.Over
-
+import Mathlib.NumberTheory.NumberField.Basic
+import Mathlib.RingTheory.NormalClosure
 /-!
 # Splitting Definitions and Trichotomy
 
@@ -33,34 +34,49 @@ namespace Ideal
 variable {R : Type*} [CommRing R]
 variable (p : Ideal R) (S : Type*) [CommRing S] [IsDedekindDomain S] [Algebra R S]
 -- Local notation for ramification index, inertia degree, and number of primes
-local notation3 "e(" P ")" => ramificationIdx (algebraMap R S) p P
-local notation3 "f(" P ")" => p.inertiaDeg P
-local notation3 "g" => (primesOverFinset p S).card
--- local notation3 "π(" p ", " S ")" => primesOverFinset p S
-local notation3 "τ(" P ")" => (e(P), f(P), g)
+local notation3 "e(" p ")" => ramificationIdxIn p S
+local notation3 "f(" p ")" => Ideal.inertiaDegIn p S
+local notation3 "g(" p ")" => (primesOver p S).ncard
+local notation3 "τ(" p ")" => (e(p), f(p), g(p))
 
 
 section GeneralDefs
-
+--TODO delete
 /-- A prime `p` **splits** in `S` if at least two primes of `S` lie over `p`,
 each with ramification index 1. -/
 def IsSplitIn : Prop :=
-  1 < g ∧
-    ∀ P ∈ primesOverFinset p S, e(P)  = 1
+  g(p) ≥ 2 ∧ e(p) = 1
 
 /-- A prime `p` is **inert** in `S` if exactly one prime of `S` lies over `p`,
 with ramification index 1. -/
 def IsInertIn : Prop :=
-  g = 1 ∧
-    ∀ P ∈ primesOverFinset p S, e(P) = 1
+  g(p) = 1 ∧ e(p) = 1
 
 /-- A prime `p` **ramifies** in `S` if some prime of `S` lying over `p`
 has ramification index > 1. -/
 def IsRamifiedIn : Prop :=
-  ∃ P ∈ primesOverFinset p S, 1 < e(P)
+  e(p) > 1
 
 end GeneralDefs
 
+section Splitting
+open scoped NumberField
+
+variable (p : Ideal ℤ) (K : Type*)
+variable [Field K] [NumberField K]
+--TODO define local notation
+-- TODO: define split/inert/ramified for prime ideals of ℤ in 𝓞 K
+
+/-- A prime ideal `p` of `ℤ` splits in `𝓞 K` if every prime above it
+has ramification index `1` and inertia degree `1`. -/
+def IsSplit : Prop :=
+  ∀ P ∈ primesOverFinset p (𝓞 K),
+    ramificationIdx (algebraMap ℤ (𝓞 K)) p P = 1 ∧ p.inertiaDeg P = 1
+
+def IsSplitNat (p : ℕ) (K : Type*) [Field K] [NumberField K] : Prop :=
+  IsSplit (Ideal.span ({(p : ℤ)} : Set ℤ)) K
+
+end Splitting
 section Trichotomy
 
 /-! ## Trichotomy for degree-2 extensions
@@ -70,7 +86,80 @@ For `[L : K] = 2`, `∑ eᵢfᵢ = 2` forces exactly three possibilities:
 * `(e, f, g) = (1, 2, 1)` — inert
 * `(e, f, g) = (2, 1, 1)` — ramified
 -/
+-- Set A is set of ℕ , Σ A = p → ∀ a ∈ A, a = 1 or a = p
+lemma eq_one_or_p_if_prod_eq_p {p : ℕ} (hp : Nat.Prime p) {S : Finset ℕ}
+      (h : ∏ a ∈ S, a = p) : ∀ a ∈ S, a = 1 ∨ a = p := by
+    intro a ha
+    have : a ∣ p := by
+      rw [← h]
+      apply Finset.dvd_prod_of_mem
+      assumption
+    exact (Nat.dvd_prime hp).1 this
 
+-- theorem foo (a b c : ℕ) (h : a * b * c = 2) :
+--       (a = 2 ∧ b = 1 ∧ c = 1) ∨
+--       (a = 1 ∧ b = 1 ∧ c = 2) ∨
+--       (a = 1 ∧ b = 2 ∧ c = 1) := by
+--     sorry
+
+theorem foo (a b c : ℕ) (h : a * b * c = 2) :
+      (a = 2 ∧ b = 1 ∧ c = 1) ∨
+      (a = 1 ∧ b = 1 ∧ c = 2) ∨
+      (a = 1 ∧ b = 2 ∧ c = 1) := by
+    have hS : ∏ x ∈ ({a, b, c} : Finset ℕ), x = 2 := by
+      rw [← h, Nat.prod_eq_mul]
+      sorry
+    have H := eq_one_or_p_if_prod_eq_p Nat.prime_two hS
+    rcases H a (by simp) with (rfl | rfl)
+    <;> rcases H b (by simp) with (rfl | rfl)
+    <;> rcases H c (by simp) with (rfl | rfl)
+    <;> simp_all
+
+theorem efg_trichotomy''' [Nontrivial R] [Algebra.IsQuadraticExtension R S] [IsDedekindDomain R]
+    -- [Algebra.IsSeparable R S]
+    -- [Algebra.IsQuadraticExtension K L]
+    (hp : p ≠ ⊥) [p.IsMaximal] :
+    (g(p) = 2 ∧ e(p) = 1 ∧ f(p) = 1) ∨
+    (g(p) = 1 ∧ e(p) = 1 ∧ f(p) = 2) ∨
+    (g(p) = 1 ∧ e(p) = 2 ∧ f(p) = 1) := by
+  let K:=FractionRing R
+  let L:=FractionRing S
+  let:=Ring.instAlgebraFractionRing
+  let := IsIntegralClosure.MulSemiringAction R K L S
+  have : Algebra.IsQuadraticExtension K L := sorry
+  have : Algebra.IsSeparable K L := sorry
+  have := IsGaloisGroup.of_isFractionRing Gal(L/K) R S K L
+  have h_mul:= Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn hp S Gal(L/K)
+  have : Nat.card Gal(L/K) = 2 := by
+    rw [← Algebra.IsQuadraticExtension.finrank_eq_two K L]
+    exact IsGaloisGroup.card_eq_finrank Gal(L/K) K L
+  rw [this] at h_mul
+  apply foo
+  rw [mul_assoc]
+  assumption
+
+variable [Field K] [Field L] [Algebra K L] [Algebra R K] [Algebra S L] [Algebra R L]
+  [p.IsMaximal] [Module.IsTorsionFree R S] [IsDedekindDomain R]
+  [IsFractionRing R K] [IsFractionRing S L]
+  [IsScalarTower R K L] [IsScalarTower R S L] [Module.Finite R S]
+
+theorem efg_trichotomy'' [Algebra.IsSeparable K L]
+    [Algebra.IsQuadraticExtension K L]
+    (hp : p ≠ ⊥) :
+    (g(p) = 2 ∧ e(p) = 1 ∧ f(p) = 1) ∨
+    (g(p) = 1 ∧ e(p) = 1 ∧ f(p) = 2) ∨
+    (g(p) = 1 ∧ e(p) = 2 ∧ f(p) = 1) := by
+  let := IsIntegralClosure.MulSemiringAction R K L S
+  have := IsGaloisGroup.of_isFractionRing Gal(L/K) R S K L
+  have h_mul:= Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn hp S Gal(L/K)
+  have : Nat.card Gal(L/K) = 2 := by
+    rw [← Algebra.IsQuadraticExtension.finrank_eq_two K L]
+    exact IsGaloisGroup.card_eq_finrank Gal(L/K) K L
+  rw [this] at h_mul
+  apply foo
+  assumption
+
+-- TODO delete or
 theorem IsSplitIn.not_isInert :
      p.IsSplitIn S → ¬ p.IsInertIn S :=
     fun hs hi => Nat.lt_irrefl 1 (hi.1 ▸ hs.1)
@@ -196,6 +285,41 @@ theorem isSplit_or_isInert_or_isRamified
       have h1 : 1 ≤ e(P) := e_ge_one p S hp P hP
       omega
 
+--TODO using this to simplify efg_trichotomy and efg_trichotomy' by showing g=1 or g=2 first
+lemma g_eq_two_or_eq_one (hp : p ≠ ⊥) (h_deg : Module.finrank K L = 2) :
+    g = 2 ∨ g = 1 := by
+  have := g_ge_one p S hp
+  have := Ideal.sum_ramification_inertia S K L hp
+  rw [h_deg] at this
+  have hmul_ge_one : ∀ P ∈ primesOverFinset p S, 1 ≤ e(P) * f(P) :=
+    fun P hP => Right.one_le_mul (e_ge_one p S hp P hP) (f_ge_one p S hp P hP)
+  have hg_le : g ≤ 2 := by
+    rw [← this, Finset.card_eq_sum_ones]
+    exact Finset.sum_le_sum (fun P hP => hmul_ge_one P hP)
+  omega
+
+--TODO `e_eq_two_or_eq_one`
+lemma e_eq_two_or_eq_one {P} (hp : p ≠ ⊥) (h_deg : Module.finrank K L = 2)
+    (hP : P ∈ primesOverFinset p S) :
+    e(P) = 2 ∨ e(P) = 1 := by
+  have := e_ge_one p S hp P hP
+  sorry
+
+-- variable [Module.IsTorsionFree K L]
+--TODO `f_eq_two_or_eq_one`
+lemma f_eq_two_or_eq_one {P} (hp : p ≠ ⊥) (h_deg : Module.finrank K L = 2)[Finite (Gal(L/K))]
+    (hP : P ∈ primesOverFinset p S)[Algebra.IsAlgebraic K L] [IsGalois K L]:
+    f(P) = 2 ∨ f(P) = 1 := by
+  have := f_ge_one p S hp P hP
+  let := IsIntegralClosure.MulSemiringAction R K L S
+  have := IsGaloisGroup.of_isFractionRing Gal(L/K) R S K L
+  have h_mul:= Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn (A:=R) (B:=S) hp Gal(L/K)
+  rw [← coe_primesOverFinset hp S,Set.ncard_coe_finset] at h_mul
+
+
+
+
+
 
 
 /-- In a degree-2 extension, the triple `(g, e(P), f(P))` is one of
@@ -209,17 +333,14 @@ theorem efg_trichotomy {P}
   --  1≤  g ≤ 2, 1 ≤ e(P) ≤ 2, and 1 ≤ f(P) ≤ 2 (using interval_cases)
   have := e_ge_one p S hp P hP -- 1 ≤ e(P)
   have := f_ge_one p S hp P hP -- 1 ≤ f(P)
-  have := g_ge_one p S hp -- 1 ≤ g
+  -- have := g_ge_one p S hp -- 1 ≤ g
+  have := g_eq_two_or_eq_one p S K L hp h_deg -- g = 1 or g = 2(interval_cases not working)
+  -- have : 1 ≤ g  := by omega
+  -- have : g ≤ 2 := by omega
   have h_sum := Ideal.sum_ramification_inertia S K L hp
   rw [h_deg] at h_sum
   have hmul_ge_one : ∀ Q ∈ primesOverFinset p S, 1 ≤ e(Q) * f(Q) :=
     fun Q hQ => Right.one_le_mul (e_ge_one p S hp Q hQ) (f_ge_one p S hp Q hQ)
-  -- g ≤ 2
-  have hg_le : g ≤ 2 := by
-    rw [← h_sum]
-    rw [Finset.card_eq_sum_ones]
-    apply Finset.sum_le_sum
-    apply hmul_ge_one
     -- Split the sum: e(P)*f(P) + rest = 2
   have hsplit := h_sum
   rw [(Finset.add_sum_erase _ _ hP).symm] at hsplit
@@ -240,8 +361,10 @@ theorem efg_trichotomy {P}
   -- e(P) ≤ 2, f(P) ≤ 2
   have : e(P) ≤ 2 := le_trans (Nat.le_mul_of_pos_right _ (by omega)) hefP_le
   have : f(P) ≤ 2 := le_trans (Nat.le_mul_of_pos_left _ (by omega)) hefP_le
-  interval_cases g <;> interval_cases (e(P)) <;> interval_cases (f(P)) <;>
-    omega
+  -- interval_cases g <;> interval_cases (e(P)) <;> interval_cases (f(P)) <;>
+  --   omega
+  -- case using g_eq_two_or_eq_one
+  by_cases hg : g = 2 <;> interval_cases (e(P)) <;> interval_cases (f(P)) <;> omega
 
 theorem efg_trichotomy' {P}
       (hp : p ≠ ⊥) (h_deg : Module.finrank K L = 2) (hP : P ∈ primesOverFinset p S) :
@@ -293,46 +416,85 @@ lemma ef_same_g_eq_one {P} {Q}
   subst hPa; subst hQa
   refine ⟨rfl, rfl⟩
 
-/-∀P e(P) is same-/
+lemma ef_same_g_eq_two {P} {Q} (hp : p ≠ ⊥) (h_deg : Module.finrank K L = 2)
+  (hP : P ∈ primesOverFinset p S) (hQ : Q ∈ primesOverFinset p S) (hg2 : g = 2) :
+    e(P) = e(Q) ∧ f(P) = f(Q) := by
+  -- g=2 implies e(P)=f(P)=1 for all P
+  have htri := efg_trichotomy p S K L hp h_deg hP
+  have htriQ := efg_trichotomy p S K L hp h_deg hQ
+  rcases htri with ⟨hg2P, he1P, hf1P⟩ | ⟨hg1P, he1P, hf2P⟩ | ⟨hg1P, he2P, hf1P⟩
+  · rcases htriQ with ⟨hg2Q, he1Q, hf1Q⟩ | ⟨hg1Q, he1Q, hf2Q⟩ | ⟨hg1Q, he2Q, hf1Q⟩
+    · exact ⟨he1P ▸ he1Q.symm, hf1P ▸ hf1Q.symm⟩
+    · omega
+    · omega
+  · omega
+  · omega
+
+/-∀P e(P) is same -/
   --TODO(Done): lemma g=1 implies P=Q implies f(P)=f(Q) and e(P)=e(Q) forall P,Q
-  --TODO: lemma g=2 using efg_trichotomy to show e(P)=e(Q)=1 and f(P)=f(Q)=1 for all P,Q
+  --TODO(Done): lemma g=2 using efg_trichotomy to show e(P)=e(Q)=1 and f(P)=f(Q)=1 for all P,Q
 lemma e_same_for_all_primes {P} {Q} (hp : p ≠ ⊥) (h_deg : Module.finrank K L = 2)
 (hP : P ∈ primesOverFinset p S) (hQ : Q ∈ primesOverFinset p S) :
     e(P) = e(Q) := by
-  have htri := efg_trichotomy p S K L hp h_deg hP
-  have htriQ := efg_trichotomy p S K L hp h_deg hQ
-  rcases htri with ⟨hg2, he1, hf1⟩ | ⟨hg1, he1, hf2⟩ | ⟨hg1, he2, hf1⟩
-  · rcases htriQ with ⟨hg2Q, he1Q, hf1Q⟩ | ⟨hg1Q, he1Q, hf2Q⟩ | ⟨hg1Q, he2Q, hf1Q⟩
-    · exact he1 ▸ he1Q.symm
-    · omega
-    · omega
-  · rcases htriQ with ⟨hg2Q, he1Q, hf1Q⟩ | ⟨hg1Q, he1Q, hf2Q⟩ | ⟨hg1Q, he2Q, hf1Q⟩
-    · exact he1 ▸ he1Q.symm
-    · omega
-    · sorry -- f(P) = 2 and f(Q) = 1 cannot happen since P and Q are the same prime
-  · sorry
+  -- case on g
+  by_cases hg : g = 2
+  · exact (ef_same_g_eq_two _ _ _ _ hp h_deg hP hQ hg).1
+  · refine (ef_same_g_eq_one _ _ hP hQ ?_).1
+    -- TODO(Done) lemma g=1 or g=2
+    exact (g_eq_two_or_eq_one p S _ _ hp h_deg).resolve_left hg
 
+
+
+/-∀P f(P) is same (recase htri)-/
 lemma f_same_for_all_primes {P} {Q} (hp : p ≠ ⊥) (h_deg : Module.finrank K L = 2)
 (hP : P ∈ primesOverFinset p S) (hQ : Q ∈ primesOverFinset p S) :
     f(P) = f(Q) := by
-  sorry
+  have htri := efg_trichotomy p S K L hp h_deg hP
+  have htriQ := efg_trichotomy p S K L hp h_deg hQ
+  rcases htri with ⟨hg2, he1, hf1⟩ | ⟨hg1, he1, hf2⟩ | ⟨hg1, he2, hf1⟩
+  · refine (ef_same_g_eq_two _ _ _ _ hp h_deg hP hQ hg2).2
+  · exact (ef_same_g_eq_one p S hP hQ hg1).2
+  · exact (ef_same_g_eq_one p S hP hQ hg1).2
 
--- TODO
+--?
 variable (P : Ideal S) (hP : P ∈ primesOverFinset p S)
-local notation3 "e" => e(P)
+local notation3 "e" => e(P) -- TODO define `e` not depending on P
 local notation3 "f" => f(P)
 local notation3 "τ" => τ(P)
 
 
-lemma isSplit_iff {P} (hp : p ≠ ⊥)
-    (h_deg : Module.finrank K L = 2)
-    (hP : P ∈ primesOverFinset p S) : p.IsSplitIn S ↔ τ(P) = (1, 1, 2) := by
-  sorry
+lemma isSplit_iff (hp : p ≠ ⊥) (hP : P ∈ primesOverFinset p S)
+    (h_deg : Module.finrank K L = 2) : p.IsSplitIn S ↔ τ = (1, 1, 2) := by
+  have htri := efg_trichotomy p S K L hp h_deg hP
+  constructor
+  · intro hs
+    rw [IsSplitIn] at hs
+    simp
+    omega
+  · intro h
+    -- rw [IsSplitIn]
+    simp at h
+    refine ⟨by omega, fun Q hQ => ?_⟩
+    have:=e_same_for_all_primes p S K L hp h_deg hP hQ
+    omega
 
-lemma isSplit_iff_g_eq_two (hp : p ≠ ⊥) (h_deg : Module.finrank K L = 2) : p.IsSplitIn S ↔ g = 2 := by
-  sorry
 
-lemma isInert_iff_f_eq_two {P} (hp : p ≠ ⊥)
+theorem isSplit_iff_g_eq_two (hp : p ≠ ⊥)
+    (hP : P ∈ primesOverFinset p S) (h_deg : Module.finrank K L = 2) : p.IsSplitIn S ↔ g = 2 := by
+  have : g=2 ↔ τ = (1, 1, 2) := by
+    constructor
+    · have htri := efg_trichotomy p S K L hp h_deg hP
+      rcases htri with ⟨hg2, he1, hf1⟩ | ⟨hg1, he1, hf2⟩ | ⟨hg1, he2, hf1⟩
+      · simp [he1, hf1]
+      · omega
+      · omega
+    · simp
+  rw [isSplit_iff p S K L _ hp hP h_deg, this]
+
+
+
+
+theorem isInert_iff_f_eq_two {P} (hp : p ≠ ⊥)
     (h_deg : Module.finrank K L = 2)
     (hP : P ∈ primesOverFinset p S) : p.IsInertIn S ↔ f(P) = 2 := by
   sorry
