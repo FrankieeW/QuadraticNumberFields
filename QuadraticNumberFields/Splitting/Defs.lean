@@ -7,6 +7,7 @@ import Mathlib.NumberTheory.RamificationInertia.Basic
 import Mathlib.NumberTheory.RamificationInertia.Galois
 import Mathlib.RingTheory.Ideal.Over
 import Mathlib.Data.Fintype.EquivFin
+import Mathlib.FieldTheory.PurelyInseparable.Basic
 import Mathlib.NumberTheory.NumberField.Basic
 import Mathlib.RingTheory.NormalClosure
 /-!
@@ -177,6 +178,72 @@ lemma isSplitIn_iff_isCompletelySplitIn (G : Type*) [Group G] [Finite G]
 end GalDefs
 
 
+section MissingMathlib
+-- variable
+/-! ## Fraction-field bridge lemma
+
+This is a general bridge result that appears to be missing from mathlib.
+-/
+
+/-- A quadratic extension of domains induces a quadratic extension of fraction fields. -/
+theorem _root_.Algebra.IsQuadraticExtension.fractionRing
+    {R S K L : Type*} [CommRing R] [CommRing S] [Field K] [Field L]
+    [Algebra R S] [Algebra R K] [Algebra S L] [Algebra R L] [Algebra K L]
+    [IsDomain R] [IsDomain S] [IsFractionRing R K] [IsFractionRing S L]
+    [IsScalarTower R K L] [IsScalarTower R S L] [Algebra.IsQuadraticExtension R S] :
+    Algebra.IsQuadraticExtension K L := by
+  letI : Algebra.IsAlgebraic R S := Algebra.IsAlgebraic.of_finite R S
+  refine ⟨?_⟩
+  calc
+    Module.finrank K L = Module.finrank R S := by
+      simpa using
+        (Algebra.IsAlgebraic.finrank_of_isFractionRing (R := R) (R' := K) (S := S) (S' := L))
+    _ = 2 := Algebra.IsQuadraticExtension.finrank_eq_two R S
+
+/-- A quadratic extension of fields of characteristic different from `2` is separable. -/
+theorem _root_.Algebra.IsQuadraticExtension.isSeparable_of_char_ne_two
+    {F K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsQuadraticExtension F K]
+    (hchar : ringChar F ≠ 2) : Algebra.IsSeparable F K := by
+  rw [isSeparable_iff_finInsepDegree_eq_one]
+  obtain ⟨n, hn⟩ := finInsepDegree_eq_pow (F := F) (E := K) (q := ringExpChar F)
+  have hdiv : Field.finInsepDegree F K ∣ 2 := by
+    refine ⟨Field.finSepDegree F K, ?_⟩
+    rw [Nat.mul_comm, Field.finSepDegree_mul_finInsepDegree,
+      Algebra.IsQuadraticExtension.finrank_eq_two F K]
+  rcases (Nat.dvd_prime Nat.prime_two).1 hdiv with h1 | h2
+  · exact h1
+  · have hexp : ringExpChar F ≠ 2 := by
+      rw [ringExpChar]
+      intro h
+      omega
+    rw [hn] at h2
+    cases n with
+    | zero => simp at h2
+    | succ n =>
+        have hq_dvd : ringExpChar F ∣ 2 := by
+          rw [pow_succ] at h2
+          exact ⟨(ringExpChar F) ^ n, by simpa [Nat.mul_comm] using h2.symm⟩
+        rcases (Nat.dvd_prime Nat.prime_two).1 hq_dvd with hq1 | hq2
+        · simp [hq1] at h2
+        · exact (hexp hq2).elim
+
+/-- If the fraction field of the base is perfect, a quadratic extension of domains induces
+a separable extension of fraction fields. -/
+theorem _root_.Algebra.IsQuadraticExtension.isSeparable_fractionRing
+    {R S K L : Type*} [CommRing R] [CommRing S] [Field K] [Field L]
+    [Algebra R S] [Algebra R K] [Algebra S L] [Algebra R L] [Algebra K L]
+    [IsDomain R] [IsDomain S] [IsFractionRing R K] [IsFractionRing S L]
+    [IsScalarTower R K L] [IsScalarTower R S L] [PerfectField K]
+    [Algebra.IsQuadraticExtension R S] :
+    Algebra.IsSeparable K L := by
+  letI : Algebra.IsQuadraticExtension K L :=
+    Algebra.IsQuadraticExtension.fractionRing (R := R) (S := S)
+  letI : Algebra.IsAlgebraic K L := Algebra.IsAlgebraic.of_finite K L
+  infer_instance
+
+end MissingMathlib
+
+
 section Trichotomy
 
 variable [IsDedekindDomain S]
@@ -212,20 +279,28 @@ theorem foo (a b c : ℕ) (h : a * b * c = 2) :
     <;> rcases H b (by simp) with (rfl | rfl)
     <;> rcases H c (by simp) with (rfl | rfl)
     <;> simp_all
+--Test
+section TEST
+variable [Nontrivial R] [IsDedekindDomain R] [Algebra.IsQuadraticExtension R S]
+-- let K:=FractionRing R
+-- let L:=FractionRing S
+-- #synth CharZero (FractionRing R)
 
-theorem efg_trichotomy [Nontrivial R] [Algebra.IsQuadraticExtension R S] [IsDedekindDomain R]
-    -- [Algebra.IsSeparable R S]
-    -- [Algebra.IsQuadraticExtension K L]
+end TEST
+theorem efg_trichotomy [Nontrivial R] [IsDedekindDomain R] [Algebra.IsQuadraticExtension R S]
+    [CharZero R] -- char≠ 2 is enough
     (hp : p ≠ ⊥) [p.IsMaximal] :
     (g(p) = 2 ∧ e(p) = 1 ∧ f(p) = 1) ∨
     (g(p) = 1 ∧ e(p) = 1 ∧ f(p) = 2) ∨
     (g(p) = 1 ∧ e(p) = 2 ∧ f(p) = 1) := by
   let K:=FractionRing R
   let L:=FractionRing S
-  let:=Ring.instAlgebraFractionRing
+  let := Ring.instAlgebraFractionRing
   let := IsIntegralClosure.MulSemiringAction R K L S
-  have : Algebra.IsQuadraticExtension K L := sorry
-  have : Algebra.IsSeparable K L := sorry
+  have : Algebra.IsQuadraticExtension K L :=
+    Algebra.IsQuadraticExtension.fractionRing (R := R) (S := S)
+  have : Algebra.IsSeparable K L :=
+    Algebra.IsQuadraticExtension.isSeparable_fractionRing (R := R) (S := S)
   have := IsGaloisGroup.of_isFractionRing Gal(L/K) R S K L
   have h_mul:= Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn hp S Gal(L/K)
   have : Nat.card Gal(L/K) = 2 := by
@@ -236,27 +311,27 @@ theorem efg_trichotomy [Nontrivial R] [Algebra.IsQuadraticExtension R S] [IsDede
   rw [mul_assoc]
   assumption
 
-variable [Field K] [Field L] [Algebra K L] [Algebra R K] [Algebra S L] [Algebra R L]
-  [p.IsMaximal] [Module.IsTorsionFree R S] [IsDedekindDomain R]
-  [IsFractionRing R K] [IsFractionRing S L]
-  [IsScalarTower R K L] [IsScalarTower R S L] [Module.Finite R S]
+-- variable [Field K] [Field L] [Algebra K L] [Algebra R K] [Algebra S L] [Algebra R L]
+--   [p.IsMaximal] [Module.IsTorsionFree R S] [IsDedekindDomain R]
+--   [IsFractionRing R K] [IsFractionRing S L]
+--   [IsScalarTower R K L] [IsScalarTower R S L] [Module.Finite R S]
 
-theorem efg_trichotomy'' [Algebra.IsSeparable K L]
-    [Algebra.IsQuadraticExtension K L]
-    (hp : p ≠ ⊥) :
-    (g(p) = 2 ∧ e(p) = 1 ∧ f(p) = 1) ∨
-    (g(p) = 1 ∧ e(p) = 1 ∧ f(p) = 2) ∨
-    (g(p) = 1 ∧ e(p) = 2 ∧ f(p) = 1) := by
-  let := IsIntegralClosure.MulSemiringAction R K L S
-  have := IsGaloisGroup.of_isFractionRing Gal(L/K) R S K L
-  have h_mul:= Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn hp S Gal(L/K)
-  have : Nat.card Gal(L/K) = 2 := by
-    rw [← Algebra.IsQuadraticExtension.finrank_eq_two K L]
-    exact IsGaloisGroup.card_eq_finrank Gal(L/K) K L
-  rw [this] at h_mul
-  apply foo
-  rw [mul_assoc]
-  assumption
+-- theorem efg_trichotomy'' [Algebra.IsSeparable K L]
+--     [Algebra.IsQuadraticExtension K L]
+--     (hp : p ≠ ⊥) :
+--     (g(p) = 2 ∧ e(p) = 1 ∧ f(p) = 1) ∨
+--     (g(p) = 1 ∧ e(p) = 1 ∧ f(p) = 2) ∨
+--     (g(p) = 1 ∧ e(p) = 2 ∧ f(p) = 1) := by
+--   let := IsIntegralClosure.MulSemiringAction R K L S
+--   have := IsGaloisGroup.of_isFractionRing Gal(L/K) R S K L
+--   have h_mul:= Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn hp S Gal(L/K)
+--   have : Nat.card Gal(L/K) = 2 := by
+--     rw [← Algebra.IsQuadraticExtension.finrank_eq_two K L]
+--     exact IsGaloisGroup.card_eq_finrank Gal(L/K) K L
+--   rw [this] at h_mul
+--   apply foo
+--   rw [mul_assoc]
+--   assumption
 
 
 -- -- TODO delete or
