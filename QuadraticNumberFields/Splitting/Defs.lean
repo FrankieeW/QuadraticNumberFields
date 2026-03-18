@@ -17,9 +17,15 @@ in Dedekind extensions, and proves the trichotomy theorem for degree-2 extension
 
 ## Main Definitions
 
-* `Ideal.IsSplitIn`: A prime splits if there are ≥ 2 primes above it, each with e = 1.
+* `Ideal.IsSplitIn`: A prime splits if there are ≥ 2 primes above it, each with e = 1 and f = 1.
 * `Ideal.IsInertIn`: A prime is inert if there is exactly 1 prime above it, with e = 1.
 * `Ideal.IsRamifiedIn`: A prime ramifies if some prime above it has e > 1.
+
+
+## iff
+* `Ideal.IsSplitIn_iff`: τ = (1, 1, 2)
+* `Ideal.IsInertIn_iff`: τ = (1, 2, 1)
+* `Ideal.IsRamifiedIn_iff`: τ = (2, 1, 1)
 
 ## Main Theorems
 
@@ -33,18 +39,18 @@ namespace Ideal
 
 variable {R : Type*} [CommRing R]
 variable (p : Ideal R) (S : Type*) [CommRing S] [IsDedekindDomain S] [Algebra R S]
--- Local notation for ramification index, inertia degree, and number of primes
-local notation3 "e(" p ")" => ramificationIdxIn p S
-local notation3 "f(" p ")" => Ideal.inertiaDegIn p S
+local notation3 "e(" p "," P ")" => ramificationIdx (algebraMap R S) p P
+local notation3 "f(" p "," P ")" => Ideal.inertiaDeg p P
 local notation3 "g(" p ")" => (primesOver p S).ncard
-local notation3 "τ(" p ")" => (e(p), f(p), g(p))
-
+local notation3 "τ(" p "," P ")" => (e(p, P), f(p, P), g(p))
 
 section GeneralDefs
+
+
 /-- A prime `p` **splits** in `S` if at least two primes of `S` lie over `p`,
 each with ramification index 1. -/
 def IsSplitIn : Prop :=
-  g(p) ≥ 2 ∧ e(p) = 1
+   e(p) = 1 ∧ f(p) = 1
 
 /-- A prime `p` is **inert** in `S` if exactly one prime of `S` lies over `p`,
 with ramification index 1. -/
@@ -57,6 +63,16 @@ def IsRamifiedIn : Prop :=
   e(p) > 1
 
 end GeneralDefs
+
+local notation3 "e(" p ")" => ramificationIdxIn p S
+local notation3 "f(" p ")" => Ideal.inertiaDegIn p S
+local notation3 "τ(" p ")" => (e(p), f(p), g(p))
+section GalDefs
+-- Gal
+
+
+end GalDefs
+
 
 section Trichotomy
 
@@ -132,6 +148,7 @@ theorem efg_trichotomy'' [Algebra.IsSeparable K L]
   apply foo
   rw [mul_assoc]
   assumption
+
 
 -- -- TODO delete or
 -- theorem IsSplitIn.not_isInert :
