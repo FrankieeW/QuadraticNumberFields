@@ -37,6 +37,7 @@ local notation3 "e(" P ")" => ramificationIdx (algebraMap R S) p P
 local notation3 "f(" P ")" => p.inertiaDeg P
 local notation3 "g" => (primesOverFinset p S).card
 -- local notation3 "π(" p ", " S ")" => primesOverFinset p S
+local notation3 "τ(" P ")" => (e(P), f(P), g)
 
 
 section GeneralDefs
@@ -196,6 +197,7 @@ theorem isSplit_or_isInert_or_isRamified
       omega
 
 
+
 /-- In a degree-2 extension, the triple `(g, e(P), f(P))` is one of
       `(2, 1, 1)` (split), `(1, 1, 2)` (inert), or `(1, 2, 1)` (ramified). -/
 theorem efg_trichotomy {P}
@@ -226,7 +228,9 @@ theorem efg_trichotomy {P}
   have hefP_le : e(P) * f(P) ≤ 2 := by omega
   have hg_rest : g - 1 ≤ rest := by
       rw [hrest_def, ← Finset.card_erase_of_mem hP, Finset.card_eq_sum_ones]
-      exact Finset.sum_le_sum fun Q hQ => hmul_ge_one Q (Finset.mem_of_mem_erase hQ)
+      apply Finset.sum_le_sum
+      intro Q hQ
+      exact hmul_ge_one Q (Finset.mem_of_mem_erase hQ)
   have hg1_rest0 : g = 1 → rest = 0 := by
       intro hg1
       obtain ⟨a, ha⟩ := Finset.card_eq_one.mp hg1
@@ -239,8 +243,104 @@ theorem efg_trichotomy {P}
   interval_cases g <;> interval_cases (e(P)) <;> interval_cases (f(P)) <;>
     omega
 
+theorem efg_trichotomy' {P}
+      (hp : p ≠ ⊥) (h_deg : Module.finrank K L = 2) (hP : P ∈ primesOverFinset p S) :
+      τ(P) = (1, 1, 2) ∨
+      τ(P) = (1, 2, 1) ∨
+      τ(P) = (2, 1, 1) := by
+    classical
+    have := e_ge_one p S hp P hP
+    have := f_ge_one p S hp P hP
+    have := g_ge_one p S hp
+    have h_sum := h_deg ▸ Ideal.sum_ramification_inertia S K L hp
+    have hmul_ge_one : ∀ Q ∈ primesOverFinset p S, 1 ≤ e(Q) * f(Q) :=
+      fun Q hQ => Right.one_le_mul (e_ge_one p S hp Q hQ) (f_ge_one p S hp Q hQ)
+    have hg_le : g ≤ 2 := by
+      -- rw [← h_sum]
+      -- rw [Finset.card_eq_sum_ones]
+      -- apply Finset.sum_le_sum
+      -- apply hmul_ge_one
+      rw [← h_sum, Finset.card_eq_sum_ones]
+      exact Finset.sum_le_sum (fun P hP => hmul_ge_one P hP)
+    have hsplit := h_sum
+    rw [(Finset.add_sum_erase _ _ hP).symm] at hsplit
+    -- have hsplit := (Finset.add_sum_erase _ _ hP).symm ▸ h_sum
+    set rest := ∑ Q ∈ (primesOverFinset p S).erase P, e(Q) * f(Q) with hrest_def
+    have hefP_le : e(P) * f(P) ≤ 2 := by omega
+    have hg_rest : g - 1 ≤ rest := by
+      rw [hrest_def, ← Finset.card_erase_of_mem hP, Finset.card_eq_sum_ones]
+      apply Finset.sum_le_sum
+      intro Q hQ
+      exact hmul_ge_one Q (Finset.mem_of_mem_erase hQ)
+    have hg1_rest0 : g = 1 → rest = 0 := by
+      intro hg1
+      obtain ⟨a, ha⟩ := Finset.card_eq_one.mp hg1
+      have hPa : P = a := Finset.mem_singleton.mp (ha ▸ hP)
+      subst hPa
+      simp [hrest_def, ha]
+    have : e(P) ≤ 2 := le_trans (Nat.le_mul_of_pos_right _ (by omega)) hefP_le
+    have : f(P) ≤ 2 := le_trans (Nat.le_mul_of_pos_left _ (by omega)) hefP_le
+    interval_cases e(P) <;> interval_cases f(P) <;> interval_cases g <;> simp <;> omega
+
+--TODO move to sutable place
+lemma ef_same_g_eq_one {P} {Q}
+  (hP : P ∈ primesOverFinset p S) (hQ : Q ∈ primesOverFinset p S) (hg1 : g = 1) :
+    e(P) = e(Q) ∧ f(P) = f(Q) := by
+  -- P=Q since g=1
+  obtain ⟨a, ha⟩ := Finset.card_eq_one.mp hg1
+  have hPa : P = a := Finset.mem_singleton.mp (ha ▸ hP)
+  have hQa : Q = a := Finset.mem_singleton.mp (ha ▸ hQ)
+  subst hPa; subst hQa
+  refine ⟨rfl, rfl⟩
+
+/-∀P e(P) is same-/
+  --TODO(Done): lemma g=1 implies P=Q implies f(P)=f(Q) and e(P)=e(Q) forall P,Q
+  --TODO: lemma g=2 using efg_trichotomy to show e(P)=e(Q)=1 and f(P)=f(Q)=1 for all P,Q
+lemma e_same_for_all_primes {P} {Q} (hp : p ≠ ⊥) (h_deg : Module.finrank K L = 2)
+(hP : P ∈ primesOverFinset p S) (hQ : Q ∈ primesOverFinset p S) :
+    e(P) = e(Q) := by
+  have htri := efg_trichotomy p S K L hp h_deg hP
+  have htriQ := efg_trichotomy p S K L hp h_deg hQ
+  rcases htri with ⟨hg2, he1, hf1⟩ | ⟨hg1, he1, hf2⟩ | ⟨hg1, he2, hf1⟩
+  · rcases htriQ with ⟨hg2Q, he1Q, hf1Q⟩ | ⟨hg1Q, he1Q, hf2Q⟩ | ⟨hg1Q, he2Q, hf1Q⟩
+    · exact he1 ▸ he1Q.symm
+    · omega
+    · omega
+  · rcases htriQ with ⟨hg2Q, he1Q, hf1Q⟩ | ⟨hg1Q, he1Q, hf2Q⟩ | ⟨hg1Q, he2Q, hf1Q⟩
+    · exact he1 ▸ he1Q.symm
+    · omega
+    · sorry -- f(P) = 2 and f(Q) = 1 cannot happen since P and Q are the same prime
+  · sorry
+
+lemma f_same_for_all_primes {P} {Q} (hp : p ≠ ⊥) (h_deg : Module.finrank K L = 2)
+(hP : P ∈ primesOverFinset p S) (hQ : Q ∈ primesOverFinset p S) :
+    f(P) = f(Q) := by
+  sorry
+
+-- TODO
+variable (P : Ideal S) (hP : P ∈ primesOverFinset p S)
+local notation3 "e" => e(P)
+local notation3 "f" => f(P)
+local notation3 "τ" => τ(P)
 
 
+lemma isSplit_iff {P} (hp : p ≠ ⊥)
+    (h_deg : Module.finrank K L = 2)
+    (hP : P ∈ primesOverFinset p S) : p.IsSplitIn S ↔ τ(P) = (1, 1, 2) := by
+  sorry
+
+lemma isSplit_iff_g_eq_two (hp : p ≠ ⊥) (h_deg : Module.finrank K L = 2) : p.IsSplitIn S ↔ g = 2 := by
+  sorry
+
+lemma isInert_iff_f_eq_two {P} (hp : p ≠ ⊥)
+    (h_deg : Module.finrank K L = 2)
+    (hP : P ∈ primesOverFinset p S) : p.IsInertIn S ↔ f(P) = 2 := by
+  sorry
+
+lemma isRamified_iff_e_eq_two {P} (hp : p ≠ ⊥)
+    (h_deg : Module.finrank K L = 2)
+    (hP : P ∈ primesOverFinset p S) : p.IsRamifiedIn S ↔ e(P) = 2 := by
+  sorry
 /-using efg_trichotomy-/
 theorem isSplit_or_isInert_or_isRamified'
     (hp : p ≠ ⊥)
