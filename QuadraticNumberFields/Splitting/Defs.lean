@@ -227,19 +227,6 @@ theorem _root_.Algebra.IsQuadraticExtension.isSeparable_of_char_ne_two
         · simp [hq1] at h2
         · exact (hexp hq2).elim
 
-/-- If the fraction field of the base is perfect, a quadratic extension of domains induces
-a separable extension of fraction fields. -/
-theorem _root_.Algebra.IsQuadraticExtension.isSeparable_fractionRing
-    {R S K L : Type*} [CommRing R] [CommRing S] [Field K] [Field L]
-    [Algebra R S] [Algebra R K] [Algebra S L] [Algebra R L] [Algebra K L]
-    [IsDomain R] [IsDomain S] [IsFractionRing R K] [IsFractionRing S L]
-    [IsScalarTower R K L] [IsScalarTower R S L] [PerfectField K]
-    [Algebra.IsQuadraticExtension R S] :
-    Algebra.IsSeparable K L := by
-  letI : Algebra.IsQuadraticExtension K L :=
-    Algebra.IsQuadraticExtension.fractionRing (R := R) (S := S)
-  letI : Algebra.IsAlgebraic K L := Algebra.IsAlgebraic.of_finite K L
-  infer_instance
 
 end MissingMathlib
 
@@ -299,8 +286,7 @@ theorem efg_trichotomy [Nontrivial R] [IsDedekindDomain R] [Algebra.IsQuadraticE
   let := IsIntegralClosure.MulSemiringAction R K L S
   have : Algebra.IsQuadraticExtension K L :=
     Algebra.IsQuadraticExtension.fractionRing (R := R) (S := S)
-  have : Algebra.IsSeparable K L :=
-    Algebra.IsQuadraticExtension.isSeparable_fractionRing (R := R) (S := S)
+  -- have : Algebra.IsSeparable K L := sorry  add char≠2 to assumptions or 【[CharZero R] 】
   have := IsGaloisGroup.of_isFractionRing Gal(L/K) R S K L
   have h_mul:= Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn hp S Gal(L/K)
   have : Nat.card Gal(L/K) = 2 := by
