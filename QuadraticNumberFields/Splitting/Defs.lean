@@ -275,8 +275,8 @@ variable [Nontrivial R] [IsDedekindDomain R] [Algebra.IsQuadraticExtension R S]
 
 end TEST
 theorem efg_trichotomy [Nontrivial R] [IsDedekindDomain R] [Algebra.IsQuadraticExtension R S]
-    [CharZero R] -- char≠ 2 is enough
-    (hp : p ≠ ⊥) [p.IsMaximal] :
+    -- [CharZero R] -- char≠ 2 is enough
+    (hchar : ringChar R ≠ 2) (hp : p ≠ ⊥) [p.IsMaximal] :
     (g(p) = 2 ∧ e(p) = 1 ∧ f(p) = 1) ∨
     (g(p) = 1 ∧ e(p) = 1 ∧ f(p) = 2) ∨
     (g(p) = 1 ∧ e(p) = 2 ∧ f(p) = 1) := by
@@ -287,6 +287,12 @@ theorem efg_trichotomy [Nontrivial R] [IsDedekindDomain R] [Algebra.IsQuadraticE
   have : Algebra.IsQuadraticExtension K L :=
     Algebra.IsQuadraticExtension.fractionRing (R := R) (S := S)
   -- have : Algebra.IsSeparable K L := sorry  add char≠2 to assumptions or 【[CharZero R] 】
+  have : ringChar K ≠ 2 := by
+    haveI : CharP K (ringChar R) :=
+      IsFractionRing.charP_of_isFractionRing (R := R) (K := K) (ringChar R)
+    simpa [ringChar.eq K (ringChar R)] using hchar
+    -- ?`ringChar (FractionRing R)≠ 2` ←  `ringChar R≠ 2`
+  have : Algebra.IsSeparable K L := Algebra.IsQuadraticExtension.isSeparable_of_char_ne_two this
   have := IsGaloisGroup.of_isFractionRing Gal(L/K) R S K L
   have h_mul:= Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn hp S Gal(L/K)
   have : Nat.card Gal(L/K) = 2 := by
