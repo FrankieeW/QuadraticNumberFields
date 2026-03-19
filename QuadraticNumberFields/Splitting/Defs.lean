@@ -200,11 +200,12 @@ theorem _root_.Algebra.IsQuadraticExtension.fractionRing
         (Algebra.IsAlgebraic.finrank_of_isFractionRing (R := R) (R' := K) (S := S) (S' := L))
     _ = 2 := Algebra.IsQuadraticExtension.finrank_eq_two R S
 
-/-- A quadratic extension of fields of characteristic different from `2` is separable. -/
-theorem _root_.Algebra.IsQuadraticExtension.isSeparable_of_char_ne_two
+/-- Field-level version: a quadratic extension of fields of characteristic different from `2`
+is separable. -/
+theorem _root_.Algebra.IsQuadraticExtension.isSeparable_of_field_of_char_ne_two
     {F K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsQuadraticExtension F K]
     (hchar : ringChar F ≠ 2) : Algebra.IsSeparable F K := by
-  rw [isSeparable_iff_finInsepDegree_eq_one]
+  rw [isSeparable_iff_finInsepDegree_eq_one] -- [Field F, Field K, Algebra F K]
   obtain ⟨n, hn⟩ := finInsepDegree_eq_pow (F := F) (E := K) (q := ringExpChar F)
   have hdiv : Field.finInsepDegree F K ∣ 2 := by
     refine ⟨Field.finSepDegree F K, ?_⟩
@@ -226,6 +227,22 @@ theorem _root_.Algebra.IsQuadraticExtension.isSeparable_of_char_ne_two
         rcases (Nat.dvd_prime Nat.prime_two).1 hq_dvd with hq1 | hq2
         · simp [hq1] at h2
         · exact (hexp hq2).elim
+
+/- A plausible ring-level strengthening is:-/
+
+theorem _root_.Algebra.IsQuadraticExtension.isSeparable_of_isDomain_of_char_ne_two
+    {R S : Type*} [CommRing R] [CommRing S] [Algebra R S]
+    [IsDomain R] [IsDomain S] [Algebra.IsQuadraticExtension R S]
+    (hchar : ringChar R ≠ 2) : Algebra.IsSeparable R S := by
+  rw [Algebra.isSeparable_iff]
+  intro x
+  refine ⟨?_, ?_⟩
+  · -- `IsIntegral`
+    sorry
+  · -- `IsSeparable`
+    sorry
+
+
 
 
 end MissingMathlib
@@ -291,8 +308,8 @@ theorem efg_trichotomy [Nontrivial R] [IsDedekindDomain R] [Algebra.IsQuadraticE
     haveI : CharP K (ringChar R) :=
       IsFractionRing.charP_of_isFractionRing (R := R) (K := K) (ringChar R)
     simpa [ringChar.eq K (ringChar R)] using hchar
-    -- ?`ringChar (FractionRing R)≠ 2` ←  `ringChar R≠ 2`
-  have : Algebra.IsSeparable K L := Algebra.IsQuadraticExtension.isSeparable_of_char_ne_two this
+  have : Algebra.IsSeparable K L :=
+    Algebra.IsQuadraticExtension.isSeparable_of_field_of_char_ne_two this
   have := IsGaloisGroup.of_isFractionRing Gal(L/K) R S K L
   have h_mul:= Ideal.ncard_primesOver_mul_ramificationIdxIn_mul_inertiaDegIn hp S Gal(L/K)
   have : Nat.card Gal(L/K) = 2 := by
