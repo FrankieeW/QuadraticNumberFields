@@ -228,22 +228,6 @@ theorem _root_.Algebra.IsQuadraticExtension.isSeparable_of_field_of_char_ne_two
         · simp [hq1] at h2
         · exact (hexp hq2).elim
 
-/- A plausible ring-level strengthening is:-/
-
-theorem _root_.Algebra.IsQuadraticExtension.isSeparable_of_isDomain_of_char_ne_two
-    {R S : Type*} [CommRing R] [CommRing S] [Algebra R S]
-    [IsDomain R] [IsDomain S] [Algebra.IsQuadraticExtension R S]
-    (hchar : ringChar R ≠ 2) : Algebra.IsSeparable R S := by
-  rw [Algebra.isSeparable_iff]
-  intro x
-  refine ⟨?_, ?_⟩
-  · -- `IsIntegral`
-    sorry
-  · -- `IsSeparable`
-    sorry
-
-
-
 
 end MissingMathlib
 
