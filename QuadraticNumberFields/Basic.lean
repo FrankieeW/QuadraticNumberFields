@@ -33,6 +33,7 @@ including norm, trace, and field/number field instances.
 -/
 
 /-- A field `K` is a quadratic field if it is a quadratic extension of `ℚ`. -/
+@[deprecated Algebra.IsQuadraticExtension (since := "2026-03-21")]
 abbrev IsQuadraticField (K : Type*) [Field K] [Algebra ℚ K] : Prop :=
   Algebra.IsQuadraticExtension ℚ K
 
