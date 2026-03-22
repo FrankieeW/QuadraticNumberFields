@@ -13,7 +13,7 @@ This file provides `NumberField` instances for quadratic extensions of `ℚ`.
 
 ## Main Instances
 
-* `IsQuadraticField.instNumberField`: Any quadratic field is a number field.
+* `Algebra.IsQuadraticExtension.instNumberField`: Any quadratic field is a number field.
 * `QuadraticAlgebra.instIsQuadraticExtension`: Any `QuadraticAlgebra ℚ a b` that is a field
   is a quadratic extension of `ℚ`.
 
@@ -28,8 +28,8 @@ the two `Algebra ℚ` instances (`DivisionRing.toRatAlgebra` vs `QuadraticAlgebr
 
 /-- A quadratic field is a number field: it has characteristic zero
 and is finite-dimensional over `ℚ`. -/
-instance IsQuadraticField.instNumberField (K : Type*) [Field K] [Algebra ℚ K]
-    [IsQuadraticField K] : NumberField K where
+instance Algebra.IsQuadraticExtension.instNumberField (K : Type*) [Field K] [Algebra ℚ K]
+    [Algebra.IsQuadraticExtension ℚ K] : NumberField K where
   to_charZero := charZero_of_injective_algebraMap (algebraMap ℚ K).injective
   to_finiteDimensional := by
     haveI : CharZero K := charZero_of_injective_algebraMap (algebraMap ℚ K).injective
@@ -56,7 +56,7 @@ private theorem QuadraticAlgebra.module_eq (a b : ℚ) [Fact (∀ r : ℚ, r ^ 2
     (QuadraticAlgebra.C_mul_eq_smul (R := ℚ) (a := a) (b := b) r x)
 
 /-- Any `QuadraticAlgebra ℚ a b` that is a field is automatically a quadratic extension
-of `ℚ`, i.e., a degree-2 extension. Combined with `IsQuadraticField.instNumberField`,
+of `ℚ`, i.e., a degree-2 extension. Combined with `Algebra.IsQuadraticExtension.instNumberField`,
 this gives `NumberField (QuadraticAlgebra ℚ a b)` for free. -/
 instance QuadraticAlgebra.instIsQuadraticExtension (a b : ℚ)
     [Fact (∀ r : ℚ, r ^ 2 ≠ a + b * r)] :

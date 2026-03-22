@@ -40,7 +40,7 @@ open Polynomial IntermediateField
 nonsquare rational parameter `q`. This is an internal intermediate step before
 normalizing the parameter to a squarefree integer. -/
 private theorem exists_rat_param_of_isQuadraticField
-    (K : Type*) [Field K] [Algebra ℚ K] [IsQuadraticField K] :
+    (K : Type*) [Field K] [Algebra ℚ K] [Algebra.IsQuadraticExtension ℚ K] :
     ∃ q : ℚ, ¬ IsSquare q ∧ Nonempty (K ≃ₐ[ℚ] Qsqrtd q) := by
   obtain ⟨α, hαtop⟩ := Field.exists_primitive_element ℚ K
   let b : ℚ := (minpoly ℚ α).coeff 1
