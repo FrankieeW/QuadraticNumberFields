@@ -304,10 +304,55 @@ theorem efg_trichotomy [Nontrivial R] [IsDedekindDomain R] [Algebra.IsQuadraticE
   rw [mul_assoc]
   assumption
 
--- variable [Field K] [Field L] [Algebra K L] [Algebra R K] [Algebra S L] [Algebra R L]
---   [p.IsMaximal] [Module.IsTorsionFree R S] [IsDedekindDomain R]
---   [IsFractionRing R K] [IsFractionRing S L]
---   [IsScalarTower R K L] [IsScalarTower R S L] [Module.Finite R S]
+theorem isSplitIn_iff_efg [Nontrivial R] [IsDedekindDomain R]
+    [Algebra.IsQuadraticExtension R S]
+    (hchar : ringChar R ≠ 2) (hp : p ≠ ⊥) [p.IsMaximal] :
+    p.IsSplitIn S ↔ g(p) = 2 ∧ e(p) = 1 ∧ f(p) = 1 := by
+  constructor
+  · rintro ⟨he, hf⟩
+    rcases efg_trichotomy p S hchar hp with ⟨hg, -, -⟩ | ⟨-, -, hf'⟩ | ⟨-, he', -⟩
+    · exact ⟨hg, he, hf⟩
+    all_goals omega
+  · rintro ⟨-, he, hf⟩
+    exact ⟨he, hf⟩
+
+theorem isInertIn_iff_efg [Nontrivial R] [IsDedekindDomain R]
+    [Algebra.IsQuadraticExtension R S]
+    (hchar : ringChar R ≠ 2) (hp : p ≠ ⊥) [p.IsMaximal] :
+    p.IsInertIn S ↔ g(p) = 1 ∧ e(p) = 1 ∧ f(p) = 2 := by
+  constructor
+  · rintro ⟨hg, he⟩
+    rcases efg_trichotomy p S hchar hp with ⟨hg', -, -⟩ | ⟨-, -, hf⟩ | ⟨-, he', -⟩
+    · omega
+    · exact ⟨hg, he, hf⟩
+    · omega
+  · rintro ⟨hg, he, -⟩
+    exact ⟨hg, he⟩
+
+theorem isRamifiedIn_iff_efg [Nontrivial R] [IsDedekindDomain R]
+    [Algebra.IsQuadraticExtension R S]
+    (hchar : ringChar R ≠ 2) (hp : p ≠ ⊥) [p.IsMaximal] :
+    p.IsRamifiedIn S ↔ g(p) = 1 ∧ e(p) = 2 ∧ f(p) = 1 := by
+  constructor
+  · intro hram
+    rcases efg_trichotomy p S hchar hp with ⟨-, he, -⟩ | ⟨-, he, -⟩ | ⟨hg, he, hf⟩
+    · exact absurd he (by unfold IsRamifiedIn at hram; omega)
+    · exact absurd he (by unfold IsRamifiedIn at hram; omega)
+    · exact ⟨hg, he, hf⟩
+  · rintro ⟨-, he, -⟩
+    change 1 < e(p)
+    omega
+
+/-- For a degree-2 extension of Dedekind domains with `ringChar R ≠ 2`, every nonzero
+prime ideal is split, inert, or ramified. -/
+theorem isSplit_or_isInert_or_isRamified [Nontrivial R] [IsDedekindDomain R]
+    [Algebra.IsQuadraticExtension R S]
+    (hchar : ringChar R ≠ 2) (hp : p ≠ ⊥) [p.IsMaximal] :
+    p.IsSplitIn S ∨ p.IsInertIn S ∨ p.IsRamifiedIn S := by
+  rcases efg_trichotomy p S hchar hp with h | h | h
+  · exact Or.inl ((isSplitIn_iff_efg p S hchar hp).mpr h)
+  · exact Or.inr (Or.inl ((isInertIn_iff_efg p S hchar hp).mpr h))
+  · exact Or.inr (Or.inr ((isRamifiedIn_iff_efg p S hchar hp).mpr h))
 
 -- theorem efg_trichotomy'' [Algebra.IsSeparable K L]
 --     [Algebra.IsQuadraticExtension K L]

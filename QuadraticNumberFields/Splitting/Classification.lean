@@ -77,6 +77,29 @@ theorem isSplit_iff_legendreSym_eq_one
 --     (p : ℕ) [Fact p.Prime] (hpd : (p : ℤ) ∣ d) :
 --     (Ideal.span {(p : ℤ)}).IsRamifiedIn (𝓞 (Qsqrtd (d : ℚ))) := ...
 
+/-! ## Basic trichotomy for `𝓞(ℚ(√d))` -/
+
+instance : Algebra.IsQuadraticExtension ℤ (𝓞 (Qsqrtd (d : ℚ))) :=
+  @Algebra.IsQuadraticExtension.mk ℤ _ _ _ _ _
+    (inferInstance : Module.Free ℤ (𝓞 (Qsqrtd (d : ℚ))))
+    ((NumberField.RingOfIntegers.rank (Qsqrtd (d : ℚ))).trans
+      (Algebra.IsQuadraticExtension.finrank_eq_two ℚ _))
+
+/-- For a squarefree `d ≠ 1` and any prime `p`, the ideal `(p)` in `𝓞(ℚ(√d))` is
+split, inert, or ramified. -/
+theorem isSplit_or_isInert_or_isRamified (p : ℕ) [Fact p.Prime] :
+    (Ideal.span {(p : ℤ)}).IsSplitIn (𝓞 (Qsqrtd (d : ℚ))) ∨
+    (Ideal.span {(p : ℤ)}).IsInertIn (𝓞 (Qsqrtd (d : ℚ))) ∨
+    (Ideal.span {(p : ℤ)}).IsRamifiedIn (𝓞 (Qsqrtd (d : ℚ))) := by
+  have hchar : ringChar ℤ ≠ 2 := by simp [ringChar.eq_zero]
+  have hbot : Ideal.span {(p : ℤ)} ≠ ⊥ := by
+    rw [Ne, Ideal.span_singleton_eq_bot, Nat.cast_eq_zero]
+    exact (Fact.out : Nat.Prime p).ne_zero
+  haveI : (Ideal.span {(p : ℤ)}).IsMaximal :=
+    PrincipalIdealRing.isMaximal_of_irreducible
+      ((Nat.prime_iff_prime_int.mp (Fact.out : Nat.Prime p)).irreducible)
+  exact Ideal.isSplit_or_isInert_or_isRamified _ _ hchar hbot
+
 /-! ## Unified classification -/
 
 -- TODO: complete trichotomy
