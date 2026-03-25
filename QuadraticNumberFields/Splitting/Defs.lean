@@ -185,7 +185,8 @@ section MissingMathlib
 This is a general bridge result that appears to be missing from mathlib.
 -/
 
-/-- A quadratic extension of domains induces a quadratic extension of fraction fields. -/
+/-- If `S` is a quadratic extension of `R`, then the fraction field of `S` is a quadratic
+extension of the fraction field of `R`. -/
 theorem _root_.Algebra.IsQuadraticExtension.fractionRing
     {R S K L : Type*} [CommRing R] [CommRing S] [Field K] [Field L]
     [Algebra R S] [Algebra R K] [Algebra S L] [Algebra R L] [Algebra K L]
@@ -200,8 +201,8 @@ theorem _root_.Algebra.IsQuadraticExtension.fractionRing
         (Algebra.IsAlgebraic.finrank_of_isFractionRing (R := R) (R' := K) (S := S) (S' := L))
     _ = 2 := Algebra.IsQuadraticExtension.finrank_eq_two R S
 
-/-- Field-level version: a quadratic extension of fields of characteristic different from `2`
-is separable. -/
+/-- If `K` is a quadratic extension of a field `F` of characteristic not equal to `2`,
+then `K/F` is separable. -/
 theorem _root_.Algebra.IsQuadraticExtension.isSeparable_of_field_of_char_ne_two
     {F K : Type*} [Field F] [Field K] [Algebra F K] [Algebra.IsQuadraticExtension F K]
     (hchar : ringChar F ≠ 2) : Algebra.IsSeparable F K := by
@@ -267,14 +268,7 @@ theorem foo (a b c : ℕ) (h : a * b * c = 2) :
     <;> rcases H b (by simp) with (rfl | rfl)
     <;> rcases H c (by simp) with (rfl | rfl)
     <;> simp_all
---Test
-section TEST
-variable [Nontrivial R] [IsDedekindDomain R] [Algebra.IsQuadraticExtension R S]
--- let K:=FractionRing R
--- let L:=FractionRing S
--- #synth CharZero (FractionRing R)
 
-end TEST
 theorem efg_trichotomy [Nontrivial R] [IsDedekindDomain R] [Algebra.IsQuadraticExtension R S]
     -- [CharZero R] -- char≠ 2 is enough
     (hchar : ringChar R ≠ 2) (hp : p ≠ ⊥) [p.IsMaximal] :
